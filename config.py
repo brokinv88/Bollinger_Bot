@@ -27,3 +27,15 @@ BINANCE_ACC1_API_SECRET = "YOUR_ACC1_API_SECRET"
 # 6. API Binance Tài khoản 2 (Danh mục Top 100 MarketCap)
 BINANCE_ACC2_API_KEY = "YOUR_ACC2_API_KEY"
 BINANCE_ACC2_API_SECRET = "YOUR_ACC2_API_SECRET"
+
+# 7. CHIẾN LƯỢC B (chạy song song với BASE trên cả 2 danh mục)
+#    Cùng quy tắc vào/thoát như BASE, NHƯNG thêm bộ lọc "tránh đuổi đỉnh & coin rủi ro cao"
+#    Kết quả backtest (86 coin Top 100, D1): PnL +$1,659, WR 28.6%, PF 6.63, MaxDD -$813
+#    So với BASE: PnL +$1,315, WR 18.8%, PF 2.27, MaxDD -$1,684
+ENABLE_STRATEGY_B = True
+STRATEGY_B_LABEL = "CHIẾN LƯỢC B"
+STRATEGY_B_MAX_ROC5 = 20.0     # Chặn lệnh mua khi coin tăng quá nóng trong 5 ngày (đuổi đỉnh)
+STRATEGY_B_MAX_ROC20 = 40.0    # Chặn lệnh mua sau cơn bùng nổ 20 ngày
+STRATEGY_B_MAX_ATR_PCT = 6.0   # Chỉ vào lệnh coin có độ biến động (ATR 14d) < 6% để giảm rủi ro
+# DB riêng cho Strategy B (BASE giữ DB cũ, không đụng dữ liệu hiện có)
+STRATEGY_B_DB_SUFFIX = "_stratb"   # vd: database_volume_stratb.db

@@ -85,15 +85,38 @@ def evaluate_signals(df):
     hard_stop_ref = max([s for s in valid_smas if s < c_curr['close']] + [c_curr['lower_band']])
     hard_stop_price = hard_stop_ref * 0.99
     
+    # === Chỉ báo nâng cao cho Chiến lược B ===
+    df['roc5'] = df['close'].pct_change(5) * 100.0
+    df['roc20'] = df['close'].pct_change(20) * 100.0
+    tr = pd.concat([df['high'] - df['low'],
+                    (df['high'] - df['close'].shift()).abs(),
+                    (df['low'] - df['close'].shift()).abs()], axis=1).max(axis=1)
+    atr14 = tr.rolling(14).mean()
+    df['atr_pct'] = atr14 / df['close'] * 100.0
+    
+    c_roc5 = df.iloc[-2]['roc5']
+    c_roc20 = df.iloc[-2]['roc20']
+    c_atr = df.iloc[-2]['atr_pct']
+    
+    entry_b_signal = entry_signal and \
+        not np.isnan(c_roc5) and not np.isnan(c_roc20) and not np.isnan(c_atr) and \
+        c_roc5 < config.STRATEGY_B_MAX_ROC5 and \
+        c_roc20 < config.STRATEGY_B_MAX_ROC20 and \
+        c_atr < config.STRATEGY_B_MAX_ATR_PCT
+    
     return {
         'entry': entry_signal,
+        'entry_b': entry_b_signal,
         'exit': exit_signal,
         'exit_reason': exit_reason,
         'close': c_curr['close'],
         'upper_band': c_curr['upper_band'],
         'hard_stop_price': hard_stop_price,
         'date': str(c_curr['datetime'])[:10],
-        'roc_20': roc_20
+        'roc_20': roc_20,
+        'roc5': c_roc5,
+        'roc20': c_roc20,
+        'atr_pct': c_atr
     }
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -105,17 +128,13 @@ def fetch_and_evaluate_symbol(sym):
         return sym, eval_res
     return sym, None
 
-def scan_account(account_name: str, db_file: str, symbols: list, kline_cache: dict):
+def scan_strategy(account_name, strategy_label, db_file, data_dict, entry_key, today_str, today_vn):
+    """Quét một chiến lược trên một tài khoản: kiểm tra thoát, vào lệnh, nhồi lệnh."""
     db = PortfolioDB(db_file)
-    now_utc = datetime.now(timezone.utc)
-    today_str = now_utc.strftime('%Y-%m-%d')
-    today_vn = (now_utc + timedelta(hours=7)).strftime('%d/%m/%Y %H:%M')
     
-    print(f"\n[{account_name.upper()}] Phân tích {len(symbols)} mã...")
+    print(f"[{account_name.upper()} | {strategy_label}] Chạm DB `{db_file}`...")
     open_positions = db.get_open_positions()
     
-    data_dict = {sym: kline_cache[sym] for sym in symbols if sym in kline_cache and kline_cache[sym] is not None}
-                
     # 1. Check Exit
     alerts_exit = []
     for sym, pos in list(open_positions.items()):
@@ -136,7 +155,7 @@ def scan_account(account_name: str, db_file: str, symbols: list, kline_cache: di
     alerts_entry = []
     candidates = []
     for sym, res in data_dict.items():
-        if res['entry']:
+        if res[entry_key]:
             if sym in open_positions:
                 pos = open_positions[sym]
                 if pos['pyramid_level'] < config.MAX_PYRAMID:
@@ -149,23 +168,31 @@ def scan_account(account_name: str, db_file: str, symbols: list, kline_cache: di
                         f"🛡 *Cắt lỗ treo sàn:* `STOP_LOSS_LIMIT` tại `{res['hard_stop_price']:.4f}$`"
                     )
             else:
-                candidates.append((sym, res['roc_20'], res['close'], res['upper_band'], res['hard_stop_price']))
+                candidates.append((sym, res['roc_20'], res['close'], res['upper_band'], res['hard_stop_price'], res))
                 
     candidates.sort(key=lambda x: x[1], reverse=True)
     available_slots = config.MAX_OPEN_COINS - len(open_positions)
-    for sym, roc, price, upper, stop in candidates[:available_slots]:
+    for sym, roc, price, upper, stop, res in candidates[:available_slots]:
         qty = (config.CASH_PER_ENTRY * 0.99925) / price
         db.add_or_pyramid_position(sym, qty, config.CASH_PER_ENTRY, price, today_str)
         open_positions[sym] = True
-        alerts_entry.append(
+        msg = (
             f"🟢 *MUA MỚI (LẦN 1/3):* `{sym}`\n"
             f"• Vốn: `{config.CASH_PER_ENTRY}$` | ROC 20d: `{roc:+.1f}%`\n"
+        )
+        if entry_key == 'entry_b':
+            msg += (
+                f"• Bộ lọc B: ROC5 `{res['roc5']:+.1f}%` <{config.STRATEGY_B_MAX_ROC5:.0f} | "
+                f"ROC20 `{res['roc20']:+.1f}%` <{config.STRATEGY_B_MAX_ROC20:.0f} | "
+                f"ATR `{res['atr_pct']:.1f}%` <{config.STRATEGY_B_MAX_ATR_PCT:.0f}\n"
+            )
+        msg += (
             f"🎯 *Lệnh Limit (15-30p):* Kê `{upper:.4f}$` - `{price:.4f}$`\n"
             f"🛡 *Cắt lỗ treo sàn:* `STOP_LOSS_LIMIT` tại `{stop:.4f}$`"
         )
+        alerts_entry.append(msg)
         
-    # Message
-    header = f"🏛 *DANH MỤC: {account_name.upper()}*\n🗓 Ngày: `{today_vn}` | Mode: `{config.MODE}`\n" + "="*30 + "\n"
+    # Body
     body = ""
     if alerts_exit: body += "\n" + "\n\n".join(alerts_exit) + "\n"
     if alerts_entry: body += "\n" + "\n\n".join(alerts_entry) + "\n"
@@ -180,11 +207,39 @@ def scan_account(account_name: str, db_file: str, symbols: list, kline_cache: di
         f"💰 Vốn giải ngân: `{total_invested:.2f}$ / {config.TOTAL_PORTFOLIO_CAP:.2f}$`\n"
         f"📌 Nắm giữ: " + (", ".join([f"`{s}`" for s in current_portfolio.keys()]) if current_portfolio else "Trống")
     )
-    notifier.send_telegram_alert(header + body + footer)
+    return f"\n*━━━━ {strategy_label} ━━━━*\n{body}{footer}\n"
+
+def scan_account(account_name: str, db_file_base: str, symbols: list, kline_cache: dict):
+    db_base = PortfolioDB(db_file_base)
+    now_utc = datetime.now(timezone.utc)
+    today_str = now_utc.strftime('%Y-%m-%d')
+    today_vn = (now_utc + timedelta(hours=7)).strftime('%d/%m/%Y %H:%M')
+    
+    print(f"\n[{account_name.upper()}] Phân tích {len(symbols)} mã...")
+    open_positions = db_base.get_open_positions()
+    
+    data_dict = {sym: kline_cache[sym] for sym in symbols if sym in kline_cache and kline_cache[sym] is not None}
+    
+    strategies = []
+    if config.ENABLE_STRATEGY_B:
+        strategies = [
+            ("BASE", db_file_base, 'entry'),
+            (config.STRATEGY_B_LABEL, db_file_base.replace('.db', config.STRATEGY_B_DB_SUFFIX + '.db'), 'entry_b'),
+        ]
+    else:
+        strategies = [("BASE", db_file_base, 'entry')]
+        
+    sections = []
+    for strategy_label, db_file, entry_key in strategies:
+        sections.append(scan_strategy(account_name, strategy_label, db_file, data_dict, entry_key, today_str, today_vn))
+        
+    header = f"🏛 *DANH MỤC: {account_name.upper()}*\n🗓 Ngày: `{today_vn}` | Mode: `{config.MODE}`\n" + "="*30 + "\n"
+    notifier.send_telegram_alert(header + "".join(sections))
 
 def main():
     start_time = time.time()
     print("=== CHẠY QUÉT SONG SONG 2 TÀI KHOẢN (ĐA LUỒNG SIÊU TỐC) ===")
+    print(f">> Chạy đồng thời: BASE + {config.STRATEGY_B_LABEL} (nếu được bật)")
     vol_symbols = universe.get_top_100_volume_symbols()
     mc_symbols = universe.get_top_100_marketcap_symbols()
     
@@ -198,10 +253,10 @@ def main():
             sym, res = future.result()
             kline_cache[sym] = res
             
-    # 1. Quét Tài khoản 1: Top 100 Volume
+    # 1. Quét Tài khoản 1: Top 100 Volume (BASE + Strategy B)
     scan_account("Tài Khoản 1 (Top 100 Volume)", "database_volume.db", vol_symbols, kline_cache)
     
-    # 2. Quét Tài khoản 2: Top 100 MarketCap
+    # 2. Quét Tài khoản 2: Top 100 MarketCap (BASE + Strategy B)
     scan_account("Tài Khoản 2 (Top 100 MarketCap)", "database_marketcap.db", mc_symbols, kline_cache)
     
     elapsed = time.time() - start_time

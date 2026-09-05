@@ -39,5 +39,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main || true
-          git add database_volume.db database_marketcap.db
+          git add database_volume.db database_marketcap.db \
+                  database_volume_stratb.db database_marketcap_stratb.db
           git diff --staged --quiet || (git commit -m "Update portfolio databases [skip ci]" && git push origin main)
