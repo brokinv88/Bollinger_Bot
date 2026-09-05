@@ -2,10 +2,14 @@ name: Futures Real-time SL Monitor
 
 on:
   schedule:
-    # Chạy mỗi 30 phút để đóng lệnh chạm SL theo giá realtime giữa các móc H4.
-    # Giờ :15/:45 lệch pha khỏi daily_scan.yml (:01), auto_trade.yml (:05),
-    # futures.yml (:10) — tránh 2 workflow push cùng lúc lên dashboard.html.
-    - cron: '15,45 * * * *'
+    # Chạy mỗi 15 phút để đóng lệnh chạm SL theo giá realtime giữa các móc H4.
+    # Tăng tần suất từ 30 -> 15 phút để giảm rủi ro gap khi thị trường biến động
+    # mạnh (public repo → Actions miễn phí, monitor chỉ 1 request ticker cho
+    # cả 6 vị thế, không fetch klines). Không nên dưới 15 phút — GitHub cron
+    # có queue delay; chống gap tuyệt đối cần real stop order (bridge REAL).
+    # Giờ :00/:15/:30/:45 lệch pha khỏi daily_scan.yml (:01), auto_trade.yml
+    # (:05), futures.yml (:10) — tránh 2 workflow push cùng lúc lên dashboard.
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
