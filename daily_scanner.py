@@ -143,7 +143,12 @@ def scan_strategy(account_name, strategy_label, db_file, data_dict, entry_key, t
         res = data_dict[sym]
         curr_price = res['close']
         if res['exit']:
-            pnl_usd, pnl_pct, invested = db.close_position_db(sym, curr_price, today_str, res['exit_reason'])
+            if config.ENABLE_AUTO_TRADE:
+                # AUTO-TRADE: scanner chỉ BÁO, việc đóng lệnh do auto_trade.py xử lý
+                pnl_usd = (curr_price - pos['avg_entry_price']) * pos['total_qty']
+                pnl_pct = (pnl_usd / pos['total_invested']) * 100.0
+            else:
+                pnl_usd, pnl_pct, invested = db.close_position_db(sym, curr_price, today_str, res['exit_reason'])
             alerts_exit.append(
                 f"🔴 *BÁN/ĐÓNG:* `{sym}`\n"
                 f"• Lý do: {res['exit_reason']}\n"
@@ -160,7 +165,11 @@ def scan_strategy(account_name, strategy_label, db_file, data_dict, entry_key, t
                 pos = open_positions[sym]
                 if pos['pyramid_level'] < config.MAX_PYRAMID:
                     qty = (config.CASH_PER_ENTRY * 0.99925) / res['close']
-                    new_lvl = db.add_or_pyramid_position(sym, qty, config.CASH_PER_ENTRY, res['close'], today_str)
+                    if config.ENABLE_AUTO_TRADE:
+                        # AUTO-TRADE: scanner chỉ BÁO, lệnh nhồi do auto_trade.py ghi
+                        new_lvl = pos['pyramid_level'] + 1
+                    else:
+                        new_lvl = db.add_or_pyramid_position(sym, qty, config.CASH_PER_ENTRY, res['close'], today_str)
                     alerts_entry.append(
                         f"🟡 *NHỒI LỆNH (TẦNG {new_lvl}/3):* `{sym}`\n"
                         f"• Vốn: `{config.CASH_PER_ENTRY}$` (Tổng: `{pos['total_invested'] + config.CASH_PER_ENTRY}$`)\n"
@@ -174,7 +183,9 @@ def scan_strategy(account_name, strategy_label, db_file, data_dict, entry_key, t
     available_slots = config.MAX_OPEN_COINS - len(open_positions)
     for sym, roc, price, upper, stop, res in candidates[:available_slots]:
         qty = (config.CASH_PER_ENTRY * 0.99925) / price
-        db.add_or_pyramid_position(sym, qty, config.CASH_PER_ENTRY, price, today_str)
+        if not config.ENABLE_AUTO_TRADE:
+            db.add_or_pyramid_position(sym, qty, config.CASH_PER_ENTRY, price, today_str)
+        # AUTO-TRADE: lệnh MUA MỚI do auto_trade.py ghi; scanner chỉ báo.
         open_positions[sym] = True
         msg = (
             f"🟢 *MUA MỚI (LẦN 1/3):* `{sym}`\n"

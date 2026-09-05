@@ -34,7 +34,7 @@ def log_trade():
         print(f"• Trạng thái: Pyramid Tầng {lvl}/3")
         
     elif args.action == "sell":
-        pnl_usd, pnl_pct, invested = db.close_position_db(symbol, args.price, today_str, args.reason)
+        pnl_usd, pnl_pct, invested = db.close_position_db(symbol, args.price, today_str, args.reason, source="manual")
         print(f"\n✅ ĐÃ GHI NHẬN LỆNH BÁN TAY:")
         print(f"• Tài khoản: {args.account.upper()} | Chiến lược: {args.strategy.upper()}")
         print(f"• DB: {db_file}")

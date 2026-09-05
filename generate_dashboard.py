@@ -122,6 +122,11 @@ def generate_dashboard():
             return '<span class="badge stratb">CHIẾN LƯỢC B</span>'
         return '<span class="badge">BASE</span>'
 
+    def source_badge(source):
+        if str(source or 'manual') == 'auto':
+            return '<span class="badge auto">TỰ ĐỘNG</span>'
+        return '<span class="badge manual">THỦ CÔNG</span>'
+
     trades_rows = ""
     if total_trades > 0:
         for _, r in all_trades.iterrows():
@@ -130,6 +135,7 @@ def generate_dashboard():
             <tr>
                 <td><span class="badge acc">{r['account']}</span></td>
                 <td>{strategy_badge(r['strategy'])}</td>
+                <td>{source_badge(r.get('source'))}</td>
                 <td><strong>{r['symbol']}</strong></td>
                 <td>{r['entry_date']}</td>
                 <td>{r['exit_date']}</td>
@@ -141,25 +147,28 @@ def generate_dashboard():
             </tr>
             """
     else:
-        trades_rows = "<tr><td colspan='10' style='text-align:center; padding:30px; color:#888;'>Chưa có lệnh đóng nào.</td></tr>"
+        trades_rows = "<tr><td colspan='11' style='text-align:center; padding:30px; color:#888;'>Chưa có lệnh đóng nào.</td></tr>"
 
     active_rows = ""
     if len(all_pos) > 0:
         for _, r in all_pos.iterrows():
+            sl_txt = f"${r['sl_price']:.4f}" if pd.notna(r.get('sl_price')) and r['sl_price'] is not None else "—"
             active_rows += f"""
             <tr>
                 <td><span class="badge acc">{r['account']}</span></td>
                 <td>{strategy_badge(r['strategy'])}</td>
+                <td>{source_badge(r.get('source'))}</td>
                 <td><strong>{r['symbol']}</strong></td>
                 <td><span class="pyramid-badge">Tầng {r['pyramid_level']}/3</span></td>
                 <td>${r['total_invested']:.2f}</td>
                 <td>${r['avg_entry_price']:.4f}</td>
+                <td>{sl_txt}</td>
                 <td>{r['first_entry_date']}</td>
                 <td>{r['last_entry_date']}</td>
             </tr>
             """
     else:
-        active_rows = "<tr><td colspan='8' style='text-align:center; padding:30px; color:#888;'>Hiện không có vị thế nào đang mở.</td></tr>"
+        active_rows = "<tr><td colspan='10' style='text-align:center; padding:30px; color:#888;'>Hiện không có vị thế nào đang mở.</td></tr>"
 
     html_content = f"""<!DOCTYPE html>
 <html lang="vi">
@@ -296,6 +305,8 @@ def generate_dashboard():
         }}
         .badge.acc {{ background: rgba(0, 180, 216, 0.15); color: var(--accent-blue); }}
         .badge.stratb {{ background: rgba(121, 40, 202, 0.2); color: #c084fc; }}
+        .badge.auto {{ background: rgba(0, 240, 144, 0.12); color: var(--accent-green); }}
+        .badge.manual {{ background: rgba(255, 255, 255, 0.08); color: var(--text-secondary); }}
         .pyramid-badge {{
             background: rgba(255, 184, 0, 0.15);
             color: #ffb800;
@@ -370,10 +381,12 @@ def generate_dashboard():
                 <tr>
                     <th>TÀI KHOẢN</th>
                     <th>CHIẾN LƯỢC</th>
+                    <th>NGUỒN</th>
                     <th>CẶP COIN</th>
                     <th>TẦNG PYRAMID</th>
                     <th>VỐN ĐÃ VÀO</th>
                     <th>GIÁ VỐN TRUNG BÌNH</th>
+                    <th>MỨC CẮT LỖ (SL)</th>
                     <th>NGÀY VÀO ĐẦU TIÊN</th>
                     <th>LẦN NHỒI GẦN NHẤT</th>
                 </tr>
@@ -391,6 +404,7 @@ def generate_dashboard():
                 <tr>
                     <th>TÀI KHOẢN</th>
                     <th>CHIẾN LƯỢC</th>
+                    <th>NGUỒN</th>
                     <th>CẶP COIN</th>
                     <th>NGÀY MUA</th>
                     <th>NGÀY BÁN</th>

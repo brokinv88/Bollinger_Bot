@@ -1,9 +1,11 @@
-name: Daily Crypto Portfolio Scanner
+name: Paper Auto-Trade (realtime SL checks)
 
 on:
   schedule:
-    # 00:01 UTC = 07:01 Sáng giờ Việt Nam
-    - cron: '1 0 * * *'
+    # Chạy thêm trong ngày (mỗi 4h) để cập nhật SL + đóng lệnh chạm SL theo giá realtime.
+    # 00:01 UTC đã được daily_scan.yml xử lý (scanner + auto_trade ban đầu).
+    # 04/08/12/16/20 UTC = 11/15/19/23/03 giờ Việt Nam.
+    - cron: '0 4,8,12,16,20 * * *'
   workflow_dispatch:
 
 # Cấp quyền đọc và ghi trực tiếp từ trong file workflow
@@ -11,7 +13,7 @@ permissions:
   contents: write
 
 jobs:
-  scan-and-alert:
+  auto-trade:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,11 +32,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests pandas numpy python-telegram-bot ccxt python-dotenv tabulate
 
-      - name: Run Daily Scanner
-        run: |
-          python daily_scanner.py
-
-      - name: Run Paper Auto-Trade (buys/sells/SL at daily signal)
+      - name: Run Paper Auto-Trade
         run: |
           python auto_trade.py
 

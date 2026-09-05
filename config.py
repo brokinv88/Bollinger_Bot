@@ -39,3 +39,15 @@ STRATEGY_B_MAX_ROC20 = 40.0    # Chặn lệnh mua sau cơn bùng nổ 20 ngày
 STRATEGY_B_MAX_ATR_PCT = 6.0   # Chỉ vào lệnh coin có độ biến động (ATR 14d) < 6% để giảm rủi ro
 # DB riêng cho Strategy B (BASE giữ DB cũ, không đụng dữ liệu hiện có)
 STRATEGY_B_DB_SUFFIX = "_stratb"   # vd: database_volume_stratb.db
+
+# 8. ĐẶT LỆNH TỰ ĐỘNG ẢO (PAPER AUTO-TRADE)
+#    Bot tự khớp mua/bán ảo, tự cập nhật SL, tự ghi PnL vào dashboard theo 4 đơn vị
+#    (2 chiến lược BASE/STRATEGY B x 2 danh mục). Giá mua ảo dùng midpoint upper_band/close,
+#    giá SL = 0.99 x max(SMA < giá, lower band), cập nhật theo công thức mới nhất mỗi lần chạy.
+ENABLE_AUTO_TRADE = True
+AUTO_TRADE_LABEL = "TỰ ĐỘNG ẢO"
+# Giá khớp mua ảo: nội suy giữa upper_band và close (0.0 = khớp tại close, 1.0 = khớp tại upper_band)
+AUTO_ENTRY_FILL = 0.5
+# Chạy scan hàng ngày lúc 07:01 VN. Các giờ bổ sung trong ngày (VN) chỉ auto_trade:
+#   cập nhật giá realtime, cập nhật SL, tự chốt lỗ khi giá cắt SL. Không phát sinh tín hiệu mua/bán mới
+#   (tín hiệu vào/thoát vẫn theo nến DAILY, chỉ xử tại giờ scan 07:01).

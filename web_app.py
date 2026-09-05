@@ -83,6 +83,8 @@ HTML_TEMPLATE = """
         .badge-mc { background:rgba(255,184,0,0.15); color:var(--accent-gold); }
         .badge-base { background:rgba(0,240,144,0.12); color:var(--accent-green); }
         .badge-stratb { background:rgba(121,40,202,0.2); color:#c084fc; }
+        .badge-auto { background:rgba(0,240,144,0.15); color:var(--accent-green); }
+        .badge-manual { background:rgba(139,148,158,0.2); color:var(--text-dim); }
         .badge-pyramid { background:rgba(0,240,144,0.15); color:var(--accent-green); padding:3px 8px; border-radius:4px; font-size:11px; font-weight:600; }
         .pos { color:var(--accent-green); font-weight:600; }
         .neg { color:var(--accent-red); font-weight:600; }
@@ -196,10 +198,12 @@ HTML_TEMPLATE = """
                         <tr>
                             <th>TÀI KHOẢN</th>
                             <th>CHIẾN LƯỢC</th>
+                            <th>NGUỒN</th>
                             <th>MÃ COIN</th>
                             <th>PYRAMID</th>
                             <th>VỐN ĐÃ VÀO</th>
                             <th>GIÁ VỐN TB</th>
+                            <th>MỨC CẮT LỖ</th>
                             <th>NGÀY VÀO</th>
                             <th>THAO TÁC</th>
                         </tr>
@@ -210,10 +214,12 @@ HTML_TEMPLATE = """
                             <tr>
                                 <td><span class="badge {{ 'badge-mc' if 'MarketCap' in p.account else '' }}">{{ p.account }}</span></td>
                                 <td><span class="badge {{ 'badge-stratb' if p.strategy == 'CHIẾN LƯỢC B' else 'badge-base' }}">{{ p.strategy }}</span></td>
+                                <td>{% if p.source == 'auto' %}<span class="badge badge-auto">TỰ ĐỘNG</span>{% else %}<span class="badge badge-manual">THỦ CÔNG</span>{% endif %}</td>
                                 <td><strong>{{ p.symbol }}</strong></td>
                                 <td><span class="badge-pyramid">Tầng {{ p.pyramid_level }}/3</span></td>
                                 <td>${{ "{:.2f}".format(p.total_invested) }}</td>
                                 <td>${{ "{:.4f}".format(p.avg_entry_price) }}</td>
+                                <td>{% if p.sl_price is not none %}${{ "{:.4f}".format(p.sl_price) }}{% else %}—{% endif %}</td>
                                 <td>{{ p.first_entry_date }}</td>
                                 <td>
                                     <form method="POST" action="/quick-sell" style="display:inline;">
@@ -226,7 +232,7 @@ HTML_TEMPLATE = """
                             </tr>
                             {% endfor %}
                         {% else %}
-                            <tr><td colspan="8" style="text-align:center; color:var(--text-dim); padding:25px;">Chưa có vị thế nào. Hãy nhập lệnh mua mới bên trái.</td></tr>
+                            <tr><td colspan="10" style="text-align:center; color:var(--text-dim); padding:25px;">Chưa có vị thế nào. Hãy nhập lệnh mua mới bên trái.</td></tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -240,6 +246,7 @@ HTML_TEMPLATE = """
                         <tr>
                             <th>TÀI KHOẢN</th>
                             <th>CHIẾN LƯỢC</th>
+                            <th>NGUỒN</th>
                             <th>MÃ COIN</th>
                             <th>NGÀY VÀO</th>
                             <th>NGÀY RA</th>
@@ -256,6 +263,7 @@ HTML_TEMPLATE = """
                             <tr>
                                 <td><span class="badge {{ 'badge-mc' if 'MarketCap' in t.account else '' }}">{{ t.account }}</span></td>
                                 <td><span class="badge {{ 'badge-stratb' if t.strategy == 'CHIẾN LƯỢC B' else 'badge-base' }}">{{ t.strategy }}</span></td>
+                                <td>{% if t.source == 'auto' %}<span class="badge badge-auto">TỰ ĐỘNG</span>{% else %}<span class="badge badge-manual">THỦ CÔNG</span>{% endif %}</td>
                                 <td><strong>{{ t.symbol }}</strong></td>
                                 <td>{{ t.entry_date }}</td>
                                 <td>{{ t.exit_date }}</td>
@@ -267,7 +275,7 @@ HTML_TEMPLATE = """
                             </tr>
                             {% endfor %}
                         {% else %}
-                            <tr><td colspan="10" style="text-align:center; color:var(--text-dim); padding:25px;">Chưa có lịch sử lệnh đóng.</td></tr>
+                            <tr><td colspan="11" style="text-align:center; color:var(--text-dim); padding:25px;">Chưa có lịch sử lệnh đóng.</td></tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -368,9 +376,9 @@ def submit_trade():
     
     if action == 'buy':
         qty = (cash * 0.99925) / price
-        db.add_or_pyramid_position(symbol, qty, cash, price, today_str)
+        db.add_or_pyramid_position(symbol, qty, cash, price, today_str, source="manual")
     elif action == 'sell':
-        db.close_position_db(symbol, price, today_str, reason)
+        db.close_position_db(symbol, price, today_str, reason, source="manual")
         
     return redirect(url_for('index'))
 
@@ -382,7 +390,7 @@ def quick_sell():
     today_str = datetime.now(timezone.utc).strftime('%Y-%m-%d')
     
     db = PortfolioDB(db_file)
-    db.close_position_db(symbol, exit_price, today_str, "Bán Nhanh qua Web")
+    db.close_position_db(symbol, exit_price, today_str, "Bán Nhanh qua Web", source="manual")
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
