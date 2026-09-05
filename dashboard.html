@@ -189,6 +189,37 @@
             border-radius: 4px;
             color: var(--accent-green);
         }
+
+        .logic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+        .logic-card {
+            background: rgba(22, 27, 34, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .logic-header {
+            padding: 18px 24px;
+            border-left: 4px solid var(--accent-blue);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .logic-title { font-size: 18px; font-weight: 700; }
+        .logic-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+        .logic-row {
+            display: flex;
+            gap: 14px;
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .logic-row:last-child { border-bottom: none; }
+        .logic-icon { font-size: 18px; flex-shrink: 0; }
+        .logic-row-title { font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+        .logic-row-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
     </style>
 </head>
 <body>
@@ -199,7 +230,7 @@
         </div>
         <div style="text-align: right;">
             <div style="font-size: 13px; color: var(--text-secondary);">Cập nhật lúc:</div>
-            <div style="font-weight: 600;">05/09/2026 10:04:07</div>
+            <div style="font-weight: 600;">05/09/2026 17:11:34</div>
         </div>
     </div>
 
@@ -207,13 +238,13 @@
     <div class="kpi-grid">
         <div class="kpi-card">
             <div class="kpi-title">Tổng Tài Sản (Tiền Mặt + Coin)</div>
-            <div class="kpi-value positive">$6,029.39</div>
-            <div class="kpi-desc">Vốn trần: $6,000 | Tiền mặt: $5,250.00 | Coin: $779.39</div>
+            <div class="kpi-value positive">$6,036.39</div>
+            <div class="kpi-desc">Vốn trần: $6,000 | Tiền mặt: $5,250.00 | Coin: $786.39</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Tổng Lợi Nhuận (Đã Chốt + Chưa Chốt)</div>
-            <div class="kpi-value positive">$+29.39</div>
-            <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+29.39</div>
+            <div class="kpi-value positive">$+36.39</div>
+            <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+36.39</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Tỷ Lệ Thắng (Win Rate)</div>
@@ -242,7 +273,7 @@
         <div class="asset-summary">
             <div class="asset-item">
                 <div class="kpi-title">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
-                <div class="kpi-value positive">$1,515.30</div>
+                <div class="kpi-value positive">$1,519.20</div>
                 <div class="kpi-desc">Vốn trần: $1,500 | Đã dùng: $450.00</div>
             </div>
             <div class="asset-item">
@@ -252,13 +283,13 @@
             </div>
             <div class="asset-item">
                 <div class="kpi-title">GIÁ TRỊ COIN HIỆN TẠI</div>
-                <div class="kpi-value" style="color: #ffb800;">$465.30</div>
+                <div class="kpi-value" style="color: #ffb800;">$469.20</div>
                 <div class="kpi-desc">Theo giá realtime</div>
             </div>
             <div class="asset-item">
                 <div class="kpi-title">LỢI NHUẬN DANH MỤC (ĐÃ CHỐT + CHƯA CHỐT)</div>
-                <div class="kpi-value positive">+15.30$</div>
-                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+15.30</div>
+                <div class="kpi-value positive">+19.20$</div>
+                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+19.20</div>
             </div>
         </div>
         <div class="coin-table-container">
@@ -282,31 +313,31 @@
                 <td><strong>DASHUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
                 <td>2.3963</td>
                 <td>$62.5969</td>
-                <td>$66.7100</td>
-                <td>$159.86</td>
+                <td>$67.8300</td>
+                <td>$162.54</td>
                 <td><span class="badge manual">THỦ CÔNG</span></td>
-                <td class="positive">+6.57%</td>
-                <td class="positive"><strong>+9.86$</strong></td>
+                <td class="positive">+8.36%</td>
+                <td class="positive"><strong>+12.54$</strong></td>
             </tr>
             <tr>
                 <td><strong>ZENUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
                 <td>20.9926</td>
                 <td>$7.1454</td>
-                <td>$7.2030</td>
-                <td>$151.21</td>
+                <td>$7.2410</td>
+                <td>$152.01</td>
                 <td><span class="badge manual">THỦ CÔNG</span></td>
-                <td class="positive">+0.81%</td>
-                <td class="positive"><strong>+1.21$</strong></td>
+                <td class="positive">+1.34%</td>
+                <td class="positive"><strong>+2.01$</strong></td>
             </tr>
             <tr>
                 <td><strong>NEARUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
                 <td>69.0090</td>
                 <td>$2.1736</td>
-                <td>$2.2350</td>
-                <td>$154.24</td>
+                <td>$2.2410</td>
+                <td>$154.65</td>
                 <td><span class="badge manual">THỦ CÔNG</span></td>
-                <td class="positive">+2.82%</td>
-                <td class="positive"><strong>+4.24$</strong></td>
+                <td class="positive">+3.10%</td>
+                <td class="positive"><strong>+4.65$</strong></td>
             </tr>
                 </tbody>
             </table>
@@ -343,7 +374,7 @@
         <div class="asset-summary">
             <div class="asset-item">
                 <div class="kpi-title">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
-                <div class="kpi-value positive">$1,514.09</div>
+                <div class="kpi-value positive">$1,517.19</div>
                 <div class="kpi-desc">Vốn trần: $1,500 | Đã dùng: $300.00</div>
             </div>
             <div class="asset-item">
@@ -353,13 +384,13 @@
             </div>
             <div class="asset-item">
                 <div class="kpi-title">GIÁ TRỊ COIN HIỆN TẠI</div>
-                <div class="kpi-value" style="color: #ffb800;">$314.09</div>
+                <div class="kpi-value" style="color: #ffb800;">$317.19</div>
                 <div class="kpi-desc">Theo giá realtime</div>
             </div>
             <div class="asset-item">
                 <div class="kpi-title">LỢI NHUẬN DANH MỤC (ĐÃ CHỐT + CHƯA CHỐT)</div>
-                <div class="kpi-value positive">+14.09$</div>
-                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+14.09</div>
+                <div class="kpi-value positive">+17.19$</div>
+                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+17.19</div>
             </div>
         </div>
         <div class="coin-table-container">
@@ -383,21 +414,21 @@
                 <td><strong>DASHUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
                 <td>2.3963</td>
                 <td>$62.5969</td>
-                <td>$66.7100</td>
-                <td>$159.86</td>
+                <td>$67.8300</td>
+                <td>$162.54</td>
                 <td><span class="badge manual">THỦ CÔNG</span></td>
-                <td class="positive">+6.57%</td>
-                <td class="positive"><strong>+9.86$</strong></td>
+                <td class="positive">+8.36%</td>
+                <td class="positive"><strong>+12.54$</strong></td>
             </tr>
             <tr>
                 <td><strong>NEARUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
                 <td>69.0090</td>
                 <td>$2.1736</td>
-                <td>$2.2350</td>
-                <td>$154.24</td>
+                <td>$2.2410</td>
+                <td>$154.65</td>
                 <td><span class="badge manual">THỦ CÔNG</span></td>
-                <td class="positive">+2.82%</td>
-                <td class="positive"><strong>+4.24$</strong></td>
+                <td class="positive">+3.10%</td>
+                <td class="positive"><strong>+4.65$</strong></td>
             </tr>
                 </tbody>
             </table>
@@ -568,6 +599,26 @@
         </div>
     </div>
     
+
+    <div class='section-title'>LOGIC CHIẾN LƯỢC (TÓM TẮT ĐỂ ĐÁNH GIÁ)</div><div class='logic-grid'>
+        <div class="logic-card">
+            <div class="logic-header" style="border-left-color: #00b4d8;">
+                <div>
+                    <div class="logic-title">STRATEGY BASE</div>
+                    <div class="logic-subtitle">Đối chứng từ config: chuẩn so sánh với CHIẾN LƯỢC B</div>
+                </div>
+            </div>
+            <div class='logic-row'><div class='logic-icon'>📊</div><div class='logic-body'><div class='logic-row-title'>Chỉ báo kỹ thuật</div><div class='logic-row-desc'>Bollinger Envelopes 24/7 theo 20 phiên (bội số 1.5σ), tính trên HIGH/LOW thay vì close:<br>• Băng trên = SMA20(HIGH) + 1.5×σ(HIGH)<br>• Băng dưới = SMA20(LOW) − 1.5×σ(LOW)<br>• Baseline = trung bình (upper + lower)</div></div></div><div class='logic-row'><div class='logic-icon'>📈</div><div class='logic-body'><div class='logic-row-title'>Tín hiệu VÀO LỆNH (Mua mới hoặc nhồi)</div><div class='logic-row-desc'>Nến hôm qua đủ điều kiện:<br>• Giá đóng trên SMA 50, 100, 150, 200 (SMA không có dữ liệu thì bỏ qua điều kiện đó)<br>• Hôm trước đóng ≤ Băng trên, hôm nay đóng > Băng trên (vượt kênh Bollinger)<br>→ Mua mới $50, hoặc nhồi thêm tầng nếu mã đang giữ (tối đa 3 tầng, mỗi tầng $50).</div></div></div><div class='logic-row'><div class='logic-icon'>📉</div><div class='logic-body'><div class='logic-row-title'>Tín hiệu THOÁT LỆNH (Bán hết)</div><div class='logic-row-desc'>Nến đóng cắt xuống dưới 1 trong các mức sau:<br>• Băng dưới Bollinger<br>• SMA 50, 100, 150 hoặc 200<br>→ Đóng toàn bộ vị thế và ghi nhận PnL.</div></div></div><div class='logic-row'><div class='logic-icon'>🛡</div><div class='logic-body'><div class='logic-row-title'>Cắt lỗ treo (Hard Stop)</div><div class='logic-row-desc'>Áp dụng cho mọi lệnh đang giữ, cập nhật mỗi lần quét:<br>• Giá SL = 0.99 × max(lower band, các SMA nằm dưới giá đóng)<br>• Nếu giá realtime ≤ SL → đóng lệnh ngay, không chờ nến. Khi giá tăng, SL tự nâng theo (bám sát đáy của SMA dưới giá).</div></div></div><div class='logic-row'><div class='logic-icon'>💼</div><div class='logic-body'><div class='logic-row-title'>Quản lý vốn</div><div class='logic-row-desc'>• 10 mã mở tối đa song song<br>• $50/lệnh, tối đa 3 tầng ⇒ $150/mã<br>• Trần vốn danh mục $1500<br>• Chi phí mua phí 0.075% trên mỗi lệnh (giá khớp ~ tại giữa Close và Băng trên khi tự động ảo).</div></div></div>
+        </div>
+        <div class="logic-card">
+            <div class="logic-header" style="border-left-color: #c084fc;">
+                <div>
+                    <div class="logic-title">CHIẾN LƯỢC B</div>
+                    <div class="logic-subtitle">BASE + bộ lọc rủi ro để tránh đuổi đỉnh & coin biến động cao (backtest PnL +$1,659, WR 28.6%, PF 6.63 vs BASE PnL +$1,315, WR 18.8%, PF 2.27)</div>
+                </div>
+            </div>
+            <div class='logic-row'><div class='logic-icon'>🧪</div><div class='logic-body'><div class='logic-row-title'>Nền tảng</div><div class='logic-row-desc'>Kế thừa 100% logic BASE (chỉ báo, vào/thoát, pyramid, SL) nhưng thêm bộ lọc rủi ro trước khi mua.</div></div></div><div class='logic-row'><div class='logic-icon'>🚦</div><div class='logic-body'><div class='logic-row-title'>Bộ lọc tránh đuổi đỉnh</div><div class='logic-row-desc'>• ROC 5 ngày < 20% (loại coin tăng quá nóng trong 5 phiên)<br>• ROC 20 ngày < 40% (loại coin bùng nổ trong 20 phiên)</div></div></div><div class='logic-row'><div class='logic-icon'>🛡</div><div class='logic-body'><div class='logic-row-title'>Bộ lọc biến động</div><div class='logic-row-desc'>• ATR 14 phiên < 6.0% (chỉ mua coin biến động thấp để giảm rủi ro giật giá)<br>• Bất kỳ lọc nào vi phạm đều chặn lệnh mua (AND logic).</div></div></div><div class='logic-row'><div class='logic-icon'>💾</div><div class='logic-body'><div class='logic-row-title'>Dữ liệu riêng</div><div class='logic-row-desc'>Toàn bộ lệnh lưu DB riêng (`*_stratb.db`), không đụng dữ liệu/ghi lịch sử của BASE.</div></div></div>
+        </div></div>
 
     <div class="section-title">Vị Thế Đang Nắm Giữ (Active Positions)</div>
     <div class="table-container">

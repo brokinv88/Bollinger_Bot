@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from flask import Flask, render_template_string, request, redirect, url_for, jsonify
 from database import PortfolioDB
-from generate_dashboard import fetch_current_prices, compute_unit_asset
+from generate_dashboard import fetch_current_prices, compute_unit_asset, render_strategy_logic
 
 app = Flask(__name__)
 
@@ -102,6 +102,17 @@ HTML_TEMPLATE = """
         .unit-assets .kpi-val { font-size:20px; }
         .section-title { font-size:16px; font-weight:600; margin:28px 0 14px; display:flex; align-items:center; gap:8px; }
         .section-title::before { content:''; width:4px; height:18px; background:var(--accent-blue); border-radius:2px; }
+
+        .logic-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(400px, 1fr)); gap:16px; margin-bottom:16px; }
+        .logic-card { background:rgba(22,27,34,0.7); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+        .logic-header { padding:16px 18px; border-left:4px solid var(--accent-blue); border-bottom:1px solid var(--border); }
+        .logic-title { font-size:16px; font-weight:700; }
+        .logic-subtitle { font-size:12px; color:var(--text-dim); margin-top:4px; line-height:1.5; }
+        .logic-row { display:flex; gap:12px; padding:12px 18px; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .logic-row:last-child { border-bottom:none; }
+        .logic-icon { font-size:16px; flex-shrink:0; }
+        .logic-row-title { font-weight:600; font-size:13px; margin-bottom:4px; }
+        .logic-row-desc { font-size:12px; color:var(--text-dim); line-height:1.7; }
     </style>
 </head>
 <body>
@@ -253,6 +264,8 @@ HTML_TEMPLATE = """
                 </div>
             </div>
             {% endfor %}
+
+            {{ strategy_logic | safe }}
 
             <!-- BẢNG VỊ THẾ ĐANG MỞ -->
             <div class="table-card">
@@ -424,7 +437,8 @@ def get_data():
     return {
         'units_metrics': units_metrics,
         'open_positions': positions.to_dict('records') if not positions.empty else [],
-        'closed_trades': trades.to_dict('records') if not trades.empty else []
+        'closed_trades': trades.to_dict('records') if not trades.empty else [],
+        'strategy_logic': render_strategy_logic()
     }
 
 @app.route('/')

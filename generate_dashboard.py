@@ -219,6 +219,80 @@ def render_unit_kpi(unit, m, asset_rows, asset):
     </div>
     """
 
+def render_strategy_logic():
+    """Mô tả chi tiết logic từng chiến lược (BASE & CHIẾN LƯỢC B) để tiện đánh giá."""
+    bb = config.BB_LEN
+    mult = config.BB_MULT
+    smas = "50/100/150/200"
+    sma_cond = "Giá đóng trên SMA 50, 100, 150, 200 (SMA không có dữ liệu thì bỏ qua điều kiện đó)"
+    fill_pct = (0.99925 * 100) - 100
+    fee_txt = "phí 0.075%"
+    sl_txt = "0.99 × max(lower band, các SMA nằm dưới giá đóng)"
+
+    base_blocks = [
+        ("📊", "Chỉ báo kỹ thuật",
+         f"Bollinger Envelopes 24/7 theo {bb} phiên (bội số {mult}σ), tính trên HIGH/LOW thay vì close:\n"
+         f"• Băng trên = SMA{bb}(HIGH) + {mult}×σ(HIGH)\n"
+         f"• Băng dưới = SMA{bb}(LOW) − {mult}×σ(LOW)\n"
+         f"• Baseline = trung bình (upper + lower)"),
+        ("📈", "Tín hiệu VÀO LỆNH (Mua mới hoặc nhồi)",
+         f"Nến hôm qua đủ điều kiện:\n"
+         f"• {sma_cond}\n"
+         f"• Hôm trước đóng ≤ Băng trên, hôm nay đóng > Băng trên (vượt kênh Bollinger)\n"
+         f"→ Mua mới $50, hoặc nhồi thêm tầng nếu mã đang giữ (tối đa {config.MAX_PYRAMID} tầng, mỗi tầng ${config.CASH_PER_ENTRY:.0f})."),
+        ("📉", "Tín hiệu THOÁT LỆNH (Bán hết)",
+         "Nến đóng cắt xuống dưới 1 trong các mức sau:\n"
+         "• Băng dưới Bollinger\n"
+         "• SMA 50, 100, 150 hoặc 200\n"
+         "→ Đóng toàn bộ vị thế và ghi nhận PnL."),
+        ("🛡", "Cắt lỗ treo (Hard Stop)",
+         f"Áp dụng cho mọi lệnh đang giữ, cập nhật mỗi lần quét:\n"
+         f"• Giá SL = {sl_txt}\n"
+         f"• Nếu giá realtime ≤ SL → đóng lệnh ngay, không chờ nến. Khi giá tăng, SL tự nâng theo (bám sát đáy của SMA dưới giá)."),
+        ("💼", "Quản lý vốn",
+         f"• {config.MAX_OPEN_COINS} mã mở tối đa song song\n"
+         f"• ${config.CASH_PER_ENTRY:.0f}/lệnh, tối đa {config.MAX_PYRAMID} tầng ⇒ ${config.CASH_PER_ENTRY*config.MAX_PYRAMID:.0f}/mã\n"
+         f"• Trần vốn danh mục ${config.TOTAL_PORTFOLIO_CAP:.0f}\n"
+         f"• Chi phí mua {fee_txt} trên mỗi lệnh (giá khớp ~ tại giữa Close và Băng trên khi tự động ảo)."),
+    ]
+
+    blocks_b = [
+        ("🧪", "Nền tảng",
+         "Kế thừa 100% logic BASE (chỉ báo, vào/thoát, pyramid, SL) nhưng thêm bộ lọc rủi ro trước khi mua."),
+        ("🚦", "Bộ lọc tránh đuổi đỉnh",
+         f"• ROC 5 ngày < {config.STRATEGY_B_MAX_ROC5:.0f}% (loại coin tăng quá nóng trong 5 phiên)\n"
+         f"• ROC 20 ngày < {config.STRATEGY_B_MAX_ROC20:.0f}% (loại coin bùng nổ trong 20 phiên)"),
+        ("🛡", "Bộ lọc biến động",
+         f"• ATR 14 phiên < {config.STRATEGY_B_MAX_ATR_PCT:.1f}% (chỉ mua coin biến động thấp để giảm rủi ro giật giá)\n"
+         f"• Bất kỳ lọc nào vi phạm đều chặn lệnh mua (AND logic)."),
+        ("💾", "Dữ liệu riêng",
+         f"Toàn bộ lệnh lưu DB riêng (`*_stratb.db`), không đụng dữ liệu/ghi lịch sử của BASE."),
+    ]
+
+    def build_card(title, color, subtitle, blocks):
+        rows = "".join(
+            f"<div class='logic-row'><div class='logic-icon'>{icon}</div><div class='logic-body'><div class='logic-row-title'>{t}</div><div class='logic-row-desc'>{d.replace(chr(10), '<br>')}</div></div></div>"
+            for icon, t, d in blocks
+        )
+        return f"""
+        <div class="logic-card">
+            <div class="logic-header" style="border-left-color: {color};">
+                <div>
+                    <div class="logic-title">{title}</div>
+                    <div class="logic-subtitle">{subtitle}</div>
+                </div>
+            </div>
+            {rows}
+        </div>"""
+
+    perf_base = ("Đối chứng từ config: chuẩn so sánh với CHIẾN LƯỢC B")
+    cards = [build_card("STRATEGY BASE", "#00b4d8", perf_base, base_blocks)]
+    if config.ENABLE_STRATEGY_B:
+        cards.append(build_card("CHIẾN LƯỢC B", "#c084fc",
+                                "BASE + bộ lọc rủi ro để tránh đuổi đỉnh & coin biến động cao (backtest PnL +$1,659, WR 28.6%, PF 6.63 vs BASE PnL +$1,315, WR 18.8%, PF 2.27)",
+                                blocks_b))
+    return f"<div class='section-title'>LOGIC CHIẾN LƯỢC (TÓM TẮT ĐỂ ĐÁNH GIÁ)</div><div class='logic-grid'>" + "".join(cards) + "</div>"
+
 def generate_dashboard():
     # 1. Load & tính chỉ số cho 4 đơn vị
     units_data = []
@@ -268,6 +342,7 @@ def generate_dashboard():
 
     # 3. Render 4 cụm KPI riêng
     unit_sections = "".join(render_unit_kpi(ud['unit'], ud['metrics'], ud['asset_rows'], ud['asset']) for ud in units_data)
+    strategy_logic_html = render_strategy_logic()
 
     # 4. Bảng lệnh đã đóng (có badge chiến lược)
     def strategy_badge(strategy):
@@ -514,6 +589,37 @@ def generate_dashboard():
             border-radius: 4px;
             color: var(--accent-green);
         }}
+
+        .logic-grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 10px;
+        }}
+        .logic-card {{
+            background: rgba(22, 27, 34, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }}
+        .logic-header {{
+            padding: 18px 24px;
+            border-left: 4px solid var(--accent-blue);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }}
+        .logic-title {{ font-size: 18px; font-weight: 700; }}
+        .logic-subtitle {{ font-size: 12px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }}
+        .logic-row {{
+            display: flex;
+            gap: 14px;
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }}
+        .logic-row:last-child {{ border-bottom: none; }}
+        .logic-icon {{ font-size: 18px; flex-shrink: 0; }}
+        .logic-row-title {{ font-weight: 600; font-size: 14px; margin-bottom: 5px; }}
+        .logic-row-desc {{ font-size: 13px; color: var(--text-secondary); line-height: 1.7; }}
     </style>
 </head>
 <body>
@@ -559,6 +665,8 @@ def generate_dashboard():
 
     <div class="section-title">HIỆU SUẤT THEO CHIẾN LƯỢC & DANH MỤC (4 ĐƠN VỊ)</div>
     {unit_sections}
+
+    {strategy_logic_html}
 
     <div class="section-title">Vị Thế Đang Nắm Giữ (Active Positions)</div>
     <div class="table-container">
