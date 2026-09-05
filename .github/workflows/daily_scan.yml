@@ -31,10 +31,14 @@ jobs:
           pip install requests pandas numpy python-telegram-bot ccxt python-dotenv tabulate
 
       - name: Run Daily Scanner
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
           python daily_scanner.py
 
       - name: Run Paper Auto-Trade (buys/sells/SL at daily signal)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: |
           python auto_trade.py
 
