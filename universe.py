@@ -1,10 +1,12 @@
-import requests
-import pandas as pd
+HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
 
 def get_binance_listed_usdt_symbols():
-    """Lấy toàn bộ các cặp giao dịch USDT đang active trên Binance"""
-    url = "https://api.binance.com/api/v3/exchangeInfo"
-    resp = requests.get(url, timeout=10).json()
+    url = "https://data-api.binance.vision/api/v3/exchangeInfo"
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=10).json()
+    except Exception:
+        url = "https://api3.binance.com/api/v3/exchangeInfo"
+        resp = requests.get(url, headers=HEADERS, timeout=10).json()
     symbols = set()
     for s in resp['symbols']:
         if s['status'] == 'TRADING' and s['quoteAsset'] == 'USDT':
@@ -12,9 +14,12 @@ def get_binance_listed_usdt_symbols():
     return symbols
 
 def get_top_100_volume_symbols():
-    """Lấy Top 100 theo 24h Trading Volume trên Binance"""
-    url = "https://api.binance.com/api/v3/ticker/24hr"
-    resp = requests.get(url, timeout=10).json()
+    url = "https://data-api.binance.vision/api/v3/ticker/24hr"
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=10).json()
+    except Exception:
+        url = "https://api3.binance.com/api/v3/ticker/24hr"
+        resp = requests.get(url, headers=HEADERS, timeout=10).json()
     usdt_pairs = []
     exclude = ['USDCUSDT', 'FDUSDUSDT', 'TUSDUSDT', 'BUSDUSDT', 'EURUSDT', 'AEURUSDT', 'DAIUSDT', 'WBTCUSDT', 'WBETHUSDT', 'USDEUSDT']
     for item in resp:

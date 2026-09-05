@@ -9,12 +9,17 @@ import notifier
 from database import PortfolioDB
 import universe
 
+HEADERS = {"User-Agent": "Mozilla/5.0"}
+
 def get_daily_data(symbol, limit=250):
-    url = f"https://api.binance.com/api/v3/klines?symbol={symbol}&interval=1d&limit={limit}"
+    url = f"https://data-api.binance.vision/api/v3/klines?symbol={symbol}&interval=1d&limit={limit}"
     try:
-        resp = requests.get(url, timeout=10).json()
+        resp = requests.get(url, headers=HEADERS, timeout=10).json()
         if not isinstance(resp, list):
-            return None
+            url_alt = f"https://api3.binance.com/api/v3/klines?symbol={symbol}&interval=1d&limit={limit}"
+            resp = requests.get(url_alt, headers=HEADERS, timeout=10).json()
+            if not isinstance(resp, list):
+                return None
         df = pd.DataFrame(resp, columns=[
             'open_time', 'open', 'high', 'low', 'close', 'volume',
             'close_time', 'quote_asset_volume', 'number_of_trades',
