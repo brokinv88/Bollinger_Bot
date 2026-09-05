@@ -78,6 +78,34 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
         }
+        .asset-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+        .asset-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }
+        .coin-table-container {
+            margin-bottom: 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-card);
+        }
+        .coin-table-title {
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+        }
 
         .section-title {
             font-size: 20px;
@@ -171,16 +199,21 @@
         </div>
         <div style="text-align: right;">
             <div style="font-size: 13px; color: var(--text-secondary);">Cập nhật lúc:</div>
-            <div style="font-weight: 600;">05/09/2026 09:44:23</div>
+            <div style="font-weight: 600;">05/09/2026 17:03:03</div>
         </div>
     </div>
 
     <div class="section-title">TỔNG QUAN TOÀN DANH MỤC</div>
     <div class="kpi-grid">
         <div class="kpi-card">
-            <div class="kpi-title">Tổng Lợi Nhuận Net</div>
-            <div class="kpi-value positive">$+0.00</div>
-            <div class="kpi-desc">Lợi nhuận ròng toàn danh mục (cả 2 chiến lược)</div>
+            <div class="kpi-title">Tổng Tài Sản (Tiền Mặt + Coin)</div>
+            <div class="kpi-value positive">$6,029.52</div>
+            <div class="kpi-desc">Vốn trần: $6,000 | Tiền mặt: $5,250.00 | Coin: $779.52</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Tổng Lợi Nhuận (Đã Chốt + Chưa Chốt)</div>
+            <div class="kpi-value positive">$+29.52</div>
+            <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+29.52</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Tỷ Lệ Thắng (Win Rate)</div>
@@ -206,9 +239,81 @@
             <h3>🎯 Top 100 Volume</h3>
             <span class="badge">BASE</span>
         </div>
+        <div class="asset-summary">
+            <div class="asset-item">
+                <div class="kpi-title">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
+                <div class="kpi-value positive">$1,515.60</div>
+                <div class="kpi-desc">Vốn trần: $1,500 | Đã dùng: $450.00</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">TIỀN MẶT KHẢ DỤNG</div>
+                <div class="kpi-value" style="color: var(--accent-blue);">$1,050.00</div>
+                <div class="kpi-desc">3 mã đang giữ</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">GIÁ TRỊ COIN HIỆN TẠI</div>
+                <div class="kpi-value" style="color: #ffb800;">$465.60</div>
+                <div class="kpi-desc">Theo giá realtime</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">LỢI NHUẬN DANH MỤC (ĐÃ CHỐT + CHƯA CHỐT)</div>
+                <div class="kpi-value positive">+15.60$</div>
+                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+15.60</div>
+            </div>
+        </div>
+        <div class="coin-table-container">
+            <div class="coin-table-title">💼 CHI TIẾT TỪNG MÃ TRONG DANH MỤC</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>MÃ COIN</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>GIÁ MUA TB</th>
+                        <th>GIÁ HIỆN TẠI</th>
+                        <th>GIÁ TRỊ HIỆN TẠI</th>
+                        <th>NGUỒN</th>
+                        <th>LỜI/LỖ %</th>
+                        <th>LỜI/LỖ $</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td><strong>DASHUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
+                <td>2.3963</td>
+                <td>$62.5969</td>
+                <td>$66.6400</td>
+                <td>$159.69</td>
+                <td><span class="badge manual">THỦ CÔNG</span></td>
+                <td class="positive">+6.46%</td>
+                <td class="positive"><strong>+9.69$</strong></td>
+            </tr>
+            <tr>
+                <td><strong>ZENUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
+                <td>20.9926</td>
+                <td>$7.1454</td>
+                <td>$7.2250</td>
+                <td>$151.67</td>
+                <td><span class="badge manual">THỦ CÔNG</span></td>
+                <td class="positive">+1.11%</td>
+                <td class="positive"><strong>+1.67$</strong></td>
+            </tr>
+            <tr>
+                <td><strong>NEARUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
+                <td>69.0090</td>
+                <td>$2.1736</td>
+                <td>$2.2350</td>
+                <td>$154.24</td>
+                <td><span class="badge manual">THỦ CÔNG</span></td>
+                <td class="positive">+2.82%</td>
+                <td class="positive"><strong>+4.24$</strong></td>
+            </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="kpi-subgrid">
             <div class="kpi-card">
-                <div class="kpi-title">Lợi Nhuận Net</div>
+                <div class="kpi-title">Lợi Nhuận Đã Chốt</div>
                 <div class="kpi-value positive">$+0.00</div>
                 <div class="kpi-desc">0 lệnh đã đóng</div>
             </div>
@@ -235,9 +340,71 @@
             <h3>🎯 Top 100 MarketCap</h3>
             <span class="badge">BASE</span>
         </div>
+        <div class="asset-summary">
+            <div class="asset-item">
+                <div class="kpi-title">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
+                <div class="kpi-value positive">$1,513.92</div>
+                <div class="kpi-desc">Vốn trần: $1,500 | Đã dùng: $300.00</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">TIỀN MẶT KHẢ DỤNG</div>
+                <div class="kpi-value" style="color: var(--accent-blue);">$1,200.00</div>
+                <div class="kpi-desc">2 mã đang giữ</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">GIÁ TRỊ COIN HIỆN TẠI</div>
+                <div class="kpi-value" style="color: #ffb800;">$313.92</div>
+                <div class="kpi-desc">Theo giá realtime</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">LỢI NHUẬN DANH MỤC (ĐÃ CHỐT + CHƯA CHỐT)</div>
+                <div class="kpi-value positive">+13.92$</div>
+                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+13.92</div>
+            </div>
+        </div>
+        <div class="coin-table-container">
+            <div class="coin-table-title">💼 CHI TIẾT TỪNG MÃ TRONG DANH MỤC</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>MÃ COIN</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>GIÁ MUA TB</th>
+                        <th>GIÁ HIỆN TẠI</th>
+                        <th>GIÁ TRỊ HIỆN TẠI</th>
+                        <th>NGUỒN</th>
+                        <th>LỜI/LỖ %</th>
+                        <th>LỜI/LỖ $</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+            <tr>
+                <td><strong>DASHUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
+                <td>2.3963</td>
+                <td>$62.5969</td>
+                <td>$66.6400</td>
+                <td>$159.69</td>
+                <td><span class="badge manual">THỦ CÔNG</span></td>
+                <td class="positive">+6.46%</td>
+                <td class="positive"><strong>+9.69$</strong></td>
+            </tr>
+            <tr>
+                <td><strong>NEARUSDT</strong> <span class="pyramid-badge">Tầng 3/3</span></td>
+                <td>69.0090</td>
+                <td>$2.1736</td>
+                <td>$2.2350</td>
+                <td>$154.24</td>
+                <td><span class="badge manual">THỦ CÔNG</span></td>
+                <td class="positive">+2.82%</td>
+                <td class="positive"><strong>+4.24$</strong></td>
+            </tr>
+                </tbody>
+            </table>
+        </div>
         <div class="kpi-subgrid">
             <div class="kpi-card">
-                <div class="kpi-title">Lợi Nhuận Net</div>
+                <div class="kpi-title">Lợi Nhuận Đã Chốt</div>
                 <div class="kpi-value positive">$+0.00</div>
                 <div class="kpi-desc">0 lệnh đã đóng</div>
             </div>
@@ -264,9 +431,51 @@
             <h3>🎯 Top 100 Volume</h3>
             <span class="badge stratb">CHIẾN LƯỢC B</span>
         </div>
+        <div class="asset-summary">
+            <div class="asset-item">
+                <div class="kpi-title">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
+                <div class="kpi-value positive">$1,500.00</div>
+                <div class="kpi-desc">Vốn trần: $1,500 | Đã dùng: $0.00</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">TIỀN MẶT KHẢ DỤNG</div>
+                <div class="kpi-value" style="color: var(--accent-blue);">$1,500.00</div>
+                <div class="kpi-desc">0 mã đang giữ</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">GIÁ TRỊ COIN HIỆN TẠI</div>
+                <div class="kpi-value" style="color: #ffb800;">$0.00</div>
+                <div class="kpi-desc">Theo giá realtime</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">LỢI NHUẬN DANH MỤC (ĐÃ CHỐT + CHƯA CHỐT)</div>
+                <div class="kpi-value positive">+0.00$</div>
+                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+0.00</div>
+            </div>
+        </div>
+        <div class="coin-table-container">
+            <div class="coin-table-title">💼 CHI TIẾT TỪNG MÃ TRONG DANH MỤC</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>MÃ COIN</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>GIÁ MUA TB</th>
+                        <th>GIÁ HIỆN TẠI</th>
+                        <th>GIÁ TRỊ HIỆN TẠI</th>
+                        <th>NGUỒN</th>
+                        <th>LỜI/LỖ %</th>
+                        <th>LỜI/LỖ $</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan='8' style='text-align:center; padding:24px; color:#888;'>Chưa có mã nào đang giữ trong đơn vị này.</td></tr>
+                </tbody>
+            </table>
+        </div>
         <div class="kpi-subgrid">
             <div class="kpi-card">
-                <div class="kpi-title">Lợi Nhuận Net</div>
+                <div class="kpi-title">Lợi Nhuận Đã Chốt</div>
                 <div class="kpi-value positive">$+0.00</div>
                 <div class="kpi-desc">0 lệnh đã đóng</div>
             </div>
@@ -293,9 +502,51 @@
             <h3>🎯 Top 100 MarketCap</h3>
             <span class="badge stratb">CHIẾN LƯỢC B</span>
         </div>
+        <div class="asset-summary">
+            <div class="asset-item">
+                <div class="kpi-title">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
+                <div class="kpi-value positive">$1,500.00</div>
+                <div class="kpi-desc">Vốn trần: $1,500 | Đã dùng: $0.00</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">TIỀN MẶT KHẢ DỤNG</div>
+                <div class="kpi-value" style="color: var(--accent-blue);">$1,500.00</div>
+                <div class="kpi-desc">0 mã đang giữ</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">GIÁ TRỊ COIN HIỆN TẠI</div>
+                <div class="kpi-value" style="color: #ffb800;">$0.00</div>
+                <div class="kpi-desc">Theo giá realtime</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">LỢI NHUẬN DANH MỤC (ĐÃ CHỐT + CHƯA CHỐT)</div>
+                <div class="kpi-value positive">+0.00$</div>
+                <div class="kpi-desc">Đã chốt: $+0.00 | Chưa chốt: $+0.00</div>
+            </div>
+        </div>
+        <div class="coin-table-container">
+            <div class="coin-table-title">💼 CHI TIẾT TỪNG MÃ TRONG DANH MỤC</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>MÃ COIN</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>GIÁ MUA TB</th>
+                        <th>GIÁ HIỆN TẠI</th>
+                        <th>GIÁ TRỊ HIỆN TẠI</th>
+                        <th>NGUỒN</th>
+                        <th>LỜI/LỖ %</th>
+                        <th>LỜI/LỖ $</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan='8' style='text-align:center; padding:24px; color:#888;'>Chưa có mã nào đang giữ trong đơn vị này.</td></tr>
+                </tbody>
+            </table>
+        </div>
         <div class="kpi-subgrid">
             <div class="kpi-card">
-                <div class="kpi-title">Lợi Nhuận Net</div>
+                <div class="kpi-title">Lợi Nhuận Đã Chốt</div>
                 <div class="kpi-value positive">$+0.00</div>
                 <div class="kpi-desc">0 lệnh đã đóng</div>
             </div>

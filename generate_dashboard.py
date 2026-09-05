@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import json
 import os
+import requests
+import time
+import config
 from datetime import datetime
 
 # 4 đơn vị theo dõi song song: 2 chiến lược x 2 danh mục
@@ -28,6 +31,72 @@ def load_unit_data(db_file, label, strategy):
     pos_df['strategy'] = strategy
     return trades_df, pos_df
 
+HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+
+
+def fetch_current_prices(symbols):
+    """Lấy giá hiện tại (realtime) cho danh sách symbol."""
+    prices = {}
+    symbols = list(set(symbols))
+    try:
+        url = "https://data-api.binance.vision/api/v3/ticker/24hr"
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        data = resp.json()
+        if isinstance(data, list):
+            for item in data:
+                sym = item.get('symbol', '')
+                if sym in symbols and item.get('lastPrice'):
+                    try:
+                        prices[sym] = float(item['lastPrice'])
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+    missing = [s for s in symbols if s not in prices]
+    for sym in missing:
+        try:
+            r = requests.get(f"https://data-api.binance.vision/api/v3/ticker/price?symbol={sym}", headers=HEADERS, timeout=8)
+            j = r.json()
+            if isinstance(j, dict) and j.get('price'):
+                prices[sym] = float(j['price'])
+        except Exception:
+            pass
+        time.sleep(0.05)
+    return prices
+
+
+def compute_unit_asset(pos_df, prices):
+    """Chi tiết từng mã đang giữ + tổng tài sản của đơn vị (tiền mặt + giá trị coin)."""
+    cap = config.TOTAL_PORTFOLIO_CAP
+    rows = []
+    deployed = 0.0
+    coin_value = 0.0
+    for _, r in pos_df.iterrows():
+        qty = float(r['total_qty'])
+        avg = float(r['avg_entry_price'])
+        invested = float(r['total_invested'])
+        cur = prices.get(r['symbol'], avg)
+        value = qty * cur
+        pnl = value - invested
+        pnl_pct = (pnl / invested * 100) if invested else 0.0
+        sl_txt = f"${r['sl_price']:.4f}" if pd.notna(r.get('sl_price')) and r['sl_price'] is not None else "—"
+        rows.append({
+            'symbol': r['symbol'], 'qty': qty, 'avg': avg, 'cur': cur,
+            'value': value, 'invested': invested, 'pnl': pnl, 'pnl_pct': pnl_pct,
+            'sl': sl_txt, 'level': int(r['pyramid_level']),
+            'source': str(r.get('source') or 'manual'),
+        })
+        deployed += invested
+        coin_value += value
+    cash = max(0.0, cap - deployed)
+    total_assets = cash + coin_value
+    unrealized = coin_value - deployed
+    return rows, {
+        'cap': cap, 'deployed': deployed, 'cash': cash, 'coin_value': coin_value,
+        'total_assets': total_assets, 'unrealized': unrealized,
+    }
+
+
 def compute_metrics(trades_df, pos_df):
     total_trades = len(trades_df)
     winning = len(trades_df[trades_df['pnl_usd'] > 0]) if total_trades > 0 else 0
@@ -47,22 +116,87 @@ def compute_metrics(trades_df, pos_df):
         'open_count': len(pos_df)
     }
 
-def render_unit_kpi(unit, m):
+def render_unit_kpi(unit, m, asset_rows, asset):
     strat_badge = (
         f'<span class="badge stratb">CHIẾN LƯỢC B</span>'
         if unit['strategy'] == 'CHIẾN LƯỢC B'
         else '<span class="badge">BASE</span>'
     )
     pnl_class = "positive" if m['total_pnl'] >= 0 else "negative"
+    row_badges = {
+        'auto': '<span class="badge auto">TỰ ĐỘNG</span>',
+        'manual': '<span class="badge manual">THỦ CÔNG</span>',
+    }
+    coin_rows = ""
+    for r in asset_rows:
+        pnl_cls = "positive" if r['pnl'] >= 0 else "negative"
+        coin_rows += f"""
+            <tr>
+                <td><strong>{r['symbol']}</strong> <span class="pyramid-badge">Tầng {r['level']}/3</span></td>
+                <td>{r['qty']:.4f}</td>
+                <td>${r['avg']:.4f}</td>
+                <td>${r['cur']:.4f}</td>
+                <td>${r['value']:.2f}</td>
+                <td>{row_badges.get(r['source'], row_badges['manual'])}</td>
+                <td class="{pnl_cls}">{r['pnl_pct']:+.2f}%</td>
+                <td class="{pnl_cls}"><strong>{r['pnl']:+,.2f}$</strong></td>
+            </tr>"""
+    if not coin_rows:
+        coin_rows = "<tr><td colspan='8' style='text-align:center; padding:24px; color:#888;'>Chưa có mã nào đang giữ trong đơn vị này.</td></tr>"
+
+    total_pnl_all = m['total_pnl'] + asset['unrealized']
+    total_pnl_all_cls = "positive" if total_pnl_all >= 0 else "negative"
     return f"""
     <div class="unit-block">
         <div class="unit-header">
             <h3>🎯 {unit['label']}</h3>
             {strat_badge}
         </div>
+        <div class="asset-summary">
+            <div class="asset-item">
+                <div class="kpi-title">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
+                <div class="kpi-value {pnl_class if asset['total_assets'] >= asset['cap'] else 'negative'}">${asset['total_assets']:,.2f}</div>
+                <div class="kpi-desc">Vốn trần: ${asset['cap']:,.0f} | Đã dùng: ${asset['deployed']:,.2f}</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">TIỀN MẶT KHẢ DỤNG</div>
+                <div class="kpi-value" style="color: var(--accent-blue);">${asset['cash']:,.2f}</div>
+                <div class="kpi-desc">{asset['open_n']} mã đang giữ</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">GIÁ TRỊ COIN HIỆN TẠI</div>
+                <div class="kpi-value" style="color: #ffb800;">${asset['coin_value']:,.2f}</div>
+                <div class="kpi-desc">Theo giá realtime</div>
+            </div>
+            <div class="asset-item">
+                <div class="kpi-title">LỢI NHUẬN DANH MỤC (ĐÃ CHỐT + CHƯA CHỐT)</div>
+                <div class="kpi-value {total_pnl_all_cls}">{total_pnl_all:+,.2f}$</div>
+                <div class="kpi-desc">Đã chốt: ${m['total_pnl']:+,.2f} | Chưa chốt: ${asset['unrealized']:+,.2f}</div>
+            </div>
+        </div>
+        <div class="coin-table-container">
+            <div class="coin-table-title">💼 CHI TIẾT TỪNG MÃ TRONG DANH MỤC</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>MÃ COIN</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>GIÁ MUA TB</th>
+                        <th>GIÁ HIỆN TẠI</th>
+                        <th>GIÁ TRỊ HIỆN TẠI</th>
+                        <th>NGUỒN</th>
+                        <th>LỜI/LỖ %</th>
+                        <th>LỜI/LỖ $</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {coin_rows}
+                </tbody>
+            </table>
+        </div>
         <div class="kpi-subgrid">
             <div class="kpi-card">
-                <div class="kpi-title">Lợi Nhuận Net</div>
+                <div class="kpi-title">Lợi Nhuận Đã Chốt</div>
                 <div class="kpi-value {pnl_class}">${m['total_pnl']:+,.2f}</div>
                 <div class="kpi-desc">{m['total_trades']} lệnh đã đóng</div>
             </div>
@@ -93,12 +227,23 @@ def generate_dashboard():
     for u in UNITS:
         t, p = load_unit_data(u['db'], u['label'], u['strategy'])
         m = compute_metrics(t, p)
-        units_data.append({'unit': u, 'metrics': m})
+        units_data.append({'unit': u, 'metrics': m, 'pos_df': p})
         if len(t): all_trades_list.append(t)
         if len(p): all_pos_list.append(p)
 
     all_trades = pd.concat(all_trades_list, ignore_index=True) if all_trades_list else pd.DataFrame()
     all_pos = pd.concat(all_pos_list, ignore_index=True) if all_pos_list else pd.DataFrame()
+
+    # 1b. Fetch giá realtime cho toàn bộ mã đang giữ
+    open_symbols = set(all_pos['symbol']) if len(all_pos) > 0 else set()
+    prices = fetch_current_prices(open_symbols)
+
+    # 1c. Tính tài sản từng đơn vị (tiền mặt + coin theo giá hiện tại)
+    for ud in units_data:
+        rows, asset = compute_unit_asset(ud['pos_df'], prices)
+        asset['open_n'] = len(rows)
+        ud['asset_rows'] = rows
+        ud['asset'] = asset
 
     # 2. Tổng hợp toàn danh mục
     total_trades = len(all_trades)
@@ -113,8 +258,16 @@ def generate_dashboard():
     avg_loss = all_trades[all_trades['pnl_usd'] <= 0]['pnl_usd'].mean() if losing_trades > 0 else 0.0
     rr_ratio = abs(avg_win / avg_loss) if avg_loss != 0 else 0.0
 
+    total_deployed = sum(ud['asset']['deployed'] for ud in units_data)
+    total_cash = sum(ud['asset']['cash'] for ud in units_data)
+    total_coin_value = sum(ud['asset']['coin_value'] for ud in units_data)
+    total_assets_all = sum(ud['asset']['total_assets'] for ud in units_data)
+    total_unrealized = sum(ud['asset']['unrealized'] for ud in units_data)
+    total_pnl_all = total_pnl + total_unrealized
+    grand_cap = config.TOTAL_PORTFOLIO_CAP * len(UNITS)
+
     # 3. Render 4 cụm KPI riêng
-    unit_sections = "".join(render_unit_kpi(ud['unit'], ud['metrics']) for ud in units_data)
+    unit_sections = "".join(render_unit_kpi(ud['unit'], ud['metrics'], ud['asset_rows'], ud['asset']) for ud in units_data)
 
     # 4. Bảng lệnh đã đóng (có badge chiến lược)
     def strategy_badge(strategy):
@@ -250,6 +403,34 @@ def generate_dashboard():
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
         }}
+        .asset-summary {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 18px;
+        }}
+        .asset-item {{
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }}
+        .coin-table-container {{
+            margin-bottom: 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--bg-card);
+        }}
+        .coin-table-title {{
+            padding: 12px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.03);
+        }}
 
         .section-title {{
             font-size: 20px;
@@ -350,9 +531,14 @@ def generate_dashboard():
     <div class="section-title">TỔNG QUAN TOÀN DANH MỤC</div>
     <div class="kpi-grid">
         <div class="kpi-card">
-            <div class="kpi-title">Tổng Lợi Nhuận Net</div>
-            <div class="kpi-value {'positive' if total_pnl >= 0 else 'negative'}">${total_pnl:+,.2f}</div>
-            <div class="kpi-desc">Lợi nhuận ròng toàn danh mục (cả 2 chiến lược)</div>
+            <div class="kpi-title">Tổng Tài Sản (Tiền Mặt + Coin)</div>
+            <div class="kpi-value {'positive' if total_assets_all >= grand_cap else 'negative'}">${total_assets_all:,.2f}</div>
+            <div class="kpi-desc">Vốn trần: ${grand_cap:,.0f} | Tiền mặt: ${total_cash:,.2f} | Coin: ${total_coin_value:,.2f}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Tổng Lợi Nhuận (Đã Chốt + Chưa Chốt)</div>
+            <div class="kpi-value {'positive' if total_pnl_all >= 0 else 'negative'}">${total_pnl_all:+,.2f}</div>
+            <div class="kpi-desc">Đã chốt: ${total_pnl:+,.2f} | Chưa chốt: ${total_unrealized:+,.2f}</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Tỷ Lệ Thắng (Win Rate)</div>

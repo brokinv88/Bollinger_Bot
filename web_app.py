@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime, timezone
 from flask import Flask, render_template_string, request, redirect, url_for, jsonify
 from database import PortfolioDB
+from generate_dashboard import fetch_current_prices, compute_unit_asset
 
 app = Flask(__name__)
 
@@ -96,6 +97,9 @@ HTML_TEMPLATE = """
         .unit-kpis { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
         .unit-kpis .kpi-card { padding:14px; }
         .unit-kpis .kpi-val { font-size:20px; }
+        .unit-assets { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin-bottom:14px; }
+        .unit-assets .kpi-card { padding:14px; border:1px solid rgba(0, 240, 144, 0.25); background: rgba(0, 240, 144, 0.04); }
+        .unit-assets .kpi-val { font-size:20px; }
         .section-title { font-size:16px; font-weight:600; margin:28px 0 14px; display:flex; align-items:center; gap:8px; }
         .section-title::before { content:''; width:4px; height:18px; background:var(--accent-blue); border-radius:2px; }
     </style>
@@ -165,9 +169,69 @@ HTML_TEMPLATE = """
                     <h3>🎯 {{ u.label }}</h3>
                     <span class="badge {{ 'badge-stratb' if u.strategy == 'CHIẾN LƯỢC B' else 'badge-base' }}">{{ u.strategy }}</span>
                 </div>
+                <!-- TỔNG TÀI SẢN ĐƠN VỊ -->
+                {% set a = u.asset %}
+                <div class="unit-assets">
+                    <div class="kpi-card">
+                        <div class="kpi-name">TỔNG TÀI SẢN (TIỀN MẶT + COIN)</div>
+                        <div class="kpi-val {{ 'pos' if a.total_assets >= a.cap else 'neg' }}">${{ "{:,.2f}".format(a.total_assets) }}</div>
+                        <div class="kpi-desc">Vốn trần: ${{ "{:,.0f}".format(a.cap) }} | Đã dùng: ${{ "{:,.2f}".format(a.deployed) }}</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-name">TIỀN MẶT KHẢ DỤNG</div>
+                        <div class="kpi-val" style="color:var(--accent-blue);">${{ "{:,.2f}".format(a.cash) }}</div>
+                        <div class="kpi-desc">{{ a.open_n }} mã đang giữ</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-name">GIÁ TRỊ COIN HIỆN TẠI</div>
+                        <div class="kpi-val" style="color:var(--accent-gold);">${{ "{:,.2f}".format(a.coin_value) }}</div>
+                        <div class="kpi-desc">Theo giá realtime</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-name">LỢI NHUẬN DANH MỤC</div>
+                        <div class="kpi-val {{ 'pos' if u.total_pnl + a.unrealized >= 0 else 'neg' }}">${{ "{:+,.2f}".format(u.total_pnl + a.unrealized) }}</div>
+                        <div class="kpi-desc">Đã chốt: ${{ "{:+,.2f}".format(u.total_pnl) }} | Chưa chốt: ${{ "{:+,.2f}".format(a.unrealized) }}</div>
+                    </div>
+                </div>
+                <!-- CHI TIẾT TỪNG MÃ -->
+                <div class="table-card" style="margin-bottom:16px;">
+                    <div class="table-title">💼 CHI TIẾT TỪNG MÃ TRONG DANH MỤC</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>MÃ COIN</th>
+                                <th>SỐ LƯỢNG</th>
+                                <th>GIÁ MUA TB</th>
+                                <th>GIÁ HIỆN TẠI</th>
+                                <th>GIÁ TRỊ HIỆN TẠI</th>
+                                <th>NGUỒN</th>
+                                <th>LỜI/LỖ %</th>
+                                <th>LỜI/LỖ $</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if a.open_n > 0 %}
+                                {% for r in u.asset_rows %}
+                                <tr>
+                                    <td><strong>{{ r.symbol }}</strong> <span class="badge-pyramid">Tầng {{ r.level }}/3</span></td>
+                                    <td>{{ "{:.4f}".format(r.qty) }}</td>
+                                    <td>${{ "{:.4f}".format(r.avg) }}</td>
+                                    <td>${{ "{:.4f}".format(r.cur) }}</td>
+                                    <td>${{ "{:.2f}".format(r.value) }}</td>
+                                    <td>{% if r.source == 'auto' %}<span class="badge badge-auto">TỰ ĐỘNG</span>{% else %}<span class="badge badge-manual">THỦ CÔNG</span>{% endif %}</td>
+                                    <td class="{{ 'pos' if r.pnl >= 0 else 'neg' }}">{{ "{:+.2f}%".format(r.pnl_pct) }}</td>
+                                    <td class="{{ 'pos' if r.pnl >= 0 else 'neg' }}"><strong>{{ "{:+,.2f}$".format(r.pnl) }}</strong></td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr><td colspan="8" style="text-align:center; color:var(--text-dim); padding:20px;">Chưa có mã nào đang giữ trong đơn vị này.</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
                 <div class="unit-kpis">
                     <div class="kpi-card">
-                        <div class="kpi-name">Tổng Lợi Nhuận Net</div>
+                        <div class="kpi-name">Lợi Nhuận Đã Chốt</div>
                         <div class="kpi-val {{ 'pos' if u.total_pnl >= 0 else 'neg' }}">${{ "{:+,.2f}".format(u.total_pnl) }}</div>
                         <div class="kpi-desc">{{ u.total_trades }} lệnh đã đóng | {{ u.open_count }} mã đang giữ</div>
                     </div>
@@ -346,6 +410,16 @@ def get_data():
 
     trades = pd.concat(all_trades, ignore_index=True) if all_trades else pd.DataFrame()
     positions = pd.concat(all_pos, ignore_index=True) if all_pos else pd.DataFrame()
+
+    # Giá realtime + tài sản từng đơn vị (tiền mặt + coin theo giá hiện tại)
+    open_symbols = set(positions['symbol']) if len(positions) > 0 else set()
+    prices = fetch_current_prices(open_symbols)
+    for um in units_metrics:
+        t, p = load_db(um['db'], um['label'], um['strategy'])
+        rows, asset = compute_unit_asset(p, prices)
+        asset['open_n'] = len(rows)
+        um['asset_rows'] = rows
+        um['asset'] = asset
 
     return {
         'units_metrics': units_metrics,
