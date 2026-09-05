@@ -59,8 +59,10 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main || true
-          git add paper_state.json paper_trades.csv paper_equity.csv \
-                  bridge_state.json bridge_trades.csv bridge_equity.csv bridge_orders.jsonl \
-                  dashboard.html index.html
+          # autostash giữ an toàn khi runner có unstaged thay đổi (scan vừa sửa equity)
+          git pull --rebase --autostash origin main || true
+          # Add các file có tồn tại (bridge_orders.jsonl có thể chưa có lần đầu)
+          git add paper_state.json paper_trades.csv paper_equity.csv 2>/dev/null || true
+          git add bridge_state.json bridge_trades.csv bridge_equity.csv bridge_orders.jsonl 2>/dev/null || true
+          git add dashboard.html index.html 2>/dev/null || true
           git diff --staged --quiet || (git commit -m "Update futures paper+bridge state after H4 scan [skip ci]" && git push origin main)
