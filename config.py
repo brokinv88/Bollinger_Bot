@@ -2,6 +2,8 @@
 # CẤU HÌNH BOT GIAO DỊCH (CONFIG DUAL ACCOUNTS)
 # ==========================================
 
+import os
+
 # 1. Chế độ hoạt động chung: "PAPER" (Mô phỏng/Bắn tín hiệu) hoặc "LIVE" (Đặt lệnh thật)
 MODE = "PAPER"
 
@@ -17,8 +19,12 @@ BB_MULT = 1.5
 SMA_PERIODS = [50, 100, 150, 200]
 
 # 4. Cấu hình Telegram (Nhận thông báo chung hoặc riêng)
-TELEGRAM_BOT_TOKEN = "8832797099:AAGy-6NBbK2Hgtssh2PF-4t2BhRyI986xB8"
-TELEGRAM_CHAT_ID = "1050194344"
+#    TOKEN KHÔNG ghi trong code. Đọc từ biến môi trường TELEGRAM_BOT_TOKEN
+#    (do GitHub Actions secret cấp) để không lộ khi repo public.
+#    Gõ lệnh bên dưới để chạy local:
+#      export TELEGRAM_BOT_TOKEN="TOKEN_MỚI_TỪ_BOTFATHER"
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "YOUR_TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "1050194344")
 
 # 5. API Binance Tài khoản 1 (Danh mục Top 100 Volume)
 BINANCE_ACC1_API_KEY = "YOUR_ACC1_API_KEY"
