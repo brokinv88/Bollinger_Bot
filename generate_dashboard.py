@@ -451,6 +451,190 @@ def render_futures_section(fd):
     </div>"""
 
 
+def load_bridge_data():
+    """Đọc state + trades + equity + orders của live_bridge (dry-run/real)."""
+    import live_bridge as lb
+    data = {"enabled": config.ENABLE_FUTURES_AUTO_TRADE}
+    if not data["enabled"]:
+        return data
+    if not os.path.exists(lb.BRIDGE_STATE):
+        data["error"] = "Chưa có bridge_state.json — chạy `python live_bridge.py --seed` rồi `--scan`."
+        return data
+    with open(lb.BRIDGE_STATE) as f:
+        st = json.load(f)
+    trades = pd.DataFrame()
+    if os.path.exists(lb.BRIDGE_TRADES):
+        trades = pd.read_csv(lb.BRIDGE_TRADES)
+    equity = pd.DataFrame()
+    if os.path.exists(lb.BRIDGE_EQUITY):
+        equity = pd.read_csv(lb.BRIDGE_EQUITY)
+        equity = equity.drop_duplicates(subset=["ts"]).reset_index(drop=True)
+    orders = []
+    if os.path.exists(lb.BRIDGE_ORDERS):
+        for line in open(lb.BRIDGE_ORDERS, encoding="utf-8"):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                orders.append(json.loads(line))
+            except Exception:
+                pass
+    data.update(
+        equity_start=lb.fp.EQUITY0,
+        equity=st.get("equity", lb.fp.EQUITY0),
+        peak=st.get("peak", lb.fp.EQUITY0),
+        n_trades=st.get("n_trades", 0),
+        max_pos=lb.fp.MAX_POS,
+        max_margin_pct=lb.fp.MAX_MARGIN_PCT,
+        lev=lb.fp.LEV,
+        positions=st.get("positions", []),
+        trades=trades,
+        equity_curve=equity,
+        orders=orders,
+        last_ts=st.get("last_ts"),
+        mode="REAL" if lb.REAL else "DRY_RUN",
+    )
+    return data
+
+
+def render_bridge_section(fd):
+    if not fd.get("enabled"):
+        return ("<div class='section-title'>LIVE BRIDGE (FUTURES THẬT) — DRY-RUN</div>"
+                "<div class='helper-box'>⚠️ Cấu phần Futures áo đang tắt (ENABLE_FUTURES_AUTO_TRADE=False).</div>")
+    if fd.get("error"):
+        return ("<div class='section-title'>LIVE BRIDGE (FUTURES THẬT)</div>"
+                f"<div class='helper-box'>⚠️ {fd['error']}</div>")
+
+    m = compute_futures_metrics(fd)
+    prices = fetch_futures_prices([p["symbol"] for p in fd["positions"]]) if fd["positions"] else {}
+    unreal = sum(
+        p["direction"] * (prices.get(p["symbol"], p["entry_px"]) - p["entry_px"])
+        / p["entry_px"] * float(p["notional"])
+        for p in fd["positions"]
+    )
+    eq = fd["equity"] + unreal
+    start = fd["equity_start"]
+    curve = fd.get("equity_curve")
+    curve_peak = float(curve["equity"].max()) if curve is not None and len(curve) else 0.0
+    peak = max(fd["peak"], curve_peak, eq)
+    total_pnl = eq - start
+    tpc = "positive" if total_pnl >= 0 else "negative"
+    mdd_pct = 0.0
+    if curve is not None and len(curve):
+        eqs = np.concatenate([curve["equity"].to_numpy(dtype=float), np.array([eq])])
+        mdd_pct = float(((eqs / np.maximum.accumulate(eqs) - 1.0) * 100.0).min())
+    elif eq < start:
+        mdd_pct = (eq / start - 1.0) * 100.0
+    mdd_cls = "negative" if mdd_pct < 0 else "positive"
+    margin_usd = sum(float(p.get("margin", 0) or 0) for p in fd["positions"])
+    margin_pct = margin_usd / eq * 100 if eq > 0 else 0
+    dn = m["by_strategy"].get("DON", 0)
+    kt = m["by_strategy"].get("KELT", 0)
+
+    pos_rows = ""
+    if fd["positions"]:
+        for p in fd["positions"]:
+            side = "LONG" if p["direction"] == 1 else "SHORT"
+            is_long = p["direction"] == 1
+            cur = prices.get(p["symbol"], p["entry_px"])
+            gross = p["direction"] * (cur - p["entry_px"]) / p["entry_px"] * 100
+            pnl_cls = "positive" if gross >= 0 else "negative"
+            pos_rows += f"""
+            <tr>
+                <td><strong>{p['symbol']}</strong></td>
+                <td><span class="badge {'auto' if is_long else 'manual'}">{side}</span></td>
+                <td><span class="badge stratb">{p['strategy']}</span></td>
+                <td>${p['entry_px']:.4f}</td>
+                <td>${cur:.4f}</td>
+                <td>${p['notional']:,.0f}</td>
+                <td>${p['margin']:,.0f}</td>
+                <td class="{pnl_cls}"><strong>{gross:+.2f}%</strong></td>
+                <td>{fmt_ms(p['entry_time'])}</td>
+            </tr>"""
+    else:
+        pos_rows = "<tr><td colspan='9' style='text-align:center; padding:24px; color:#888;'>Không có vị thế mở.</td></tr>"
+
+    ord_rows = ""
+    if fd.get("orders"):
+        for r in fd["orders"][-15:]:
+            o = r.get("order", {})
+            side = "SELL" if o.get("side") == "SELL" else "BUY"
+            verb_badge = {"PLACE": ("badge auto", "MỞ"), "UPDATE": ("badge manual", "DỊCH"),
+                          "CANCEL+CLOSE": ("badge stratb", "ĐÓNG")}.get(r.get("verb"), ("badge", r.get("verb", "")))
+            px = f" stop={o.get('stopPrice')}" if o.get("stopPrice") else ""
+            ord_rows += f"""
+            <tr>
+                <td><span class="badge {'auto' if r.get('verb')=='PLACE' else 'manual'}">{r.get('verb')}</span></td>
+                <td><strong>{o.get('symbol')}</strong></td>
+                <td><span class="badge {'auto' if side=='BUY' else 'manual'}">{side}</span></td>
+                <td>{o.get('type')} <span class="badge stratb">reduceOnly</span></td>
+                <td>${o.get('price_hint', o.get('stopPrice', 0)):.4f}</td>
+                <td>{o.get('qty', 0):.6g}</td>
+                <td>{r.get('mode', 'DRY_RUN')}</td>
+                <td>{fmt_ms(r.get('ts_ms', 0))}</td>
+            </tr>"""
+    else:
+        ord_rows = "<tr><td colspan='8' style='text-align:center; padding:24px; color:#888;'>Chưa có lệnh nào được log (chờ scan/monitor có thay đổi vị thế).</td></tr>"
+
+    mode_badge = ("<span class='badge manual'>REAL</span>" if fd.get("mode") == "REAL"
+                  else "<span class='badge auto'>DRY-RUN · KHÔNG RỦI RO</span>")
+    last_scan = fmt_ms(fd["last_ts"]) if fd.get("last_ts") else "-"
+    return f"""<div class="section-title">LIVE BRIDGE — FUTURES THẬT (SO SÁNH VỚI BOT GIẤY) {mode_badge}</div>
+    <div class="helper-box">Chạy đúng engine futures_paper nhưng ghi file <code>*_bridge.*</code> riêng.
+    Mỗi quyết định được log dạng order chuẩn Binance (<code>STOP_MARKET</code> <code>reduceOnly</code>) vào
+    <code>bridge_orders.jsonl</code> — dry-run <strong>không gọi API thật, không cần API key</strong>.
+    Khi <code>FUTURES_BRIDGE_REAL=1</code> thì module này sẽ đặt lệnh thật.</div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Tài Khoản (Vốn + Lời/Lỗ)</div>
+            <div class="kpi-value {tpc}">${eq:,.2f}</div>
+            <div class="kpi-desc">Bắt đầu: ${start:,.0f} | Peak: ${peak:,.2f}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Tổng Lợi Nhuận</div>
+            <div class="kpi-value {tpc}">{total_pnl:+,.2f}$</div>
+            <div class="kpi-desc">({total_pnl/start*100:+.2f}%) | DON: {dn:+,.0f}$ | KELT: {kt:+,.0f}$</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Max Drawdown</div>
+            <div class="kpi-value {mdd_cls}">{mdd_pct:.2f}%</div>
+            <div class="kpi-desc">Từ đỉnh (equity theo giá)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Vị Thế Mở / Margin</div>
+            <div class="kpi-value" style="color: var(--accent-blue);">{len(fd['positions'])}/{fd['max_pos']}</div>
+            <div class="kpi-desc">Margin {margin_pct:.1f}% (trần {fd['max_margin_pct']*100:.0f}%)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Tỷ Lệ Thắng</div>
+            <div class="kpi-value" style="color: #ffb800;">{m['winrate']:.1f}%</div>
+            <div class="kpi-desc">{m['win']}W/{m['loss']}L | PF {m['pf']:.2f} | Scan: {last_scan}</div>
+        </div>
+    </div>
+
+    <div class="section-title">Vị Thế Bridge Đang Mở</div>
+    <div class="table-container">
+        <table>
+            <thead><tr>
+                <th>PAIR</th><th>HƯỚNG</th><th>CHIẾN LƯỢC</th><th>GIÁ VÀO</th><th>GIÁ HIỆN TẠI</th>
+                <th>NOTIONAL</th><th>MARGIN</th><th>P/L %</th><th>NGÀY VÀO</th>
+            </tr></thead>
+            <tbody>{pos_rows}</tbody>
+        </table>
+    </div>
+
+    <div class="section-title">Would-be Orders (định dạng Binance, đã log)</div>
+    <div class="table-container">
+        <table>
+            <thead><tr>
+                <th>HÀNH ĐỘNG</th><th>PAIR</th><th>SIDE</th><th>LOẠI</th><th>GIÁ</th><th>QTY</th><th>MODE</th><th>LÚC</th>
+            </tr></thead>
+            <tbody>{ord_rows}</tbody>
+        </table>
+    </div>"""
+
+
 def render_futures_logic():
     """Mô tả logic 2 chiến lược autotrade futures áo (Donchian55 + Keltner H4)."""
     import futures_paper as fp
@@ -633,6 +817,8 @@ def generate_dashboard():
     futures_data = load_futures_data()
     futures_html = render_futures_section(futures_data)
     futures_logic_html = render_futures_logic()
+    bridge_data = load_bridge_data()
+    bridge_html = render_bridge_section(bridge_data)
 
     # 2. Tổng hợp toàn danh mục
     total_trades = len(all_trades)
@@ -982,6 +1168,8 @@ def generate_dashboard():
     {unit_sections}
 
     {futures_html}
+
+    {bridge_html}
 
     {futures_logic_html}
 
