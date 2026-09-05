@@ -96,24 +96,27 @@ def evaluate_signals(df):
         'roc_20': roc_20
     }
 
-def scan_account(account_name: str, db_file: str, get_symbols_func):
+def scan_account(account_name: str, db_file: str, symbols: list, kline_cache: dict):
     db = PortfolioDB(db_file)
     now_utc = datetime.now(timezone.utc)
     today_str = now_utc.strftime('%Y-%m-%d')
     today_vn = (now_utc + timedelta(hours=7)).strftime('%d/%m/%Y %H:%M')
     
-    print(f"\n[{account_name.upper()}] Bắt đầu quét...")
+    print(f"\n[{account_name.upper()}] Bắt đầu phân tích {len(symbols)} mã...")
     open_positions = db.get_open_positions()
-    symbols = get_symbols_func()
     
     data_dict = {}
     for sym in symbols:
-        time.sleep(0.02)
-        df = get_daily_data(sym)
-        if df is not None:
-            eval_res = evaluate_signals(df)
-            if eval_res is not None:
-                data_dict[sym] = eval_res
+        if sym not in kline_cache:
+            df = get_daily_data(sym)
+            if df is not None:
+                kline_cache[sym] = evaluate_signals(df)
+            else:
+                kline_cache[sym] = None
+                
+        eval_res = kline_cache[sym]
+        if eval_res is not None:
+            data_dict[sym] = eval_res
                 
     # 1. Check Exit
     alerts_exit = []
@@ -182,13 +185,18 @@ def scan_account(account_name: str, db_file: str, get_symbols_func):
     notifier.send_telegram_alert(header + body + footer)
 
 def main():
-    print("=== CHẠY QUÉT SONG SONG 2 TÀI KHOẢN BINANCE ===")
-    # 1. Quét Tài khoản 1: Top 100 Volume
-    scan_account("Tài Khoản 1 (Top 100 Volume)", "database_volume.db", universe.get_top_100_volume_symbols)
+    print("=== CHẠY QUÉT SONG SONG 2 TÀI KHOẢN BINANCE (CHẾ ĐỘ TỐI ƯU TỐC ĐỘ) ===")
+    vol_symbols = universe.get_top_100_volume_symbols()
+    mc_symbols = universe.get_top_100_marketcap_symbols()
     
-    # 2. Quét Tài khoản 2: Top 100 MarketCap
-    scan_account("Tài Khoản 2 (Top 100 MarketCap)", "database_marketcap.db", universe.get_top_100_marketcap_symbols)
-    print("\n[HOÀN TẤT QUÉT CẢ 2 DANH MỤC]")
+    kline_cache = {}
+    
+    # 1. Quét Tài khoản 1: Top 100 Volume
+    scan_account("Tài Khoản 1 (Top 100 Volume)", "database_volume.db", vol_symbols, kline_cache)
+    
+    # 2. Quét Tài khoản 2: Top 100 MarketCap (Sử dụng lại cache các mã trùng lặp)
+    scan_account("Tài Khoản 2 (Top 100 MarketCap)", "database_marketcap.db", mc_symbols, kline_cache)
+    print(f"\n[HOÀN TẤT QUÉT CẢ 2 DANH MỤC TRONG {len(kline_cache)} MÃ COIN]")
 
 if __name__ == "__main__":
     main()
