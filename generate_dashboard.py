@@ -424,6 +424,80 @@ def render_futures_section(fd):
     </div>"""
 
 
+def render_futures_logic():
+    """Mô tả logic 2 chiến lược autotrade futures áo (Donchian55 + Keltner H4)."""
+    import futures_paper as fp
+
+    don = fp.DON
+    kelt = fp.KELT
+
+    sl_don = f"{don['sl']:.0f}×ATR (cắt lỗ ban đầu) ⇒ entry ± {don['sl']/don['tp']*100:.0f}% của tp"
+    blocks_don = [
+        ("📊", "Chỉ báo kỹ thuật",
+         f"Khung H4 (chỉ xử lý nến H4 đã đóng, giờ scan = 00:05/04:05/08:05/12:05/16:05/20:05 UTC):\n"
+         f"• Donchian {int(don['dc'])} H4: Đỉnh/Đáy 55 nến — đường breakout\n"
+         f"• EMA 50 + ADX(14) ≥ {don['adx']:.0f} (bộ lọc sức trend)\n"
+         f"• ATR(14)% so SMA50(ATR%): chỉ vào khi biến động đang mở rộng\n"
+         f"• Funding rate ≤ +{don['fdmax']*100:.2f}% (long) / ≥ −{don['fdmax']*100:.2f}% (short)"),
+        ("📈", "Tín hiệu VÀO LỆNH (LONG / SHORT)",
+         f"LONG khi đóng nến > DC_high, > EMA50, ADX ≥ {don['adx']:.0f}, ATR% > SMA50(ATR%), funding bình thường.\n"
+         f"SHORT khi đóng nến < DC_low, < EMA50, ADX ≥ {don['adx']:.0f}, điều kiện ATR + funding tương ứng phản chiếu.\n"
+         f"→ 1 slot/symbol (chiến lược đến trước chiếm slot)."),
+        ("🛡", "Quản lý thoát lệnh (Chandelier Exit)",
+         f"• Cắt lỗ ban đầu: entry ∓ {don['sl']:.0f}×ATR ({sl_don})\n"
+         f"• Trailing: bám theo {don['trail']:.0f}×ATR dưới đỉnh (long) / trên đáy (short)\n"
+         f"• Break-even: khi lãi ≥ {don['be']:.0f}×ATR → kéo SL về entry (miễn phí rủi ro)\n"
+         f"• Chốt lời: take-profit {don['tp']:.0f}×ATR"),
+        ("💼", "Sizing & Quản lý vốn",
+         f"• Risk mỗi lệnh: {don['risk']*100:.2f}% equity (SL = 2×ATR ⇒ notional = risk / (2×ATR%))\n"
+         f"• Đòn bẩy {fp.LEV:.0f}x, cụm {don['tp']/don['sl']:.1f}R:1 (~{don['tp']/don['sl']*.6:.1f} net R)\n"
+         f"• Trần margin {fp.MAX_MARGIN_PCT*100:.0f}% equity, tối đa {fp.MAX_POS} vị thế (slot DON ≤ {fp.MAX_STRAT['DON']})"),
+    ]
+
+    blocks_kelt = [
+        ("📊", "Chỉ báo kỹ thuật",
+         f"Khung H4, cùng khung giờ scan futures (H4 close):\n"
+         f"• Kênh Keltner {kelt['mult']:.1f}×ATR(14) quanh EMA20 (mid)\n"
+         f"• ADX(14) ≥ {kelt['adx']:.0f} (bộ lọc sức trend)\n"
+         f"• Funding rate ≤ +{kelt['fdmax']*100:.2f}% (long) / ≥ −{kelt['fdmax']*100:.2f}% (short)"),
+        ("📈", "Tín hiệu VÀO LỆNH (LONG / SHORT)",
+         f"LONG khi đóng nến phá lên trên kênh Keltner upper (EMA20 + {kelt['mult']:.1f}×ATR) và ADX ≥ {kelt['adx']:.0f}.\n"
+         f"SHORT khi đóng nến phá xuống dưới kênh Keltner lower (EMA20 − {kelt['mult']:.1f}×ATR) và ADX ≥ {kelt['adx']:.0f}.\n"
+         f"→ 1 slot/symbol, 2 chiến lược DON + KELT chạy song song."),
+        ("🛡", "Quản lý thoát lệnh (Chandelier Exit)",
+         f"• Cắt lỗ ban đầu: entry ∓ {kelt['sl']:.0f}×ATR\n"
+         f"• Trailing: bám theo {kelt['trail']:.1f}×ATR dưới đỉnh (long) / trên đáy (short)\n"
+         f"• Break-even: khi lãi ≥ {kelt['be']:.0f}×ATR → kéo SL về entry\n"
+         f"• Chốt lời: take-profit {kelt['tp']:.0f}×ATR"),
+        ("💼", "Sizing & Quản lý vốn",
+         f"• Risk mỗi lệnh: {kelt['risk']*100:.2f}% equity (SL = 2×ATR ⇒ notional = risk / (2×ATR%))\n"
+         f"• Đòn bẩy {fp.LEV:.0f}x, cụm {kelt['tp']/kelt['sl']:.1f}R:1 (~{kelt['tp']/kelt['sl']*.6:.1f} net R)\n"
+         f"• Trần margin {fp.MAX_MARGIN_PCT*100:.0f}% equity, slot KELT ≤ {fp.MAX_STRAT['KELT']})"),
+    ]
+
+    def build_card(title, color, subtitle, blocks):
+        rows = "".join(
+            f"<div class='logic-row'><div class='logic-icon'>{icon}</div><div class='logic-body'><div class='logic-row-title'>{t}</div><div class='logic-row-desc'>{d.replace(chr(10), '<br>')}</div></div></div>"
+            for icon, t, d in blocks
+        )
+        return f"""
+        <div class="logic-card">
+            <div class="logic-header" style="border-left-color: {color};">
+                <div>
+                    <div class="logic-title">{title}</div>
+                    <div class="logic-subtitle">{subtitle}</div>
+                </div>
+            </div>
+            {rows}
+        </div>"""
+
+    sub = (f"Vốn ${fp.EQUITY0:,.0f} | Lev {fp.LEV:.0f}x | Tối đa {fp.MAX_POS} vị thế | "
+           f"Margin ≤ {fp.MAX_MARGIN_PCT*100:.0f}% | Freeze −{abs(fp.DAILY_LOSS)*100:.0f}%/ngày, −{abs(fp.WEEKLY_LOSS)*100:.0f}/tuần")
+    cards = [build_card("DONCHAIN 55 — BREAKOUT H4", "#00b4d8", sub, blocks_don),
+             build_card("KELTNER CHANNEL — TREND H4", "#c084fc", sub, blocks_kelt)]
+    return f"<div class='section-title'>LOGIC CHIẾN LƯỢC AUTOTRADE FUTURES (TÓM TẮT ĐỂ ĐÁNH GIÁ)</div><div class='logic-grid'>" + "".join(cards) + "</div>"
+
+
 def render_strategy_logic():
     """Mô tả chi tiết logic từng chiến lược (BASE & CHIẾN LƯỢC B) để tiện đánh giá."""
     bb = config.BB_LEN
@@ -527,6 +601,7 @@ def generate_dashboard():
     # 1d. Cấu phần FUTURES ÁO (paper trader H4)
     futures_data = load_futures_data()
     futures_html = render_futures_section(futures_data)
+    futures_logic_html = render_futures_logic()
 
     # 2. Tổng hợp toàn danh mục
     total_trades = len(all_trades)
@@ -876,6 +951,8 @@ def generate_dashboard():
     {unit_sections}
 
     {futures_html}
+
+    {futures_logic_html}
 
     {strategy_logic_html}
 
