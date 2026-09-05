@@ -2,20 +2,25 @@ name: Daily Crypto Portfolio Scanner
 
 on:
   schedule:
-    # Chạy lúc 00:01 UTC hàng ngày (tức 07:01 sáng giờ Việt Nam UTC+7)
+    # 00:01 UTC = 07:01 Sáng giờ Việt Nam
     - cron: '1 0 * * *'
-  # Cho phép bấm nút "Run workflow" bằng tay trên web GitHub bất cứ lúc nào
   workflow_dispatch:
+
+# Cấp quyền đọc và ghi trực tiếp từ trong file workflow
+permissions:
+  contents: write
 
 jobs:
   scan-and-alert:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Python 3.11
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -34,4 +39,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add database_volume.db database_marketcap.db
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update portfolio databases [skip ci]" && git push)
+          git diff --staged --quiet || (git commit -m "Update portfolio databases [skip ci]" && git push)
