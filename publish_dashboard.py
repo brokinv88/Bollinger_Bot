@@ -21,10 +21,13 @@ def run(cmd, check=True):
     return p
 
 
+PY = f'"{sys.executable}"'
+
+
 def main():
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    run("python generate_dashboard.py", check=True)
+    run(f"{PY} generate_dashboard.py", check=True)
     run("cp dashboard.html index.html")
     # Stage chỉ những file tồn tại + đã track (an toàn, bỏ qua research/backtest đang dở)
     existing = [f for f in TRACKED if os.path.exists(f)]
