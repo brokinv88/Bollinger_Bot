@@ -15,6 +15,7 @@ import os
 import time
 import numpy as np
 import pandas as pd
+import requests
 
 # Cấu hình lấy từ config.__dict__ để có thể chạy độc lập (không import config) hoặc
 # như một cấu phần (import qua auto_trade.py) với giá trị từ FUTURES_* trong config.py.
@@ -274,6 +275,10 @@ class PaperLot:
         if not (hit_tp or hit_trail):
             return
         exit_px = pos["tp"] if hit_tp else pos["trail"]
+        self.close_at(ts, pos, exit_px, "TP" if hit_tp else "TRAIL")
+
+    def close_at(self, ts, pos, exit_px, reason):
+        """Đóng 1 vị thế tại exit_px (dùng chung: nến H4 đóng hoặc SL realtime)."""
         gross = pos["direction"] * (exit_px - pos["entry_px"]) / pos["entry_px"]
         gross_usd = gross * pos["notional"]
         fee = 2 * TAKER_FEE * pos["notional"]
@@ -283,7 +288,7 @@ class PaperLot:
         self.st["n_trades"] += 1
         rec = dict(strategy=pos["strategy"], symbol=pos["symbol"], direction=pos["direction"],
                    entry_time=pos["entry_time"], exit_time=ts, entry_px=pos["entry_px"],
-                   exit_px=exit_px, reason="TP" if hit_tp else "TRAIL",
+                   exit_px=exit_px, reason=reason,
                    atr_pct=round(pos["atr"] / pos["entry_px"] * 100, 3), notional=round(pos["notional"], 2),
                    gross_usd=round(gross_usd, 2), funding_usd=round(pos["fund"], 2),
                    fee_usd=round(fee, 2), net_usd=round(net, 2), equity_after=round(self.st["equity"], 2))
@@ -293,6 +298,7 @@ class PaperLot:
         if self.tiers.get(pos["symbol"]) == "T4":
             self.t4_open -= 1
         self.log.append(f"CLOSE@{ts} {pos['strategy']} {pos['symbol']}: @{exit_px:.4f} net ${net:+.2f} → equity ${self.equity():,.2f}")
+        return net
 
     # ------------------------------------------------- synthesizer data
     def prepare(self, symbol, start_ms, end_ms):
@@ -385,8 +391,86 @@ def scan_futures(notify_tg=True):
         print("ENABLE_FUTURES_AUTO_TRADE = False -> bỏ qua futures paper.")
         return None
     symbols = top_universe()
+    mon = monitor_stops(notify_tg=False)
     text = run_live(symbols, fresh=False)
+    if mon:
+        text = (mon + "\n\n" + text) if text else mon
     if text and notify_tg:
+        notify(text)
+    return text
+
+
+FAPI_TICKER = "https://fapi.binance.com/fapi/v1/ticker/price"
+
+
+def realtime_prices(symbols):
+    """Giá realtime USDT-M futures (một request tổng) — fallback từng symbol."""
+    prices = {}
+    try:
+        r = requests.get(FAPI_TICKER, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+        data = r.json()
+        if isinstance(data, list):
+            idx = {it.get("symbol"): it.get("price") for it in data}
+            for sym in symbols:
+                px = idx.get(sym)
+                if px:
+                    try:
+                        prices[sym] = float(px)
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+    for sym in symbols:
+        if sym in prices:
+            continue
+        try:
+            r = requests.get(f"{FAPI_TICKER}?symbol={sym}",
+                             headers={"User-Agent": "Mozilla/5.0"}, timeout=8)
+            j = r.json()
+            if isinstance(j, dict) and j.get("price"):
+                prices[sym] = float(j["price"])
+        except Exception:
+            pass
+        time.sleep(0.05)
+    return prices
+
+
+def monitor_stops(notify_tg=True):
+    """Realtime SL check GIỮA các móc nến H4 — đóng lệnh ngay khi giá xuyên trail.
+    Đây là cơ chế chống gap: dùng giá thị trường thật (không trễ 4h), khớp tại giá
+    realtime → mô phỏng đúng slippage/gap khi thị trường biến động mạnh.
+    Trả về text tóm tắt nếu có vị thế bị đóng (để auto_trade gộp tin)."""
+    st = load_state()
+    if not st.get("positions"):
+        return None
+    syms = [p["symbol"] for p in st["positions"]]
+    prices = realtime_prices(syms)
+    lot = PaperLot(st, syms)
+    now_ms = int(time.time() * 1000)
+    closed = []
+    for pos in list(st["positions"]):
+        px = prices.get(pos["symbol"])
+        if px is None:
+            continue
+        # Trail là mức SL/BE/trailing hiện tại (đã cập nhật theo nến H4 cuối)
+        breach = (pos["direction"] == 1 and px <= pos["trail"]) or \
+                 (pos["direction"] == -1 and px >= pos["trail"])
+        if not breach:
+            continue
+        net = lot.close_at(now_ms, pos, px, "SL_REALTIME")
+        closed.append(f"🛑 *{pos['strategy']} `{pos['symbol']}`* "
+                      f"{'LONG' if pos['direction'] == 1 else 'SHORT'} → đóng {px:.4f} net {net:+.2f}$")
+    if not closed:
+        return None
+    save_state(st)
+    ts_label = pd.Timestamp(now_ms, unit="ms", tz="UTC").strftime("%Y-%m-%d %H:%M UTC")
+    lines = [f"🛑 *FUTURES ÁO — SL REALTIME* | `{ts_label}`",
+             "=" * 28,
+             f"Equity: *${st['equity']:,.2f}* ({(st['equity']/EQUITY0-1)*100:+.2f}%)  | Peak ${st['peak']:,.2f}",
+             f"Vị thế mở: {len(st['positions'])}/{MAX_POS}  | Margin {lot.margin_pct():.0f}%",
+             *closed]
+    text = "\n".join(lines)
+    if notify_tg:
         notify(text)
     return text
 
@@ -439,6 +523,7 @@ def run_replay(symbols, months=24, allow_t4=True):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--scan", action="store_true", help="chạy 1 lần scan live (nến H4 đã đóng)")
+    ap.add_argument("--monitor", action="store_true", help="realtime SL check giữa các móc nến H4 (giá fapi)")
     ap.add_argument("--replay", action="store_true", help="replay lịch sử từ cache để kiểm chứng")
     ap.add_argument("--reset", action="store_true")
     ap.add_argument("--status", action="store_true")
@@ -470,6 +555,12 @@ def main():
     symbols = CORE_SYMBOLS if a.replay else top_universe(only_t12=a.nosub)
     if a.replay:
         run_replay(symbols, months=a.months)
+    elif a.monitor:
+        text = monitor_stops(notify_tg=a.notify)
+        if text:
+            print("\n" + text)
+        else:
+            print("Không có vị thế nào xuyên SL realtime.")
     else:
         text = scan_futures(notify_tg=a.notify)
         if text:

@@ -522,7 +522,11 @@ def render_futures_logic():
            f"Margin ≤ {fp.MAX_MARGIN_PCT*100:.0f}% | Freeze −{abs(fp.DAILY_LOSS)*100:.0f}%/ngày, −{abs(fp.WEEKLY_LOSS)*100:.0f}/tuần")
     cards = [build_card("DONCHAIN 55 — BREAKOUT H4", "#00b4d8", sub, blocks_don),
              build_card("KELTNER CHANNEL — TREND H4", "#c084fc", sub, blocks_kelt)]
-    return f"<div class='section-title'>LOGIC CHIẾN LƯỢC AUTOTRADE FUTURES (TÓM TẮT ĐỂ ĐÁNH GIÁ)</div><div class='logic-grid'>" + "".join(cards) + "</div>"
+    sl_rt = ("<div class='helper-box'>🛰️ <strong>SL REALTIME chống gap:</strong> giữa các móc nến H4, "
+             "giá futures được đọc realtime (fapi) và lệnh đóng ngay khi giá xuyên mức SL/BE/trailing hiện tại "
+             "— khớp theo giá thị trường thật (mô phỏng slippage/gap khi thị trường biến động mạnh). "
+             "Chạy lệnh <code>python futures_paper.py --monitor</code> hoặc do cron đảm nhiệm.</div>")
+    return f"<div class='section-title'>LOGIC CHIẾN LƯỢC AUTOTRADE FUTURES (TÓM TẮT ĐỂ ĐÁNH GIÁ)</div><div class='logic-grid'>" + "".join(cards) + f"</div>{sl_rt}"
 
 
 def render_strategy_logic():
