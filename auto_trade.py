@@ -17,6 +17,7 @@ Chạy tách riêng khỏi daily_scanner. Khi ENABLE_AUTO_TRADE = True:
 Khi ENABLE_AUTO_TRADE = False: không thay đổi gì, mọi thứ như cũ (scanner tự ghi).
 """
 
+import os
 import time
 import requests
 import pandas as pd
