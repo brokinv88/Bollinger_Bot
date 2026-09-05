@@ -128,19 +128,25 @@ class PortfolioDB:
 
     def auto_entered_today(self, symbol, today_str):
         """Kiểm tra: hôm nay đã TỰ ĐỘNG mua (source='auto') coin này chưa.
-        Dùng để chống mua lại lần 1 khi chạy nhiều lần trong ngày."""
+        Bao phủ cả vị thế đang mở (positions) lẫn đã đóng (trade_history):
+        căn cứ theo NGÀY VÀO lệnh để chống mua lại lần 1 trong ngày."""
         conn = self._get_conn()
         cursor = conn.cursor()
         try:
             cursor.execute(
+                "SELECT COUNT(*) FROM positions WHERE symbol = ? AND source = 'auto' AND first_entry_date = ?",
+                (symbol, today_str)
+            )
+            open_count = cursor.fetchone()[0]
+            cursor.execute(
                 "SELECT COUNT(*) FROM trade_history WHERE symbol = ? AND source = 'auto' AND entry_date = ?",
                 (symbol, today_str)
             )
-            count = cursor.fetchone()[0]
+            closed_count = cursor.fetchone()[0]
         except Exception:
-            count = 0
+            open_count = closed_count = 0
         conn.close()
-        return count > 0
+        return open_count > 0 or closed_count > 0
 
     def close_position_db(self, symbol, exit_price, today_str, reason, source="auto"):
         conn = self._get_conn()

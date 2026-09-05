@@ -16,6 +16,11 @@ permissions:
 jobs:
   futures:
     runs-on: ubuntu-latest
+    concurrency:
+      # Cùng group với daily_scan/auto_trade/futures-monitor: run sau CHỜ run trước
+      # xong bước pull+push → không còn race push dashboard.html/state files.
+      group: trading-git-push
+      cancel-in-progress: false
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
