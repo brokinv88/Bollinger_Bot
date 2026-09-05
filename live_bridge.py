@@ -49,8 +49,9 @@ def _order_log(verb, order):
 
 
 def _closes_at(verb, pos, exit_px, reason):
+    otype = "TAKE_PROFIT_MARKET" if reason and reason.startswith("TP") else "MARKET"
     order = {"symbol": pos["symbol"], "side": "SELL" if pos["direction"] == 1 else "BUY",
-             "type": "MARKET", "reduceOnly": True, "reason": reason,
+             "type": otype, "reduceOnly": True, "reason": reason,
              "qty": round(pos["notional"] / pos["entry_px"], 8),
              "price_hint": round(exit_px, 4)}
     _order_log(verb, order)
@@ -60,6 +61,13 @@ def _stops_for(pos):
     return {"symbol": pos["symbol"], "side": "SELL" if pos["direction"] == 1 else "BUY",
             "type": "STOP_MARKET", "timeInForce": "GTE_GTC", "reduceOnly": True,
             "stopPrice": round(pos["trail"], 4),
+            "qty": round(pos["notional"] / pos["entry_px"], 8)}
+
+
+def _tps_for(pos):
+    return {"symbol": pos["symbol"], "side": "SELL" if pos["direction"] == 1 else "BUY",
+            "type": "TAKE_PROFIT_MARKET", "timeInForce": "GTE_GTC", "reduceOnly": True,
+            "stopPrice": round(pos["tp"], 4),
             "qty": round(pos["notional"] / pos["entry_px"], 8)}
 
 
@@ -74,15 +82,16 @@ def _positions_snapshot():
 
 def _log_orders_between(before, after):
     """So sánh trước/sau một lần chạy → ghi would-be order chuẩn Binance."""
-    # Lệnh mở mới: đặt STOP_MARKET (lớp bảo vệ ở sàn) ngay khi mở
+    # Lệnh mở mới: đặt STOP_MARKET + TAKE_PROFIT_MARKET (2 lớp bảo vệ ở sàn) ngay khi mở
     for key, pos in after.items():
         if key not in before:
             _order_log("PLACE", _stops_for(pos))
-    # Trail/BE đổi: cập nhật lại stopPrice của lệnh stop đang treo
+            _order_log("PLACE", _tps_for(pos))
+    # Trail/BE đổi: cập nhật lại stopPrice của lệnh stop đang treo (TP cố định không đổi)
     for key, pos in after.items():
         if key in before and before[key]["trail"] != pos["trail"]:
             _order_log("UPDATE", _stops_for(pos))
-    # Vị thế đóng: hủy stop treo + market close (reduceOnly)
+    # Vị thế đóng: hủy stop treo + market/TP close (reduceOnly)
     for key, pos in before.items():
         if key not in after:
             # Giá đóng THỰC + lý do từ nhật ký close (close_at) — không fallback trail

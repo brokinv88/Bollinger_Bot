@@ -483,6 +483,15 @@ def monitor_stops(notify_tg=True):
         px = prices.get(pos["symbol"])
         if px is None:
             continue
+        # TP cũng chốt theo giá live giữa các móc H4 — mô phỏng đúng lệnh
+        # TAKE_PROFIT_MARKET đang đứng ở sàn (REAL sẽ có order này ngay khi mở).
+        hit_tp = (pos["direction"] == 1 and px >= pos["tp"]) or \
+                 (pos["direction"] == -1 and px <= pos["tp"])
+        if hit_tp:
+            net = lot.close_at(now_ms, pos, px, "TP_REALTIME")
+            closed.append(f"🎯 *{pos['strategy']} `{pos['symbol']}`* "
+                          f"{'LONG' if pos['direction'] == 1 else 'SHORT'} → TP {px:.4f} net {net:+.2f}$")
+            continue
         # Trail là mức SL/BE/trailing hiện tại (đã cập nhật theo nến H4 cuối)
         breach = (pos["direction"] == 1 and px <= pos["trail"]) or \
                  (pos["direction"] == -1 and px >= pos["trail"])
@@ -495,7 +504,7 @@ def monitor_stops(notify_tg=True):
         return None
     save_state(st)
     ts_label = pd.Timestamp(now_ms, unit="ms", tz="UTC").strftime("%Y-%m-%d %H:%M UTC")
-    lines = [f"🛑 *FUTURES ÁO — SL REALTIME* | `{ts_label}`",
+    lines = [f"🔄 *FUTURES ÁO — REALTIME TP/SL* | `{ts_label}`",
              "=" * 28,
              f"Equity: *${st['equity']:,.2f}* ({(st['equity']/EQUITY0-1)*100:+.2f}%)  | Peak ${st['peak']:,.2f}",
              f"Vị thế mở: {len(st['positions'])}/{MAX_POS}  | Margin {lot.margin_pct():.0f}%",
