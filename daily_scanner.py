@@ -96,27 +96,25 @@ def evaluate_signals(df):
         'roc_20': roc_20
     }
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+def fetch_and_evaluate_symbol(sym):
+    df = get_daily_data(sym)
+    if df is not None:
+        eval_res = evaluate_signals(df)
+        return sym, eval_res
+    return sym, None
+
 def scan_account(account_name: str, db_file: str, symbols: list, kline_cache: dict):
     db = PortfolioDB(db_file)
     now_utc = datetime.now(timezone.utc)
     today_str = now_utc.strftime('%Y-%m-%d')
     today_vn = (now_utc + timedelta(hours=7)).strftime('%d/%m/%Y %H:%M')
     
-    print(f"\n[{account_name.upper()}] Bắt đầu phân tích {len(symbols)} mã...")
+    print(f"\n[{account_name.upper()}] Phân tích {len(symbols)} mã...")
     open_positions = db.get_open_positions()
     
-    data_dict = {}
-    for sym in symbols:
-        if sym not in kline_cache:
-            df = get_daily_data(sym)
-            if df is not None:
-                kline_cache[sym] = evaluate_signals(df)
-            else:
-                kline_cache[sym] = None
-                
-        eval_res = kline_cache[sym]
-        if eval_res is not None:
-            data_dict[sym] = eval_res
+    data_dict = {sym: kline_cache[sym] for sym in symbols if sym in kline_cache and kline_cache[sym] is not None}
                 
     # 1. Check Exit
     alerts_exit = []
@@ -185,18 +183,29 @@ def scan_account(account_name: str, db_file: str, symbols: list, kline_cache: di
     notifier.send_telegram_alert(header + body + footer)
 
 def main():
-    print("=== CHẠY QUÉT SONG SONG 2 TÀI KHOẢN BINANCE (CHẾ ĐỘ TỐI ƯU TỐC ĐỘ) ===")
+    start_time = time.time()
+    print("=== CHẠY QUÉT SONG SONG 2 TÀI KHOẢN (ĐA LUỒNG SIÊU TỐC) ===")
     vol_symbols = universe.get_top_100_volume_symbols()
     mc_symbols = universe.get_top_100_marketcap_symbols()
     
-    kline_cache = {}
+    unique_symbols = list(set(vol_symbols + mc_symbols))
+    print(f">> Tải dữ liệu song song cho {len(unique_symbols)} mã coin...")
     
+    kline_cache = {}
+    with ThreadPoolExecutor(max_workers=15) as executor:
+        futures = {executor.submit(fetch_and_evaluate_symbol, sym): sym for sym in unique_symbols}
+        for future in as_completed(futures):
+            sym, res = future.result()
+            kline_cache[sym] = res
+            
     # 1. Quét Tài khoản 1: Top 100 Volume
     scan_account("Tài Khoản 1 (Top 100 Volume)", "database_volume.db", vol_symbols, kline_cache)
     
-    # 2. Quét Tài khoản 2: Top 100 MarketCap (Sử dụng lại cache các mã trùng lặp)
+    # 2. Quét Tài khoản 2: Top 100 MarketCap
     scan_account("Tài Khoản 2 (Top 100 MarketCap)", "database_marketcap.db", mc_symbols, kline_cache)
-    print(f"\n[HOÀN TẤT QUÉT CẢ 2 DANH MỤC TRONG {len(kline_cache)} MÃ COIN]")
+    
+    elapsed = time.time() - start_time
+    print(f"\n[HOÀN TẤT TOÀN BỘ 2 DANH MỤC TRONG: {elapsed:.1f} GIÂY!]")
 
 if __name__ == "__main__":
     main()
