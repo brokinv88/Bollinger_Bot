@@ -141,6 +141,7 @@ def main():
     ap.add_argument("--equity", default=EQUITY_DEFAULT)
     ap.add_argument("--state", default=STATE_DEFAULT)
     ap.add_argument("--day-conf", type=int, default=REQUIRED_DAYS)
+    ap.add_argument("--prev-verdict", default="")
     args = ap.parse_args()
     msg, verdict = run_gate(args.trades, args.equity, args.state, args.day_conf)
     print(msg)
@@ -149,6 +150,15 @@ def main():
         try:
             from notifier import send_telegram_alert
             send_telegram_alert(msg)
+            # Chỉ báo TOAN lần đầu chuyển RED/AMBER → GREEN (không spam tuần sau).
+            if verdict == "GREEN" and args.prev_verdict != "GREEN":
+                send_telegram_alert(
+                    "🎉 *REAL READY* — decision gate vừa chuyển sang "
+                    "*GREEN*. Paper ≥30 ngày, PF > 1.3, MaxDD < 20% đạt.\n\n"
+                    "Bước tiếp theo: set `MODE=REAL`, điền Binance testnet keys "
+                    "vào `config.py`, kiểm thử bridge trên testnet 1-2 ngày, "
+                    "rồi mới chuyển đủ môi trường REAL chính."
+                )
         except Exception as e:
             print(f"[notify skip] {e}")
     # Luôn exit 0: đây là báo cáo định kỳ, không phải gate CI tự chặn.

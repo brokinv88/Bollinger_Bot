@@ -15,6 +15,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Restore verdict trước (cache RED→GREEN transition)
+        id: prev
+        uses: actions/cache/restore@v4
+        with:
+          path: .prev_verdict
+          key: futures-gate-verdict-${{ runner.os }}-${{ github.ref }}
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -28,4 +35,19 @@ jobs:
       - name: Run Decision Gate
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        run: python futures_acceptance_gate.py --notify
+        run: |
+          PREV=""
+          if [ -f .prev_verdict ]; then PREV="$(cat .prev_verdict)"; fi
+          echo "prev_verdict=$PREV"
+          OUT="$(python futures_acceptance_gate.py --notify --prev-verdict "$PREV")"
+          echo "$OUT"
+          VERDICT="$(printf '%s\n' "$OUT" | sed -n 's/^EXIT=//p')"
+          echo "verdict=$VERDICT"
+          echo -n "$VERDICT" > .prev_verdict
+
+      - name: Save verdict hiện tại
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .prev_verdict
+          key: futures-gate-verdict-${{ runner.os }}-${{ github.ref }}
