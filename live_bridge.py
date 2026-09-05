@@ -85,7 +85,11 @@ def _log_orders_between(before, after):
     # Vị thế đóng: hủy stop treo + market close (reduceOnly)
     for key, pos in before.items():
         if key not in after:
-            _closes_at("CANCEL+CLOSE", pos, pos.get("exit_px", pos["trail"]), pos["reason"])
+            # Giá đóng THỰC + lý do từ nhật ký close (close_at) — không fallback trail
+            cl = fp.CLOSE_LOG.get(key, {})
+            exit_px = cl.get("exit_px", pos.get("exit_px", pos["trail"]))
+            reason = cl.get("reason", "CLOSED")
+            _closes_at("CANCEL+CLOSE", pos, exit_px, reason)
 
 
 def run_scan(notify_tg=True):

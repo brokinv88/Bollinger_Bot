@@ -112,9 +112,17 @@ def load_state():
     return st
 
 
+# Nhật ký lệnh vừa đóng trong tiến trình hiện tại: key (symbol, entry_time) -> dict(ts, exit_px, reason)
+# dùng để live_bridge ghi lại CANCEL+CLOSE với giá đóng THỰC (không phải trail).
+CLOSE_LOG: dict = {}
+
+
 def save_state(st):
-    with open(STATE_FILE, "w") as f:
+    # Atomic write: ghi file tạm rồi rename để không corrupt khi 2 tiến trình (local + runner) overlap.
+    tmp = f"{STATE_FILE}.tmp"
+    with open(tmp, "w") as f:
         json.dump(st, f, indent=1)
+    os.replace(tmp, STATE_FILE)
 
 
 def ensure_logs(replay=False):
@@ -167,10 +175,17 @@ class PaperLot:
 
     def snapshot(self, dfs, ts, note=""):
         if not self.replay:
-            pd.DataFrame([[ts, self.equity_live(dfs, ts), len(self.st["positions"]),
-                           round(self.margin_pct(), 1), note]],
-                         columns=["ts", "equity", "n_pos", "margin_pct", "note"]).to_csv(
-                EQUITY_CSV, mode="a", header=False, index=False)
+            row = [ts, self.equity_live(dfs, ts), len(self.st["positions"]),
+                   round(self.margin_pct(), 1), note]
+            # upsert theo ts: tránh trùng dòng khi local+runner cùng ghi 1 móc scan
+            if os.path.exists(EQUITY_CSV) and os.path.getsize(EQUITY_CSV) > 0:
+                eq = pd.read_csv(EQUITY_CSV)
+                eq = eq[eq["ts"] != ts]
+                pd.concat([eq, pd.DataFrame([row], columns=eq.columns)]).to_csv(
+                    EQUITY_CSV, index=False)
+            else:
+                pd.DataFrame([row], columns=["ts", "equity", "n_pos", "margin_pct", "note"]).to_csv(
+                    EQUITY_CSV, index=False)
 
     def equity_live(self, dfs, ts):
         """Equity theo giá (realized + unrealized các vị thế đang mở) tại thời điểm ts."""
@@ -294,6 +309,8 @@ class PaperLot:
                    fee_usd=round(fee, 2), net_usd=round(net, 2), equity_after=round(self.st["equity"], 2))
         out = REPLAY_TRADES if self.replay else TRADES_CSV
         pd.DataFrame([rec]).to_csv(out, mode="a", header=False, index=False)
+        CLOSE_LOG[(pos["symbol"], pos["entry_time"])] = {
+            "ts": ts, "exit_px": exit_px, "reason": reason}
         self.st["positions"].remove(pos)
         if self.tiers.get(pos["symbol"]) == "T4":
             self.t4_open -= 1
