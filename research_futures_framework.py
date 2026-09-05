@@ -41,6 +41,12 @@ def fetch_klines(symbol, interval, start_ms, end_ms, limit=1500):
             print(f"  [warn] không lấy được klines {symbol} {interval}", flush=True)
             break
         if not isinstance(data, list) or len(data) == 0:
+            if isinstance(data, dict) and ("code" in data or "msg" in data):
+                print(f"  [warn] {symbol} {interval} API error: {data.get('code')} {data.get('msg')} "
+                      f"(HTTP {r.status_code})", flush=True)
+            else:
+                print(f"  [warn] {symbol} {interval} không phải list (HTTP {r.status_code}, "
+                      f"type {type(data).__name__}, len {len(data) if hasattr(data, '__len__') else '?'})", flush=True)
             break
         all_rows.extend(data)
         last_open = data[-1][0]
