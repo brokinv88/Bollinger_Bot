@@ -2,10 +2,12 @@ name: Futures Auto-Trade (Paper + Bridge + Live SL)
 
 on:
   schedule:
-    # Chạy sau khi nến H4 futures đóng (5 phút). Đồng bộ giờ scan futures:
-    #   04:05/08:05/12:05/16:05/20:05 UTC = 11:05/15:05/19:05/23:05/03:05 giờ Việt Nam.
-    #   00:05 UTC (00:00 móc) do workflow này xử lý luôn (0,4,8,12,16,20).
-    - cron: '5 0,4,8,12,16,20 * * *'
+    # Chạy sau khi nến H4 futures đóng. Dùng :10 phút để không trùng giờ chạy
+    # với auto_trade.yml (:05) — tránh 2 workflow push cùng lúc lên dashboard.html.
+    #   04:10/08:10/12:10/16:10/20:10 UTC = 11:10/15:10/19:10/23:10/03:10 giờ Việt Nam.
+    #   00:10 UTC (00:00 móc) do workflow này xử lý luôn (0,4,8,12,16,20).
+    #   SL realtime giữa các móc do futures-monitor.yml lo (mỗi 30 phút).
+    - cron: '10 0,4,8,12,16,20 * * *'
   workflow_dispatch:
 
 permissions:

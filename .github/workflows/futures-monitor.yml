@@ -1,0 +1,67 @@
+name: Futures Real-time SL Monitor
+
+on:
+  schedule:
+    # Chạy mỗi 30 phút để đóng lệnh chạm SL theo giá realtime giữa các móc H4.
+    # Giờ :15/:45 lệch pha khỏi daily_scan.yml (:01), auto_trade.yml (:05),
+    # futures.yml (:10) — tránh 2 workflow push cùng lúc lên dashboard.html.
+    - cron: '15,45 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: futures-realtime-monitor
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pandas numpy python-telegram-bot
+
+      # Bắt buộc bridge state có từ lần scan đầu (nếu thiếu, seed từ paper).
+      - name: Seed Bridge (nếu chưa có)
+        run: python live_bridge.py --seed
+
+      - name: Paper SL Monitor (realtime)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python futures_paper.py --monitor --notify
+
+      - name: Bridge SL Monitor (dry-run)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python live_bridge.py --monitor --notify
+
+      # Chỉ commit + regen dashboard khi monitor thực sự thay đổi state
+      # (có lệnh đóng SL). Không có breach -> không commit -> không spam pages build.
+      - name: Commit and Push if SL Changed
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash origin main || true
+          git add paper_state.json paper_trades.csv paper_equity.csv 2>/dev/null || true
+          git add bridge_state.json bridge_trades.csv bridge_equity.csv bridge_orders.jsonl 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "Không có thay đổi SL — bỏ qua commit."
+          else
+            python generate_dashboard.py
+            cp dashboard.html index.html
+            git add dashboard.html index.html 2>/dev/null || true
+            git commit -m "Update futures state after real-time SL check [skip ci]" && git push origin main
+          fi
