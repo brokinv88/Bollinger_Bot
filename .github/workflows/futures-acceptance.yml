@@ -1,0 +1,31 @@
+name: Futures Acceptance Gate (Weekly)
+
+on:
+  schedule:
+    # Đánh giá tiêu chí nghiệm thu REAL mỗi thứ 2 00:30 UTC (đủ dữ liệu 1 tuần mới).
+    # Read-only — không push, không race với trading-git-push group.
+    - cron: '30 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-telegram-bot
+
+      - name: Run Decision Gate
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python futures_acceptance_gate.py --notify
