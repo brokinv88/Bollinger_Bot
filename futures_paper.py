@@ -57,6 +57,13 @@ STRATS = {"DON": DON, "KELT": KELT}
 WARMUP = 130
 
 
+def _is_week_start(ts):
+    """True nếu ts là 00:00 UTC thứ 2 (mốc đầu tuần). Dùng để reset week_start_eq."""
+    import datetime
+    dt = datetime.datetime.fromtimestamp(ts / 1000, datetime.timezone.utc)
+    return dt.weekday() == 0 and dt.hour == 0 and dt.minute == 0
+
+
 def notify(msg):
     """Gửi Telegram nếu có token, ngược lại in preview."""
     try:
@@ -197,7 +204,10 @@ class PaperLot:
             if df is None:
                 continue
             arr = df["open_time"].to_numpy()
-            idx = int(np.searchsorted(arr, ts, side="right") - 1)
+            # side='left' → lấy nến ĐÃ ĐÓNG (open_time < ts), không dùng nến đang
+            # hình thành (open_time == ts) — tránh giá live làm equity snapshot jitter
+            # giữa paper/bridge (2 fetch cách vài giây).
+            idx = int(np.searchsorted(arr, ts, side="left") - 1)
             if idx < 0:
                 continue
             c = float(df["close"].iloc[idx])
@@ -382,6 +392,10 @@ def run_live(symbols, horizon_days=75, fresh=False):
         if ts % (24 * 3600 * 1000) == 0:
             lot.snapshot(dfs, ts, "day")
             st["day_start_eq"] = st["equity"]
+        if _is_week_start(ts):
+            # Reset mốc tuần ngay đầu nến mở tuần mới (thứ 2 00:00 UTC) — nếu không,
+            # weekly -10% guard gắn với equity gốc mãi mãi (failsafe sai khi equity đã tăng).
+            st["week_start_eq"] = st["equity"]
     st["cursor"] = end
     st["last_ts"] = end
     save_state(st)
