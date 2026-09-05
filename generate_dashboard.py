@@ -315,10 +315,33 @@ def render_futures_section(fd):
                 f"<div class='helper-box'>⚠️ {fd['error']}</div>")
 
     m = compute_futures_metrics(fd)
-    eq = fd["equity"]
+
+    # Giá realtime cho vị thế đang mở → equity live (realized + unrealized)
+    prices = fetch_futures_prices([p["symbol"] for p in fd["positions"]]) if fd["positions"] else {}
+    unreal = sum(
+        p["direction"] * (prices.get(p["symbol"], p["entry_px"]) - p["entry_px"])
+        / p["entry_px"] * float(p["notional"])
+        for p in fd["positions"]
+    )
+    eq = fd["equity"] + unreal
     start = fd["equity_start"]
+    curve = fd.get("equity_curve")
+    curve_peak = float(curve["equity"].max()) if curve is not None and len(curve) else 0.0
+    peak = max(fd["peak"], curve_peak, eq)
     total_pnl = eq - start
     total_pnl_cls = "positive" if total_pnl >= 0 else "negative"
+
+    # Max drawdown từ equity curve (snapshot là equity theo giá) kèm điểm live hiện tại
+    mdd_pct = 0.0
+    if curve is not None and len(curve):
+        eqs = np.concatenate([curve["equity"].to_numpy(dtype=float), np.array([eq])])
+        run_peak = np.maximum.accumulate(eqs)
+        dd = (eqs / run_peak - 1.0) * 100.0
+        mdd_pct = float(dd.min())
+    elif eq < start:
+        mdd_pct = (eq / start - 1.0) * 100.0
+    mdd_cls = "negative" if mdd_pct < 0 else "positive"
+
     margin_usd = sum(float(p.get("margin", 0) or 0) for p in fd["positions"])
     margin_pct = margin_usd / eq * 100 if eq > 0 else 0
     dn = m["by_strategy"].get("DON", 0)
@@ -327,7 +350,6 @@ def render_futures_section(fd):
     # Bảng lệnh đang mở
     pos_rows = ""
     if fd["positions"]:
-        prices = fetch_futures_prices([p["symbol"] for p in fd["positions"]])
         for p in fd["positions"]:
             side = "LONG" if p["direction"] == 1 else "SHORT"
             is_long = p["direction"] == 1
@@ -377,12 +399,17 @@ def render_futures_section(fd):
         <div class="kpi-card">
             <div class="kpi-title">Tài Khoản (Vốn + Lời/Lỗ)</div>
             <div class="kpi-value {total_pnl_cls}">${eq:,.2f}</div>
-            <div class="kpi-desc">Vốn bắt đầu: ${start:,.0f} | Peak: ${fd['peak']:,.2f}</div>
+            <div class="kpi-desc">Vốn bắt đầu: ${start:,.0f} | Peak: ${peak:,.2f}</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Tổng Lợi Nhuận</div>
             <div class="kpi-value {total_pnl_cls}">{total_pnl:+,.2f}$</div>
             <div class="kpi-desc">({total_pnl/start*100:+.2f}%) | DON: {dn:+,.0f}$ | KELT: {kt:+,.0f}$</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Max Drawdown</div>
+            <div class="kpi-value {mdd_cls}">{mdd_pct:.2f}%</div>
+            <div class="kpi-desc">Từ đỉnh cao nhất (equity theo giá, cập nhật mỗi scan)</div>
         </div>
         <div class="kpi-card">
             <div class="kpi-title">Vị Thế Mở / Margin</div>

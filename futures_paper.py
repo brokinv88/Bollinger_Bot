@@ -164,12 +164,29 @@ class PaperLot:
             return True
         return False
 
-    def snapshot(self, ts, note=""):
+    def snapshot(self, dfs, ts, note=""):
         if not self.replay:
-            pd.DataFrame([[ts, self.equity(), len(self.st["positions"]),
+            pd.DataFrame([[ts, self.equity_live(dfs, ts), len(self.st["positions"]),
                            round(self.margin_pct(), 1), note]],
                          columns=["ts", "equity", "n_pos", "margin_pct", "note"]).to_csv(
                 EQUITY_CSV, mode="a", header=False, index=False)
+
+    def equity_live(self, dfs, ts):
+        """Equity theo giá (realized + unrealized các vị thế đang mở) tại thời điểm ts."""
+        if self.replay or not dfs:
+            return self.equity()
+        live = self.equity()
+        for p in self.st["positions"]:
+            df = dfs.get(p["symbol"])
+            if df is None:
+                continue
+            arr = df["open_time"].to_numpy()
+            idx = int(np.searchsorted(arr, ts, side="right") - 1)
+            if idx < 0:
+                continue
+            c = float(df["close"].iloc[idx])
+            live += p["direction"] * (c - p["entry_px"]) / p["entry_px"] * p["notional"]
+        return live
 
     # --------------------------------------------- entry logic (giống backtest)
     def entry_pair(self, df, i, strat):
@@ -340,12 +357,12 @@ def run_live(symbols, horizon_days=75, fresh=False):
             if len(hits):
                 lot.step_candle(dfs, sym, int(hits[0]), ts)
         if ts % (24 * 3600 * 1000) == 0:
-            lot.snapshot(ts, "day")
+            lot.snapshot(dfs, ts, "day")
             st["day_start_eq"] = st["equity"]
     st["cursor"] = end
     st["last_ts"] = end
     save_state(st)
-    lot.snapshot(end, "scan")
+    lot.snapshot(dfs, end, "scan")
     ts_label = pd.Timestamp(end, unit="ms", tz="UTC").strftime("%Y-%m-%d %H:%M UTC")
     lines = [f"📈 *FUTURES ÁO* | Scan `{ts_label}` | Mode `{_cfg('MODE', 'PAPER')}`",
              "=" * 28,
@@ -416,7 +433,7 @@ def run_replay(symbols, months=24, allow_t4=True):
         pf = gp / gl if gl > 0 else 99
         print(f"WR {len(w)/len(df)*100:.0f}%  PF {pf:.2f}  avg win ${w['net_usd'].mean():+.0f}  avg loss ${l['net_usd'].mean():+.0f}")
         print(df.groupby("strategy")[["net_usd"]].sum().round(0).to_string())
-    lot.snapshot(end, "replay-end")
+    lot.snapshot(None, end, "replay-end")
 
 
 def main():
