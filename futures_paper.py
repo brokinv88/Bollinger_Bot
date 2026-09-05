@@ -428,6 +428,13 @@ def scan_futures(notify_tg=True):
         text = (mon + "\n\n" + text) if text else mon
     if text and notify_tg:
         notify(text)
+    elif not text and notify_tg:
+        # Nếu run_live thất bại (vd Binance geo-block HTTP 451 trên runner vùng bị
+        # chặn) → báo rõ để biết scan bị trượt thay vì im lặng. Engine backfill theo
+        # cursor nên scan kế tiếp thành công sẽ xử lý lại các móc bị bỏ lỡ.
+        notify("⚠️ *FUTURES ÁO* — scan thất bại: KHÔNG lấy được klines/funding từ "
+               "Binance (runner Actions có thể bị geo-block HTTP 451). Scan tiếp theo "
+               "sẽ tự xử lý lại từ cursor — xác nhận dashboard sau khi run kế tiếp.")
     return text
 
 

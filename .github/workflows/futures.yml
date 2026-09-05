@@ -42,17 +42,38 @@ jobs:
       - name: Seed Bridge (nếu chưa có)
         run: python live_bridge.py --seed
 
+      # Failover guard: nếu móc H4 hiện tại đã được scan và push (bởi local khi máy
+      # bật, hoặc bởi chính Actions ở lần trước) thì Actions KHÔNG scan lại. local
+      # truy cập Binance luôn OK; runner Actions hay bị geo-block 451 nên local là
+      # nguồn chính khi máy bật, Actions chỉ là backup khi máy tắt.
+      - name: Failover Guard (skip nếu móc này đã scan)
+        id: guard
+        run: |
+          LAST_MS=$(.venv/bin/python -c "import json;print(json.load(open('paper_state.json')).get('last_ts',0))")
+          CUR_MOC=$(.venv/bin/python -c "import time;print((int(time.time()*1000)//(4*3600*1000))*4*3600*1000)")
+          echo "last_ts=$(python -c "print($LAST_MS//1000)") current_moc=$(python -c "print($CUR_MOC//1000)")"
+          if [ "$LAST_MS" -ge "$CUR_MOC" ]; then
+            echo "guard=skip_local" >> "$GITHUB_OUTPUT"
+            echo "Móc hiện tại đã được scan → local đang chạy, Actions bỏ qua."
+          else
+            echo "guard=run" >> "$GITHUB_OUTPUT"
+            echo "Móc hiện tại chưa scan → local tắt hoặc chưa kịp push, Actions tiếp quản."
+          fi
+
       - name: Live SL Monitor (realtime)
+        if: steps.guard.outputs.guard == 'run'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python futures_paper.py --monitor --notify
 
       - name: Paper Scan (H4 đã đóng)
+        if: steps.guard.outputs.guard == 'run'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python futures_paper.py --scan --notify
 
       - name: Bridge Scan (dry-run, log would-be orders)
+        if: steps.guard.outputs.guard == 'run'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         run: python live_bridge.py --scan --notify
