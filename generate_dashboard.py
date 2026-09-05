@@ -6,7 +6,7 @@ import os
 import requests
 import time
 import config
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 # 4 đơn vị theo dõi song song: 2 chiến lược x 2 danh mục
 UNITS = [
@@ -629,8 +629,8 @@ def generate_dashboard():
             <div class="subtitle">Theo dõi 4 đơn vị song song: 2 Chiến lược (BASE / CHIẾN LƯỢC B) x 2 Danh mục (Top 100 Volume / Top 100 MarketCap)</div>
         </div>
         <div style="text-align: right;">
-            <div style="font-size: 13px; color: var(--text-secondary);">Cập nhật lúc:</div>
-            <div style="font-weight: 600;">{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</div>
+            <div style="font-size: 13px; color: var(--text-secondary);">Cập nhật lúc: <strong>(Giờ VN)</strong></div>
+            <div style="font-weight: 600;">{(datetime.now(timezone.utc) + timedelta(hours=7)).strftime('%d/%m/%Y %H:%M:%S')}</div>
         </div>
     </div>
 

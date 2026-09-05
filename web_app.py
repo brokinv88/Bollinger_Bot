@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-from datetime import datetime, timezone
+from datetime import datetime, timezone as dt_tz, timedelta
 from flask import Flask, render_template_string, request, redirect, url_for, jsonify
 from database import PortfolioDB
 from generate_dashboard import fetch_current_prices, compute_unit_asset, render_strategy_logic
@@ -121,7 +121,7 @@ HTML_TEMPLATE = """
             <h1>CRYPTO PORTFOLIO MANAGER</h1>
             <div style="font-size:13px; color:var(--text-dim); margin-top:4px;">Cổng nhập liệu lệnh tay & Theo dõi hiệu suất tự động</div>
         </div>
-        <div class="clock">Cập nhật thời gian thực</div>
+        <div class="clock">Cập nhật lúc (Giờ VN): <strong>{{ now_vn }}</strong></div>
     </div>
 
     <div class="grid-layout">
@@ -438,7 +438,8 @@ def get_data():
         'units_metrics': units_metrics,
         'open_positions': positions.to_dict('records') if not positions.empty else [],
         'closed_trades': trades.to_dict('records') if not trades.empty else [],
-        'strategy_logic': render_strategy_logic()
+        'strategy_logic': render_strategy_logic(),
+        'now_vn': (datetime.now(dt_tz.utc) + timedelta(hours=7)).strftime('%d/%m/%Y %H:%M:%S')
     }
 
 @app.route('/')
