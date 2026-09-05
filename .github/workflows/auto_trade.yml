@@ -3,9 +3,10 @@ name: Paper Auto-Trade (realtime SL checks)
 on:
   schedule:
     # Chạy thêm trong ngày (mỗi 4h) để cập nhật SL + đóng lệnh chạm SL theo giá realtime.
-    # 00:01 UTC đã được daily_scan.yml xử lý (scanner + auto_trade ban đầu).
-    # 04/08/12/16/20 UTC = 11/15/19/23/03 giờ Việt Nam.
-    - cron: '0 4,8,12,16,20 * * *'
+    # 00:01 UTC đã được daily_scan.yml xử lý (scanner + auto_trade ban đầu, sát nến H4 00:00).
+    # 04/08/12/16/20 UTC chạy tại đây lúc :05 = sau khi nến H4 futures đóng (đồng bộ giờ scan futures).
+    #   04:05/08:05/12:05/16:05/20:05 UTC = 11:05/15:05/19:05/23:05/03:05 giờ Việt Nam.
+    - cron: '5 4,8,12,16,20 * * *'
   workflow_dispatch:
 
 # Cấp quyền đọc và ghi trực tiếp từ trong file workflow

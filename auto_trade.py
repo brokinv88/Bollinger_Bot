@@ -201,6 +201,27 @@ def scan_all():
         f"🤖 *PAPER AUTO-TRADE* | Mode: `{config.MODE}`\n"
         f"🗓 Lúc: `{today_vn}`\n" + "="*30 + "\n"
     )
+
+    # Cấu phần FUTURES ÁO: chạy cùng giờ scan H4 (đóng nến 0/4/8/12/16/20 UTC),
+    # gộp kết quả vào cùng báo cáo Telegram thay vì gửi tin riêng.
+    # Chỉ chạy trên máy local (state file + fapi persistent); GitHub Actions bỏ qua
+    # vì runner không commit paper_state.json và fapi chưa xác nhận chạy được.
+    futures_text = None
+    if (
+        config.ENABLE_AUTO_TRADE
+        and config.ENABLE_FUTURES_AUTO_TRADE
+        and not os.environ.get("GITHUB_ACTIONS")
+    ):
+        try:
+            import futures_paper
+            futures_text = futures_paper.scan_futures(notify_tg=False)
+        except Exception as e:
+            futures_text = None
+            print(f"[FUTURES] lỗi cấu phần: {e}", flush=True)
+
+    if futures_text:
+        body = body + "\n\n---\n" + futures_text
+
     notifier.send_telegram_alert(header + body)
 
     elapsed = time.time() - start

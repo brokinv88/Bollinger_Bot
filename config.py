@@ -57,3 +57,22 @@ AUTO_ENTRY_FILL = 0.5
 # Chạy scan hàng ngày lúc 07:01 VN. Các giờ bổ sung trong ngày (VN) chỉ auto_trade:
 #   cập nhật giá realtime, cập nhật SL, tự chốt lỗ khi giá cắt SL. Không phát sinh tín hiệu mua/bán mới
 #   (tín hiệu vào/thoát vẫn theo nến DAILY, chỉ xử tại giờ scan 07:01).
+
+# 9. AUTOTRADE FUTURES ẢO (PAPER FUTURES AUTO-TRADE) — cấu phần song song của #8
+#    Chiến lược Donchian55 H4 + Keltner H4 (research_futures_strategy.py), long+short,
+#    sizing theo fiat futures_trading_plan.md ($2,000, risk 0.75%/0.60%, lev 3x, margin ≤ 40%).
+#    Chạy như một cấu phần trong auto_trade.py; khung giờ scan = H4 UTC (ưu tiên cho futures).
+ENABLE_FUTURES_AUTO_TRADE = True
+FUTURES_START_EQUITY = 2000.0
+FUTURES_LEVERAGE = 3.0
+FUTURES_MAX_POS = 6
+FUTURES_MAX_MARGIN_PCT = 0.40
+FUTURES_DAILY_LOSS = -0.05
+FUTURES_WEEKLY_LOSS = -0.10
+FUTURES_RISK_DON = 0.0075
+FUTURES_RISK_KELT = 0.0060
+FUTURES_STATE_FILE = "paper_state.json"
+FUTURES_TRADES_CSV = "paper_trades.csv"
+FUTURES_EQUITY_CSV = "paper_equity.csv"
+# H4 scan: chạy sau móc đóng nến H4 (00:01/04:01/08:01/12:01/16:01/20:01 UTC).
+FUTURES_SCAN_MINUTES_UTC = "1 0,4,8,12,16,20 * * *"

@@ -219,6 +219,211 @@ def render_unit_kpi(unit, m, asset_rows, asset):
     </div>
     """
 
+def load_futures_data():
+    """Đọc state + trades + equity của futures paper trader (futures_paper.py)."""
+    import futures_paper as fp
+    data = {"enabled": config.ENABLE_FUTURES_AUTO_TRADE}
+    if not data["enabled"]:
+        return data
+    if not os.path.exists(fp.STATE_FILE):
+        data["error"] = "Chưa có paper_state.json — chạy `python futures_paper.py --scan` để khởi tạo account futures áo."
+        return data
+    with open(fp.STATE_FILE) as f:
+        st = json.load(f)
+    trades = pd.DataFrame()
+    if os.path.exists(fp.TRADES_CSV):
+        trades = pd.read_csv(fp.TRADES_CSV)
+    equity = pd.DataFrame()
+    if os.path.exists(fp.EQUITY_CSV):
+        equity = pd.read_csv(fp.EQUITY_CSV)
+        equity = equity.drop_duplicates(subset=["ts"]).reset_index(drop=True)
+    data.update(
+        equity_start=fp.EQUITY0,
+        equity=st.get("equity", fp.EQUITY0),
+        peak=st.get("peak", fp.EQUITY0),
+        n_trades=st.get("n_trades", 0),
+        max_pos=fp.MAX_POS,
+        max_margin_pct=fp.MAX_MARGIN_PCT,
+        lev=fp.LEV,
+        positions=st.get("positions", []),
+        trades=trades,
+        equity_curve=equity,
+        last_ts=st.get("last_ts"),
+    )
+    return data
+
+
+def compute_futures_metrics(fd):
+    t = fd.get("trades")
+    if t is None or len(t) == 0:
+        return {"total": 0, "win": 0, "loss": 0, "winrate": 0, "pnl": 0.0,
+                "pf": 0.0, "avg_win": 0, "avg_loss": 0, "rr": 0.0,
+                "by_strategy": {}}
+    winning = t[t["net_usd"] > 0]
+    losing = t[t["net_usd"] <= 0]
+    pnl = t["net_usd"].sum()
+    ws = winning["net_usd"].sum() if len(winning) else 0.0
+    ls = abs(losing["net_usd"].sum()) if len(losing) else 0.0
+    pf = ws / ls if ls > 0 else (99.0 if ws > 0 else 0.0)
+    aw = winning["net_usd"].mean() if len(winning) else 0.0
+    al = losing["net_usd"].mean() if len(losing) else 0.0
+    rr = abs(aw / al) if al != 0 else 0.0
+    by_strategy = t.groupby("strategy")["net_usd"].sum().to_dict()
+    return {"total": len(t), "win": len(winning), "loss": len(losing),
+            "winrate": len(winning) / len(t) * 100, "pnl": pnl, "pf": pf,
+            "avg_win": aw, "avg_loss": al, "rr": rr, "by_strategy": by_strategy}
+
+
+def fetch_futures_prices(symbols):
+    """Giá realtime futures (USDT-M) — fallback spot nếu fapi fail."""
+    prices = {}
+    try:
+        url = "https://fapi.binance.com/fapi/v1/ticker/price"
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        data = resp.json()
+        if isinstance(data, list):
+            for item in data:
+                sym = item.get("symbol", "")
+                if sym in symbols and item.get("price"):
+                    try:
+                        prices[sym] = float(item["price"])
+                    except Exception:
+                        pass
+    except Exception:
+        pass
+    missing = [s for s in symbols if s not in prices]
+    if missing:
+        prices.update(fetch_current_prices(missing))
+    return prices
+
+
+def fmt_ms(ms):
+    try:
+        return (pd.Timestamp(ms, unit="ms", tz="UTC") + timedelta(hours=7)).strftime("%d/%m %H:%M")
+    except Exception:
+        return "-"
+
+
+def render_futures_section(fd):
+    if not fd.get("enabled"):
+        return ("<div class='section-title'>FUTURES ÁO (H4) — KẾT NỐI TÀI KHOẢN REALTIME</div>"
+                "<div class='helper-box'>⚠️ Cấu phần Futures áo đang tắt (ENABLE_FUTURES_AUTO_TRADE=False) hoặc "
+                "state chưa có — chạy <code>python futures_paper.py --scan</code> để khởi tạo.</div>")
+
+    if fd.get("error"):
+        return ("<div class='section-title'>FUTURES ÁO (H4)</div>"
+                f"<div class='helper-box'>⚠️ {fd['error']}</div>")
+
+    m = compute_futures_metrics(fd)
+    eq = fd["equity"]
+    start = fd["equity_start"]
+    total_pnl = eq - start
+    total_pnl_cls = "positive" if total_pnl >= 0 else "negative"
+    margin_usd = sum(float(p.get("margin", 0) or 0) for p in fd["positions"])
+    margin_pct = margin_usd / eq * 100 if eq > 0 else 0
+    dn = m["by_strategy"].get("DON", 0)
+    kt = m["by_strategy"].get("KELT", 0)
+
+    # Bảng lệnh đang mở
+    pos_rows = ""
+    if fd["positions"]:
+        prices = fetch_futures_prices([p["symbol"] for p in fd["positions"]])
+        for p in fd["positions"]:
+            side = "LONG" if p["direction"] == 1 else "SHORT"
+            is_long = p["direction"] == 1
+            cur = prices.get(p["symbol"], p["entry_px"])
+            gross = p["direction"] * (cur - p["entry_px"]) / p["entry_px"] * 100
+            pnl_cls = "positive" if gross >= 0 else "negative"
+            pos_rows += f"""
+            <tr>
+                <td><strong>{p['symbol']}</strong></td>
+                <td><span class="badge {'auto' if is_long else 'manual'}">{side}</span></td>
+                <td><span class="badge stratb">{p['strategy']}</span></td>
+                <td>${p['entry_px']:.4f}</td>
+                <td>${cur:.4f}</td>
+                <td>${p['notional']:,.0f}</td>
+                <td>${p['margin']:,.0f}</td>
+                <td class="{pnl_cls}"><strong>{gross:+.2f}%</strong></td>
+                <td>{fmt_ms(p['entry_time'])}</td>
+            </tr>"""
+    else:
+        pos_rows = "<tr><td colspan='9' style='text-align:center; padding:24px; color:#888;'>Không có vị thế mở.</td></tr>"
+
+    trd_rows = ""
+    if m["total"] > 0:
+        t = fd["trades"].sort_values("exit_time", ascending=False).head(25)
+        for _, r in t.iterrows():
+            cls = "positive" if r["net_usd"] >= 0 else "negative"
+            side = "LONG" if r["direction"] == 1 else "SHORT"
+            pnl_pct = r["net_usd"] / r["notional"] * 100 if r["notional"] else 0.0
+            trd_rows += f"""
+            <tr>
+                <td><strong>{r['symbol']}</strong></td>
+                <td><span class="badge {'auto' if r['direction'] == 1 else 'manual'}">{side}</span></td>
+                <td><span class="badge stratb">{r['strategy']}</span></td>
+                <td>{fmt_ms(r['entry_time'])}</td>
+                <td>{fmt_ms(r['exit_time'])}</td>
+                <td>${r['entry_px']:.4f} → ${r['exit_px']:.4f}</td>
+                <td>{r['reason']}</td>
+                <td class="{cls}"><strong>{r['net_usd']:+,.2f}$</strong></td>
+                <td class="{cls}">{pnl_pct:+.2f}%</td>
+            </tr>"""
+    else:
+        trd_rows = "<tr><td colspan='9' style='text-align:center; padding:24px; color:#888;'>Chưa có lệnh nào đóng.</td></tr>"
+
+    last_scan = fmt_ms(fd["last_ts"]) if fd.get("last_ts") else "-"
+    return f"""<div class="section-title">FUTURES ÁO (HỢP ĐỒNG TƯƠNG LAI H4)</div>
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Tài Khoản (Vốn + Lời/Lỗ)</div>
+            <div class="kpi-value {total_pnl_cls}">${eq:,.2f}</div>
+            <div class="kpi-desc">Vốn bắt đầu: ${start:,.0f} | Peak: ${fd['peak']:,.2f}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Tổng Lợi Nhuận</div>
+            <div class="kpi-value {total_pnl_cls}">{total_pnl:+,.2f}$</div>
+            <div class="kpi-desc">({total_pnl/start*100:+.2f}%) | DON: {dn:+,.0f}$ | KELT: {kt:+,.0f}$</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Vị Thế Mở / Margin</div>
+            <div class="kpi-value" style="color: var(--accent-blue);">{len(fd['positions'])}/{fd['max_pos']}</div>
+            <div class="kpi-desc">Đã dùng margin: ${margin_usd:,.0f} = {margin_pct:.1f}% (trần {fd['max_margin_pct']*100:.0f}%)</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Tỷ Lệ Thắng Futures</div>
+            <div class="kpi-value" style="color: #ffb800;">{m['winrate']:.1f}%</div>
+            <div class="kpi-desc">{m['win']} Thắng / {m['loss']} Thua | PF {m['pf']:.2f} | R:R {m['rr']:.2f}</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Đòn Bẩy / Scan gần nhất</div>
+            <div class="kpi-value" style="color: var(--accent-purple);">{fd['lev']}x</div>
+            <div class="kpi-desc">Lần scan H4 cuối: {last_scan}</div>
+        </div>
+    </div>
+
+    <div class="section-title">Vị Thế Futures Đang Mở</div>
+    <div class="table-container">
+        <table>
+            <thead><tr>
+                <th>PAIR</th><th>HƯỚNG</th><th>CHIẾN LƯỢC</th><th>GIÁ VÀO</th><th>GIÁ HIỆN TẠI</th>
+                <th>NOTIONAL</th><th>MARGIN</th><th>P/L %</th><th>NGÀY VÀO</th>
+            </tr></thead>
+            <tbody>{pos_rows}</tbody>
+        </table>
+    </div>
+
+    <div class="section-title">Giao Dịch Futures Gần Đây (25 lệnh)</div>
+    <div class="table-container">
+        <table>
+            <thead><tr>
+                <th>PAIR</th><th>HƯỚNG</th><th>CHIẾN LƯỢC</th><th>VÀO</th><th>THOÁT</th>
+                <th>GIÁ</th><th>LÝ DO</th><th>P/L ($)</th><th>P/L %</th>
+            </tr></thead>
+            <tbody>{trd_rows}</tbody>
+        </table>
+    </div>"""
+
+
 def render_strategy_logic():
     """Mô tả chi tiết logic từng chiến lược (BASE & CHIẾN LƯỢC B) để tiện đánh giá."""
     bb = config.BB_LEN
@@ -318,6 +523,10 @@ def generate_dashboard():
         asset['open_n'] = len(rows)
         ud['asset_rows'] = rows
         ud['asset'] = asset
+
+    # 1d. Cấu phần FUTURES ÁO (paper trader H4)
+    futures_data = load_futures_data()
+    futures_html = render_futures_section(futures_data)
 
     # 2. Tổng hợp toàn danh mục
     total_trades = len(all_trades)
@@ -665,6 +874,8 @@ def generate_dashboard():
 
     <div class="section-title">HIỆU SUẤT THEO CHIẾN LƯỢC & DANH MỤC (4 ĐƠN VỊ)</div>
     {unit_sections}
+
+    {futures_html}
 
     {strategy_logic_html}
 

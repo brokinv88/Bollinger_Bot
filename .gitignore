@@ -1,3 +1,6 @@
 .venv/
 __pycache__/
 *.log
+
+# futures_paper.ts: cache dữ liệu klines H4/H1 (191MB) — recycle local, không đẩy lên GitHub
+futures_cache/
