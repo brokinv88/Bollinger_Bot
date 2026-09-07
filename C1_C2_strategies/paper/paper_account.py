@@ -37,6 +37,7 @@ class PaperAccount:
     realized_pnl: float = 0.0
     created_at: str = ""
     last_update: str = ""
+    last_good_scan: str = ""  # ISO của lần quét CÓ DỮ LIỆU thành công (dùng cho failover guard)
     last_seen_signal: dict = field(default_factory=dict)  # symbol -> signal_time ISO đã xử lý
 
     def open_position(self, pos: Position) -> bool:
@@ -78,6 +79,7 @@ def load(path: Path = cfg.STATE_FILE) -> PaperAccount:
         realized_pnl=d.get("realized_pnl", 0.0),
         created_at=d.get("created_at", ""),
         last_update=d.get("last_update", ""),
+        last_good_scan=d.get("last_good_scan", ""),
         last_seen_signal=d.get("last_seen_signal", {}),
     )
     return acct

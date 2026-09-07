@@ -109,17 +109,20 @@ def _paper_start(acct: acc.PaperAccount) -> pd.Timestamp:
     return start
 
 
-def _open_new_positions(acct: acc.PaperAccount, now_ms: int) -> list:
+def _open_new_positions(acct: acc.PaperAccount, now_ms: int) -> tuple[list, int]:
     """Project tín hiệu C1 mới xuất hiện KỂ TỪ LUẦN CHẠY TRƯỚC (forward, không backfill).
 
     - last_seen_signal[symbol] = entry_time ISO của tín hiệu đã xử lý trước đó.
     - Lần chạy đầu (chưa có marker): chỉ GHI NHẬN tín hiệu hiện tại, KHÔNG mở lệnh
       (thời điểm bắt đầu forward test; không replay lịch sử).
-    - Các lần sau: mở mọi tín hiệu mới có entry_time > marker.
+    - Các lần sau: mở mọi tín hiệu mới có entry_time > marker, nhưng chỉ trong
+      MAX_SIGNAL_AGE_H (chống backfill khi hệ nghỉ lâu).
+    Trả về (danh sách vị thế đã mở, số cặp fetch dữ liệu thành công).
     """
     paper_start = _paper_start(acct)
     opened = []
     active_syms = {p.symbol for p in acct.positions}
+    fetched = 0
 
     for symbol in cfg.get_universe():
         try:
@@ -127,6 +130,7 @@ def _open_new_positions(acct: acc.PaperAccount, now_ms: int) -> list:
         except Exception as e:  # noqa: BLE001
             print(f"  [paper] skip {symbol}: {e}", file=sys.stderr)
             continue
+        fetched += 1
         if len(df) < 250:
             continue
         sigs = strategies.gen_c1(df)
@@ -193,7 +197,7 @@ def _open_new_positions(acct: acc.PaperAccount, now_ms: int) -> list:
             if acct.open_position(pos):
                 opened.append(pos)
                 active_syms.add(symbol)
-    return opened
+    return opened, fetched
 
 
 def run() -> None:
@@ -204,11 +208,13 @@ def run() -> None:
     closed_records = []
     data_cache = {}
     open_remaining = []
+    fetched = 0
     for pos in acct.positions:
         sym = pos.symbol
         if sym not in data_cache:
             try:
                 data_cache[sym] = data_mod.fetch_ohlcv(sym, cfg.TF, START_MS, now_ms)
+                fetched += 1
             except Exception as e:  # noqa: BLE001
                 print(f"  skip {sym}: {e}", file=sys.stderr)
                 data_cache[sym] = None
@@ -225,7 +231,14 @@ def run() -> None:
     acct.positions = open_remaining
 
     # Mở vị thế mới (forward test)
-    new_positions = _open_new_positions(acct, now_ms)
+    new_positions, fetched_open = _open_new_positions(acct, now_ms)
+    fetched += fetched_open
+
+    # Đánh dấu lần quét CÓ DỮ LIỆU thành công — chỉ khi thật sự lấy được dữ liệu
+    # (tránh trường hợp Actions bị Binance geo-block 451 vẫn đánh dấu sai khiến
+    # local bỏ qua móc đó mà không trade).
+    if fetched > 0:
+        acct.last_good_scan = pd.Timestamp(now_ms, unit="ms", tz="UTC").isoformat()
 
     eq = acct.equity()
     if new_positions:

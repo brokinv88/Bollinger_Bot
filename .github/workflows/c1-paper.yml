@@ -31,10 +31,37 @@ jobs:
       - name: Install Dependencies
         run: pip install -r C1_C2_strategies/requirements.txt
 
+      # Failover guard (hybrid local + Actions, giống futures.yml):
+      # - Máy bật: cron local chạy engine + push state. Actions SKIP nếu có lần quét
+      #   CÓ DỮ LIỆU thành công trong 7h gần nhất → không bao giờ race với local.
+      # - Máy tắt >7h: last_good_scan cũ → Actions tiếp quản. Nếu Binance geo-block
+      #   (HTTP 451) thì không trade (không backfill, guard trong runner giữ sạch).
+      - name: Failover Guard (skip nếu local vừa chạy <7h)
+        id: guard
+        run: |
+          GUARD=$(python - <<'EOF'
+          import json, datetime
+          try:
+              t = datetime.datetime.fromisoformat(
+                  json.load(open('C1_C2_strategies/reports/paper_state.json')).get('last_good_scan', ''))
+          except Exception:
+              t = None
+          if t is None:
+              print('run')   # chưa từng scan thành công → để Actions chạy lần đầu
+          else:
+              age_h = (datetime.datetime.now(datetime.timezone.utc) - t).total_seconds() / 3600
+              print('skip' if age_h <= 7 else 'run')
+          EOF
+          )
+          echo "guard=$GUARD" >> "$GITHUB_OUTPUT"
+          echo "Failover guard = $GUARD"
+
       - name: Forward Test Run (mở/đóng vị thế C1)
+        if: steps.guard.outputs.guard == 'run'
         run: python run_paper.py run
 
       - name: Regenerate Paper Report
+        if: steps.guard.outputs.guard == 'run'
         run: python run_paper.py report
 
       - name: Commit and Push Updated State
