@@ -201,10 +201,15 @@ Kết quả:
 - `.venv/bin/python run_paper.py run` — cập nhật account (thêm/cập nhật/quét signals mới + đóng độ đúng).
 - `.venv/bin/python run_paper.py report` — báo cáo định kỳ (`reports/paper_report.txt`, `paper_metrics.csv`).
 - `.venv/bin/python run_paper.py reset` — bắt đầu lại $1000 (dùng có chủ đích).
-- `.venv/bin/python run_dashboard.py` — **dashboard web local** tại `http://127.0.0.1:8787` (Flask, không cần internet; nút "Run forward test" trong UI gọi engine, auto-refresh 60s).
-- Chạy `run` định kỳ (cron) để forward test tích luỹ theo thời gian thực.
+- `.venv/bin/python run_dashboard.py` — **dashboard web local** tại `http://127.0.0.1:8787` (Flask, không cần internet; nút "Đồng bộ từ GitHub" pull state mới nhất từ repo, auto-refresh 60s).
+- Chạy `run` định kỳ để forward test tích luỹ theo thời gian thực.
 
-**API dashboard** (localhost): `/api/overview` (KPIs + vị thế mở), `/api/trades` (nhật ký), `/api/equity` (đường equity), `/api/universe` (marker mỗi cặp), `/api/run` (chạy forward test).
+**Lịch chạy tự động (hybrid local + GitHub Actions, failover):**
+- **Máy bật → cron local là nguồn chính:** mỗi 4h lúc `:40` (`0,4,8,12,16,20`), chạy `run_paper.py run` + `report` rồi tự `git add/commit/push` state lên GitHub.
+- **Máy tắt >7h → Actions `.github/workflows/c1-paper.yml` là backup:** schedule `:35` mỗi 4h. **Failover guard**: nếu `paper_state.json.last_good_scan` (lần quét CÓ DỮ LIỆU thành công gần nhất) cách hiện tại ≤7h thì SKIP (local vừa lo rồi — tránh race/double-open); >7h thì Actions tiếp quản, mở/đóng lệnh và push state.
+- **Giới hạn thực tế:** Binance geo-block GitHub runner (HTTP 451) nên khi máy tắt thường không lấy được dữ liệu → **không mở lệnh mới, không tạo lỗi** (Actions chỉ đánh dấu scan khi fetch thành công, guard chống backfill trong runner giữ số liệu sạch). Khi máy bật trở lại, hệ tiếp tục từ đúng điểm đã chạm dừng.
+
+**API dashboard** (localhost): `/api/overview` (KPIs + vị thế mở), `/api/trades` (nhật ký), `/api/equity` (đường equity), `/api/universe` (marker mỗi cặp), `/api/run` (pull state mới nhất từ GitHub — engine không chạy local nữa).
 
 **Trạng thái hiện tại:** account $1.000, 0 lệnh, 19/20 cặp đã ghi marker, paper start 07/09/2026 09:39 UTC.
 
