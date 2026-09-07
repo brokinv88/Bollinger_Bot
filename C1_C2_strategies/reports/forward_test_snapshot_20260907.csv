@@ -1,0 +1,8 @@
+symbol,price,trend,near_swing,atr_pct,c1_watch,note,snapshot_time
+BTC/USDT,79104.5,UP,low -0.03%,0.87,True,at swing low — wait for break direction,2026-09-07 08:55:21.172017+00:00
+ETH/USDT,2479.16,UP,low +0.82%,1.34,True,closer to swing low than high,2026-09-07 08:55:21.172017+00:00
+XAU/USDT,4521.93,DOWN,low -0.00%,0.56,True,"DOWN trend, at swing low — potential short",2026-09-07 08:55:21.172017+00:00
+XRP/USDT,1.393,UP,low -0.22%,1.63,True,near swing low,2026-09-07 08:55:21.172017+00:00
+SNDK/USDT,1786.69,UP,high -0.57%,1.24,True,"near swing high, strongest candidate",2026-09-07 08:55:21.172017+00:00
+BNB/USDT,741.82,UP,low +0.17%,1.44,True,near swing low,2026-09-07 08:55:21.172017+00:00
+CL/USDT,91.76,UP,high -0.48%,0.77,True,"near swing high, low ATR",2026-09-07 08:55:21.172017+00:00

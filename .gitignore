@@ -5,5 +5,8 @@ __pycache__/
 # futures_paper.ts: cache dữ liệu klines H4/H1 (191MB) — recycle local, không đẩy lên GitHub
 futures_cache/
 
+# C1_C2_strategies: bộ nhớ đệm OHLCV/funding parquet (nhiều MB, đổi mới mỗi lần fetch)
+C1_C2_strategies/data/
+
 # ảnh research local không push lên repo
 *.jpg

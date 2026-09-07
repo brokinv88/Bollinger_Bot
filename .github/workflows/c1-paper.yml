@@ -1,0 +1,52 @@
+name: C1 Paper (Forward Test online)
+
+on:
+  schedule:
+    # Chạy sau futures.yml (:10) và futures-monitor, tránh trùng giờ push cùng lúc.
+    #   00:35/04:35/08:35/12:35/16:35/20:35 UTC, sau khi nến H4 đóng (:00).
+    # Dùng chung concurrency group 'trading-git-push' để không race push state files.
+    - cron: '35 0,4,8,12,16,20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  c1-paper:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: trading-git-push
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install -r C1_C2_strategies/requirements.txt
+
+      - name: Forward Test Run (mở/đóng vị thế C1)
+        run: python run_paper.py run
+
+      - name: Regenerate Paper Report
+        run: python run_paper.py report
+
+      - name: Commit and Push Updated State
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # autostash giữ an toàn khi repo có thay đổi (parquet cache không track)
+          git pull --rebase --autostash origin main || true
+          # chỉ add các file state có tồn tại (journal/metrics có thể chưa có lần đầu)
+          git add C1_C2_strategies/reports/paper_state.json 2>/dev/null || true
+          git add C1_C2_strategies/reports/paper_journal.csv 2>/dev/null || true
+          git add C1_C2_strategies/reports/paper_equity.csv 2>/dev/null || true
+          git add C1_C2_strategies/reports/paper_report.txt 2>/dev/null || true
+          git add C1_C2_strategies/reports/paper_metrics.csv 2>/dev/null || true
+          git diff --staged --quiet || (git commit -m "Update C1 paper forward test state [skip ci]" && git push origin main)
