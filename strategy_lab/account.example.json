@@ -1,0 +1,10 @@
+{
+  "spot_equity": 3000,
+  "spot_peak_equity": 3000,
+  "futures_equity": 1000,
+  "futures_peak_equity": 1000,
+  "reserve": 1000,
+  "spot_halted": false,
+  "futures_halted": false,
+  "positions": []
+}

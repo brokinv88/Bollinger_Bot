@@ -1,0 +1,25 @@
+{
+  "note": "Post-review descriptive combination; no independent validation or new sizing test",
+  "runs": {
+    "development": {
+      "end_equity": 5320.729327023529,
+      "return_pct": 6.414586540470579,
+      "max_drawdown_pct": 7.625650165231046
+    },
+    "validation": {
+      "end_equity": 5674.977480921196,
+      "return_pct": 13.499549618423924,
+      "max_drawdown_pct": 5.310732688244202
+    },
+    "holdout": {
+      "end_equity": 5436.557436433107,
+      "return_pct": 8.731148728662141,
+      "max_drawdown_pct": 3.626989114797652
+    },
+    "full": {
+      "end_equity": 6664.5093302616615,
+      "return_pct": 33.29018660523324,
+      "max_drawdown_pct": 7.625650165231046
+    }
+  }
+}

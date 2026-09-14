@@ -1,0 +1,122 @@
+//@version=5
+strategy("Bollinger Envelopes 24/7 + 4 SMA [Ultimate Fix]", overlay=true, 
+         initial_capital=10000, 
+         default_qty_type=strategy.cash, 
+         default_qty_value=50, 
+         pyramiding=3, 
+         commission_type=strategy.commission.percent, 
+         commission_value=0.075)
+
+// =============================================================================
+// 1. CÀI ĐẶT
+// =============================================================================
+grp_env = "Bollinger Envelopes 24/7"
+bb_len    = input.int(20, "Envelope Period", minval=5, group=grp_env)
+bb_mult   = input.float(1.5, "Multiplier", step=0.1, group=grp_env)
+
+grp_sma = "Bộ lọc Xu hướng 4 SMA"
+use_4sma = input.bool(true, "Bật bộ lọc 4 SMA", group=grp_sma)
+sma1_len = input.int(50,  "SMA 1", group=grp_sma)
+sma2_len = input.int(100, "SMA 2", group=grp_sma)
+sma3_len = input.int(150, "SMA 3", group=grp_sma)
+sma4_len = input.int(200, "SMA 4", group=grp_sma)
+
+grp_exit = "Thoát lệnh"
+exit_under_any_sma = input.bool(true, "Thoát khi thủng bất kỳ SMA nào", group=grp_exit)
+exit_under_lower   = input.bool(true, "Thoát khi thủng Lower Band", group=grp_exit)
+
+// =============================================================================
+// 2. TÍNH TOÁN
+// =============================================================================
+sma_high   = ta.sma(high, bb_len)
+std_high   = ta.stdev(high, bb_len)
+upper_band = sma_high + bb_mult * std_high
+
+sma_low    = ta.sma(low, bb_len)
+std_low    = ta.stdev(low, bb_len)
+lower_band = sma_low - bb_mult * std_low
+baseline   = (upper_band + lower_band) / 2.0
+
+sma50  = ta.sma(close, sma1_len)
+sma100 = ta.sma(close, sma2_len)
+sma150 = ta.sma(close, sma3_len)
+sma200 = ta.sma(close, sma4_len)
+
+bullish_4sma = not use_4sma or (close > sma50 and close > sma100 and close > sma150 and close > sma200)
+
+// =============================================================================
+// 3. VÀO LỆNH & THOÁT LỆNH
+// =============================================================================
+entry_condition = bullish_4sma and ta.crossover(close, upper_band)
+
+if entry_condition
+    strategy.entry("Long", strategy.long)
+
+exit_lower   = exit_under_lower and ta.crossunder(close, lower_band)
+exit_any_sma = exit_under_any_sma and (ta.crossunder(close, sma50) or ta.crossunder(close, sma100) or ta.crossunder(close, sma150) or ta.crossunder(close, sma200))
+
+if exit_lower
+    strategy.close("Long", comment="Thủng Lower")
+if exit_any_sma
+    strategy.close("Long", comment="Thủng 1 trong 4 SMA")
+
+// =============================================================================
+// 4. VẼ ĐƯỜNG
+// =============================================================================
+plot(upper_band, "Upper", color=color.new(#00e676, 20), linewidth=2)
+plot(baseline,   "Mid",   color=color.new(#29b6f6, 40), linewidth=1)
+plot(lower_band, "Lower", color=color.new(#ff5252, 20), linewidth=2)
+
+plot(use_4sma ? sma50  : na, "SMA 50",  color=color.yellow, linewidth=1)
+plot(use_4sma ? sma100 : na, "SMA 100", color=color.orange, linewidth=2)
+plot(use_4sma ? sma150 : na, "SMA 150", color=color.aqua,   linewidth=2)
+plot(use_4sma ? sma200 : na, "SMA 200", color=color.fuchsia,linewidth=2)
+
+// =============================================================================
+// 5. BẢNG GHI CHÚ - CƠ CHẾ VẼ LIÊN TỤC (KHÔNG BỊ CHẶN BỞI BARSTATE.ISLAST)
+// =============================================================================
+// Khởi tạo bảng cố định ngay tại đỉnh màn hình bên phải
+var table my_table = table.new(position.top_right, 3, 6, bgcolor=color.black, border_width=1, border_color=color.white)
+
+// CẬP NHẬT NỘI DUNG MỖI KHI CÓ TICK MỚI (Đảm bảo bảng luôn tồn tại trên mọi chart Crypto)
+is_d1 = timeframe.isdaily
+is_h4 = timeframe.isintraday and timeframe.multiplier == 240
+is_h1 = timeframe.isintraday and timeframe.multiplier == 60
+
+// Header
+table.cell(my_table, 0, 0, "KHUNG", bgcolor=color.blue, text_color=color.white, text_size=size.small)
+table.cell(my_table, 1, 0, "QUY TẮC CHIẾN LƯỢC", bgcolor=color.blue, text_color=color.white, text_size=size.small)
+table.cell(my_table, 2, 0, "LƯU Ý VỐN & EXIT", bgcolor=color.blue, text_color=color.white, text_size=size.small)
+
+// D1
+c_d1 = is_d1 ? color.green : color.rgb(30, 30, 30)
+table.cell(my_table, 0, 1, (is_d1 ? ">> " : "") + "D1", bgcolor=c_d1, text_color=color.white, text_size=size.small)
+table.cell(my_table, 1, 1, "Breakout Upper + Tren 4 SMA", bgcolor=c_d1, text_color=color.white, text_size=size.small)
+table.cell(my_table, 2, 1, "Pyramid 3x50$=150$. An song dai", bgcolor=c_d1, text_color=color.white, text_size=size.small)
+
+// H4
+c_h4 = is_h4 ? color.green : color.rgb(30, 30, 30)
+table.cell(my_table, 0, 2, (is_h4 ? ">> " : "") + "H4", bgcolor=c_h4, text_color=color.white, text_size=size.small)
+table.cell(my_table, 1, 2, "Bam dai Upper bung no", bgcolor=c_h4, text_color=color.white, text_size=size.small)
+table.cell(my_table, 2, 2, "Thoat neu gay Lower/SMA", bgcolor=c_h4, text_color=color.white, text_size=size.small)
+
+// H1
+c_h1 = is_h1 ? color.green : color.rgb(30, 30, 30)
+table.cell(my_table, 0, 3, (is_h1 ? ">> " : "") + "H1", bgcolor=c_h1, text_color=color.white, text_size=size.small)
+table.cell(my_table, 1, 3, "Danh nhip bung no ngan", bgcolor=c_h1, text_color=color.white, text_size=size.small)
+table.cell(my_table, 2, 3, "Bat buoc tren 4 SMA", bgcolor=c_h1, text_color=color.white, text_size=size.small)
+
+// SMA Filter Status
+sma_txt = bullish_4sma ? "DAT: Tren 4 SMA" : "CHUA DAT: Duoi SMA"
+sma_bg  = bullish_4sma ? color.green : color.red
+table.cell(my_table, 0, 4, "LOC 4 SMA", bgcolor=color.rgb(30, 30, 30), text_color=color.white, text_size=size.small)
+table.cell(my_table, 1, 4, sma_txt, bgcolor=sma_bg, text_color=color.white, text_size=size.small)
+table.cell(my_table, 2, 4, "SMA: 50, 100, 150, 200", bgcolor=color.rgb(30, 30, 30), text_color=color.white, text_size=size.small)
+
+// Position Status
+pos_usd = math.round(strategy.position_size * close)
+pos_txt = strategy.position_size > 0 ? "DANG VAO: " + str.tostring(pos_usd) + "$" : "CAM TIEN (FLAT)"
+pos_bg  = strategy.position_size > 0 ? color.blue : color.rgb(40, 40, 40)
+table.cell(my_table, 0, 5, "VI THE", bgcolor=color.rgb(30, 30, 30), text_color=color.white, text_size=size.small)
+table.cell(my_table, 1, 5, pos_txt, bgcolor=pos_bg, text_color=color.white, text_size=size.small)
+table.cell(my_table, 2, 5, "Pyramid max 3 lan x 50$", bgcolor=color.rgb(30, 30, 30), text_color=color.white, text_size=size.small)

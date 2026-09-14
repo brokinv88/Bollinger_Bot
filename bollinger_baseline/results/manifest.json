@@ -1,0 +1,389 @@
+{
+  "sources": [
+    {
+      "run": "spot_4h_ADAUSDT",
+      "source": "strategy_lab/data/spot/ADAUSDT.csv",
+      "sha256": "cb49ef11356d2c4af83bf945d67c6d6c579ac1abf5b83b8c3a548f3b3293a34e",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_BCHUSDT",
+      "source": "strategy_lab/data/spot/BCHUSDT.csv",
+      "sha256": "1d28fda355d25c2bab723d4a96070f79a04e89953230b01eab274694b5533d75",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_BNBUSDT",
+      "source": "strategy_lab/data/spot/BNBUSDT.csv",
+      "sha256": "548e020cdd506d4727387b23247eaf536fd2df44736c3005d16a423134e6350a",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_BTCUSDT",
+      "source": "strategy_lab/data/spot/BTCUSDT.csv",
+      "sha256": "6d6f297d7145f6532899d9572f530f8ec6bd4de6527d8ce644c45b17dd26ce24",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_DOGEUSDT",
+      "source": "strategy_lab/data/spot/DOGEUSDT.csv",
+      "sha256": "7cbdf783277c824df3bfc96976ca35064fada11043ba846f95a7fa276fd53cb1",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_DOTUSDT",
+      "source": "strategy_lab/data/spot/DOTUSDT.csv",
+      "sha256": "aa55077b9a5c2facf1346c09d96117ef86b564ce109705259e59d71c3a9ea36b",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_ETHUSDT",
+      "source": "strategy_lab/data/spot/ETHUSDT.csv",
+      "sha256": "4fb66e21941e5d94e22328b6a4e635490cf29ad51f136b8581c32cc0409f661e",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_LINKUSDT",
+      "source": "strategy_lab/data/spot/LINKUSDT.csv",
+      "sha256": "2a500bbf481146a933c86da75dde812b0bb156a7d81edd24eb4a76a14d6fc2ac",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_LTCUSDT",
+      "source": "strategy_lab/data/spot/LTCUSDT.csv",
+      "sha256": "376337f87abff293f544167450339887c33de6c2ecba4b2f07a6886f0d81324a",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_SOLUSDT",
+      "source": "strategy_lab/data/spot/SOLUSDT.csv",
+      "sha256": "0e0a3c9b0cfb5e8015a8803884b9a7318b8d420cdd0e455f62ff8b978d161167",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_UNIUSDT",
+      "source": "strategy_lab/data/spot/UNIUSDT.csv",
+      "sha256": "0905f3592005ad18c0f6d3433327f83a80ef2494c6c70252434d5a4d47741b82",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_4h_XRPUSDT",
+      "source": "strategy_lab/data/spot/XRPUSDT.csv",
+      "sha256": "d74184d41d570085960b014da2ffbe70932b9a416364a29fd90e015d383bcf78",
+      "raw_rows": 12414,
+      "signal_rows": 10786,
+      "dropped_source_rows": 1628
+    },
+    {
+      "run": "spot_24h_ADAUSDT",
+      "source": "strategy_lab/data/spot/ADAUSDT.csv",
+      "sha256": "cb49ef11356d2c4af83bf945d67c6d6c579ac1abf5b83b8c3a548f3b3293a34e",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_BCHUSDT",
+      "source": "strategy_lab/data/spot/BCHUSDT.csv",
+      "sha256": "1d28fda355d25c2bab723d4a96070f79a04e89953230b01eab274694b5533d75",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_BNBUSDT",
+      "source": "strategy_lab/data/spot/BNBUSDT.csv",
+      "sha256": "548e020cdd506d4727387b23247eaf536fd2df44736c3005d16a423134e6350a",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_BTCUSDT",
+      "source": "strategy_lab/data/spot/BTCUSDT.csv",
+      "sha256": "6d6f297d7145f6532899d9572f530f8ec6bd4de6527d8ce644c45b17dd26ce24",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_DOGEUSDT",
+      "source": "strategy_lab/data/spot/DOGEUSDT.csv",
+      "sha256": "7cbdf783277c824df3bfc96976ca35064fada11043ba846f95a7fa276fd53cb1",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_DOTUSDT",
+      "source": "strategy_lab/data/spot/DOTUSDT.csv",
+      "sha256": "aa55077b9a5c2facf1346c09d96117ef86b564ce109705259e59d71c3a9ea36b",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_ETHUSDT",
+      "source": "strategy_lab/data/spot/ETHUSDT.csv",
+      "sha256": "4fb66e21941e5d94e22328b6a4e635490cf29ad51f136b8581c32cc0409f661e",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_LINKUSDT",
+      "source": "strategy_lab/data/spot/LINKUSDT.csv",
+      "sha256": "2a500bbf481146a933c86da75dde812b0bb156a7d81edd24eb4a76a14d6fc2ac",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_LTCUSDT",
+      "source": "strategy_lab/data/spot/LTCUSDT.csv",
+      "sha256": "376337f87abff293f544167450339887c33de6c2ecba4b2f07a6886f0d81324a",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_SOLUSDT",
+      "source": "strategy_lab/data/spot/SOLUSDT.csv",
+      "sha256": "0e0a3c9b0cfb5e8015a8803884b9a7318b8d420cdd0e455f62ff8b978d161167",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_UNIUSDT",
+      "source": "strategy_lab/data/spot/UNIUSDT.csv",
+      "sha256": "0905f3592005ad18c0f6d3433327f83a80ef2494c6c70252434d5a4d47741b82",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "spot_24h_XRPUSDT",
+      "source": "strategy_lab/data/spot/XRPUSDT.csv",
+      "sha256": "d74184d41d570085960b014da2ffbe70932b9a416364a29fd90e015d383bcf78",
+      "raw_rows": 12414,
+      "signal_rows": 1797,
+      "dropped_source_rows": 1632
+    },
+    {
+      "run": "futures_1h_ADAUSDT",
+      "source": "strategy_lab/data/futures/ADAUSDT.csv",
+      "sha256": "26c974e175401a435f0f017e23d6abfaa24eec3dc2dd0f81f22a3f926655c2fe",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_BCHUSDT",
+      "source": "strategy_lab/data/futures/BCHUSDT.csv",
+      "sha256": "6d10584a905fb3e3459bba5495df6fee350ca3ae2a247e78fcf317581158f65f",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_BNBUSDT",
+      "source": "strategy_lab/data/futures/BNBUSDT.csv",
+      "sha256": "262665e17dcd891d8aeaa7751cb0096d81a075fad7aa51665a9dee62add3d4e9",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_BTCUSDT",
+      "source": "strategy_lab/data/futures/BTCUSDT.csv",
+      "sha256": "75297d657d998578e3a9a862e46f3011a03cff095ca20e6f5e78ae142d7f66ab",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_DOGEUSDT",
+      "source": "strategy_lab/data/futures/DOGEUSDT.csv",
+      "sha256": "953b9c0317f9699603d5b34408e77d157aa372063be0676dd8d885005e84f1d6",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_DOTUSDT",
+      "source": "strategy_lab/data/futures/DOTUSDT.csv",
+      "sha256": "0a450f9dfc72c9c3c57efaa70c36bd3e0438b2c98dd894ad2f47be9f4d5272e1",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_ETHUSDT",
+      "source": "strategy_lab/data/futures/ETHUSDT.csv",
+      "sha256": "6134bd87a00fb4f78ac7df44b5b5e99140650f32a82e97883904a52b6085a3c6",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_LINKUSDT",
+      "source": "strategy_lab/data/futures/LINKUSDT.csv",
+      "sha256": "8e3ce18d33a0db4dc551ee5c39a571742a1723374e1d55a246ad492c01201a23",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_LTCUSDT",
+      "source": "strategy_lab/data/futures/LTCUSDT.csv",
+      "sha256": "e1c34ae2c9ff90a00b2d57ba7424b171cc4da5d59c9e723bf1130add655e7de4",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_SOLUSDT",
+      "source": "strategy_lab/data/futures/SOLUSDT.csv",
+      "sha256": "1ad585c47e61cb3ac0a30313c47a49fccbdcbe5b5a2dbc01d5790d1740c9c2ce",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_UNIUSDT",
+      "source": "strategy_lab/data/futures/UNIUSDT.csv",
+      "sha256": "e8340ca6d09b2660499e20f17fe1e532d8af83ccbe8b5c27083fbbb27a68d064",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_1h_XRPUSDT",
+      "source": "strategy_lab/data/futures/XRPUSDT.csv",
+      "sha256": "1f383f54b6b9649c77e11b0f1053bae64b5647617e2ffcba48c8210d22d7e405",
+      "raw_rows": 49656,
+      "signal_rows": 49656,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_ADAUSDT",
+      "source": "strategy_lab/data/futures/ADAUSDT.csv",
+      "sha256": "26c974e175401a435f0f017e23d6abfaa24eec3dc2dd0f81f22a3f926655c2fe",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_BCHUSDT",
+      "source": "strategy_lab/data/futures/BCHUSDT.csv",
+      "sha256": "6d10584a905fb3e3459bba5495df6fee350ca3ae2a247e78fcf317581158f65f",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_BNBUSDT",
+      "source": "strategy_lab/data/futures/BNBUSDT.csv",
+      "sha256": "262665e17dcd891d8aeaa7751cb0096d81a075fad7aa51665a9dee62add3d4e9",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_BTCUSDT",
+      "source": "strategy_lab/data/futures/BTCUSDT.csv",
+      "sha256": "75297d657d998578e3a9a862e46f3011a03cff095ca20e6f5e78ae142d7f66ab",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_DOGEUSDT",
+      "source": "strategy_lab/data/futures/DOGEUSDT.csv",
+      "sha256": "953b9c0317f9699603d5b34408e77d157aa372063be0676dd8d885005e84f1d6",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_DOTUSDT",
+      "source": "strategy_lab/data/futures/DOTUSDT.csv",
+      "sha256": "0a450f9dfc72c9c3c57efaa70c36bd3e0438b2c98dd894ad2f47be9f4d5272e1",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_ETHUSDT",
+      "source": "strategy_lab/data/futures/ETHUSDT.csv",
+      "sha256": "6134bd87a00fb4f78ac7df44b5b5e99140650f32a82e97883904a52b6085a3c6",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_LINKUSDT",
+      "source": "strategy_lab/data/futures/LINKUSDT.csv",
+      "sha256": "8e3ce18d33a0db4dc551ee5c39a571742a1723374e1d55a246ad492c01201a23",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_LTCUSDT",
+      "source": "strategy_lab/data/futures/LTCUSDT.csv",
+      "sha256": "e1c34ae2c9ff90a00b2d57ba7424b171cc4da5d59c9e723bf1130add655e7de4",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_SOLUSDT",
+      "source": "strategy_lab/data/futures/SOLUSDT.csv",
+      "sha256": "1ad585c47e61cb3ac0a30313c47a49fccbdcbe5b5a2dbc01d5790d1740c9c2ce",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_UNIUSDT",
+      "source": "strategy_lab/data/futures/UNIUSDT.csv",
+      "sha256": "e8340ca6d09b2660499e20f17fe1e532d8af83ccbe8b5c27083fbbb27a68d064",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    },
+    {
+      "run": "futures_4h_XRPUSDT",
+      "source": "strategy_lab/data/futures/XRPUSDT.csv",
+      "sha256": "1f383f54b6b9649c77e11b0f1053bae64b5647617e2ffcba48c8210d22d7e405",
+      "raw_rows": 49656,
+      "signal_rows": 12414,
+      "dropped_source_rows": 0
+    }
+  ],
+  "engine_sha256": "8ee3dc1b16970cf8d3688e77b71307c317cc4a4eedd8521aee54e250d53bac0c"
+}

@@ -1,0 +1,667 @@
+{
+  "created_utc": "2026-09-08T05:33:01.677788+00:00",
+  "strategy": "DON55 corrected engine",
+  "periods": {
+    "warmup_start": "2023-11-01",
+    "validation": [
+      "2024-01-01",
+      "2025-01-01"
+    ],
+    "holdout": [
+      "2025-01-01",
+      "2026-09-01"
+    ],
+    "stress": "2x fees and slippage on holdout"
+  },
+  "gate": {
+    "validation_profit": true,
+    "each_following_year_profit": true,
+    "holdout_profit": true,
+    "holdout_pf": 1.15,
+    "holdout_min_trades": 20,
+    "holdout_max_dd_pct_at_0_75pct_risk": 12,
+    "stress_profit": true,
+    "liquidation_flags": 0
+  },
+  "phase1_risk": {
+    "risk_per_trade": 0.0025,
+    "max_positions": 3,
+    "max_initial_open_risk": 0.0075
+  },
+  "selected": [
+    "SUIUSDT",
+    "WLDUSDT"
+  ],
+  "portfolio_comparison": {
+    "baseline_12": {
+      "symbols": [
+        "ADAUSDT",
+        "BCHUSDT",
+        "BNBUSDT",
+        "BTCUSDT",
+        "DOGEUSDT",
+        "DOTUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "LTCUSDT",
+        "SOLUSDT",
+        "UNIUSDT",
+        "XRPUSDT"
+      ],
+      "runs": {
+        "validation": {
+          "config": {
+            "names": [
+              "DON55"
+            ],
+            "start": "2024-01-01",
+            "end": "2025-01-01",
+            "costs": 1.0,
+            "equal_size": false,
+            "hard_stop": true,
+            "fixed_cash": 50.0
+          },
+          "metrics": {
+            "trades": 162,
+            "net_pnl": 64.2787765195435,
+            "end_equity": 1064.2787765195435,
+            "return_pct": 6.427877651954339,
+            "max_drawdown_pct": 6.771307736827015,
+            "adverse_bar_drawdown_pct": 6.931065186945229,
+            "profit_factor": 1.31982743636652,
+            "win_rate_pct": 33.33333333333333,
+            "mean_r": 0.1592659485862764,
+            "fees": 8.280222351842898,
+            "funding": 3.5815018499136975,
+            "max_losing_streak": 13,
+            "longest_underwater_days": 123.25,
+            "sharpe_daily": 1.1001230545311242,
+            "exposure_pct": 70.0136612021858,
+            "reconciliation_error": 1.9042545318370685e-12
+          },
+          "audit": {
+            "ambiguous_bars": 0,
+            "shortened_stop_updates": 269,
+            "loosened_stop_updates": 0,
+            "be_activations": 79,
+            "funding_proxy_events": 0,
+            "liquidation_risk_bars": 0,
+            "lookahead_errors": 0
+          },
+          "skips": {
+            "strategy_slots": 298
+          }
+        },
+        "holdout": {
+          "config": {
+            "names": [
+              "DON55"
+            ],
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "costs": 1.0,
+            "equal_size": false,
+            "hard_stop": true,
+            "fixed_cash": 50.0
+          },
+          "metrics": {
+            "trades": 245,
+            "net_pnl": 124.25825499492089,
+            "end_equity": 1124.258254994921,
+            "return_pct": 12.425825499492094,
+            "max_drawdown_pct": 4.7223912171329925,
+            "adverse_bar_drawdown_pct": 4.80604381698212,
+            "profit_factor": 1.3787430064379285,
+            "win_rate_pct": 35.51020408163265,
+            "mean_r": 0.19675965895213432,
+            "fees": 14.319251768435018,
+            "funding": 2.916297916110965,
+            "max_losing_streak": 11,
+            "longest_underwater_days": 153.83333333333334,
+            "sharpe_daily": 1.1628599554436259,
+            "exposure_pct": 82.25054824561403,
+            "reconciliation_error": -4.661160346586257e-12
+          },
+          "audit": {
+            "ambiguous_bars": 0,
+            "shortened_stop_updates": 416,
+            "loosened_stop_updates": 0,
+            "be_activations": 107,
+            "funding_proxy_events": 0,
+            "liquidation_risk_bars": 0,
+            "lookahead_errors": 0
+          },
+          "skips": {
+            "strategy_slots": 645
+          }
+        },
+        "stress_holdout": {
+          "config": {
+            "names": [
+              "DON55"
+            ],
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "costs": 2.0,
+            "equal_size": false,
+            "hard_stop": true,
+            "fixed_cash": 50.0
+          },
+          "metrics": {
+            "trades": 244,
+            "net_pnl": 93.47961367960147,
+            "end_equity": 1093.4796136796015,
+            "return_pct": 9.347961367960146,
+            "max_drawdown_pct": 5.472952815287824,
+            "adverse_bar_drawdown_pct": 5.5141936612450255,
+            "profit_factor": 1.2865805220586832,
+            "win_rate_pct": 34.42622950819672,
+            "mean_r": 0.1516568371272331,
+            "fees": 27.219091933204286,
+            "funding": 2.7576341290485944,
+            "max_losing_streak": 12,
+            "longest_underwater_days": 194.29166666666666,
+            "sharpe_daily": 0.9200263202486556,
+            "exposure_pct": 82.3670504385965,
+            "reconciliation_error": -1.3642420526593924e-12
+          },
+          "audit": {
+            "ambiguous_bars": 0,
+            "shortened_stop_updates": 409,
+            "loosened_stop_updates": 0,
+            "be_activations": 106,
+            "funding_proxy_events": 0,
+            "liquidation_risk_bars": 0,
+            "lookahead_errors": 0
+          },
+          "skips": {
+            "strategy_slots": 649
+          }
+        }
+      },
+      "calendar_returns": {
+        "year_2025_return_pct": 4.029442091900792,
+        "year_2026_return_pct": 8.07116066254958
+      }
+    },
+    "expanded": {
+      "symbols": [
+        "ADAUSDT",
+        "BCHUSDT",
+        "BNBUSDT",
+        "BTCUSDT",
+        "DOGEUSDT",
+        "DOTUSDT",
+        "ETHUSDT",
+        "LINKUSDT",
+        "LTCUSDT",
+        "SOLUSDT",
+        "UNIUSDT",
+        "XRPUSDT",
+        "SUIUSDT",
+        "WLDUSDT"
+      ],
+      "runs": {
+        "validation": {
+          "config": {
+            "names": [
+              "DON55"
+            ],
+            "start": "2024-01-01",
+            "end": "2025-01-01",
+            "costs": 1.0,
+            "equal_size": false,
+            "hard_stop": true,
+            "fixed_cash": 50.0
+          },
+          "metrics": {
+            "trades": 172,
+            "net_pnl": 64.43709368751865,
+            "end_equity": 1064.4370936875187,
+            "return_pct": 6.443709368751871,
+            "max_drawdown_pct": 5.851608447185752,
+            "adverse_bar_drawdown_pct": 6.01294190153423,
+            "profit_factor": 1.2883624269157714,
+            "win_rate_pct": 31.976744186046513,
+            "mean_r": 0.15049784872922994,
+            "fees": 8.21689008126371,
+            "funding": 3.2089841794637124,
+            "max_losing_streak": 13,
+            "longest_underwater_days": 148.45833333333334,
+            "sharpe_daily": 1.0619532425785123,
+            "exposure_pct": 75.0455373406193,
+            "reconciliation_error": 9.663381206337363e-13
+          },
+          "audit": {
+            "ambiguous_bars": 0,
+            "shortened_stop_updates": 272,
+            "loosened_stop_updates": 0,
+            "be_activations": 79,
+            "funding_proxy_events": 0,
+            "liquidation_risk_bars": 0,
+            "lookahead_errors": 0
+          },
+          "skips": {
+            "strategy_slots": 384
+          }
+        },
+        "holdout": {
+          "config": {
+            "names": [
+              "DON55"
+            ],
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "costs": 1.0,
+            "equal_size": false,
+            "hard_stop": true,
+            "fixed_cash": 50.0
+          },
+          "metrics": {
+            "trades": 251,
+            "net_pnl": 182.34663269014482,
+            "end_equity": 1182.3466326901448,
+            "return_pct": 18.234663269014483,
+            "max_drawdown_pct": 4.4018868961906765,
+            "adverse_bar_drawdown_pct": 4.47820500926619,
+            "profit_factor": 1.5780862181765465,
+            "win_rate_pct": 36.254980079681275,
+            "mean_r": 0.2720230305045136,
+            "fees": 14.14804510765593,
+            "funding": 3.4366295259048294,
+            "max_losing_streak": 13,
+            "longest_underwater_days": 149.5,
+            "sharpe_daily": 1.631037469211755,
+            "exposure_pct": 86.14994517543859,
+            "reconciliation_error": 5.3717030823463574e-12
+          },
+          "audit": {
+            "ambiguous_bars": 0,
+            "shortened_stop_updates": 449,
+            "loosened_stop_updates": 0,
+            "be_activations": 117,
+            "funding_proxy_events": 0,
+            "liquidation_risk_bars": 0,
+            "lookahead_errors": 0
+          },
+          "skips": {
+            "strategy_slots": 813
+          }
+        },
+        "stress_holdout": {
+          "config": {
+            "names": [
+              "DON55"
+            ],
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "costs": 2.0,
+            "equal_size": false,
+            "hard_stop": true,
+            "fixed_cash": 50.0
+          },
+          "metrics": {
+            "trades": 251,
+            "net_pnl": 154.16156694394385,
+            "end_equity": 1154.1615669439439,
+            "return_pct": 15.416156694394378,
+            "max_drawdown_pct": 4.585965864974694,
+            "adverse_bar_drawdown_pct": 4.650668503113298,
+            "profit_factor": 1.4859866098302466,
+            "win_rate_pct": 35.45816733067729,
+            "mean_r": 0.23323469311188558,
+            "fees": 27.07611711765807,
+            "funding": 3.28964297694952,
+            "max_losing_streak": 13,
+            "longest_underwater_days": 152.83333333333334,
+            "sharpe_daily": 1.4385302412080412,
+            "exposure_pct": 86.26644736842105,
+            "reconciliation_error": 4.263256414560601e-12
+          },
+          "audit": {
+            "ambiguous_bars": 0,
+            "shortened_stop_updates": 444,
+            "loosened_stop_updates": 0,
+            "be_activations": 116,
+            "funding_proxy_events": 0,
+            "liquidation_risk_bars": 0,
+            "lookahead_errors": 0
+          },
+          "skips": {
+            "strategy_slots": 813
+          }
+        }
+      },
+      "calendar_returns": {
+        "year_2025_return_pct": 6.078131859520974,
+        "year_2026_return_pct": 11.45997878770373
+      }
+    }
+  },
+  "rows": [
+    {
+      "symbol": "ZECUSDT",
+      "status": "FAIL",
+      "failed": "year_2025_profit,holdout_pf_1_15,stress_profit",
+      "validation_return_pct": 10.082537601608799,
+      "validation_pf": 2.088354166328881,
+      "holdout_return_pct": 0.3841847201512927,
+      "holdout_pf": 1.0214313485451418,
+      "holdout_trades": 45,
+      "holdout_win_rate_pct": 33.33333333333333,
+      "holdout_mean_r": 0.01948700811895175,
+      "holdout_max_dd_pct": 9.630068575459704,
+      "year_2025_return_pct": -6.109701206819961,
+      "year_2026_return_pct": 6.916461029989773,
+      "stress_return_pct": -0.21105188981465073,
+      "checks": {
+        "validation_profit": true,
+        "year_2025_profit": false,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": false,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": false,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "SUIUSDT",
+      "status": "PASS",
+      "failed": "",
+      "validation_return_pct": 3.6234619112717192,
+      "validation_pf": 1.337305755267099,
+      "holdout_return_pct": 10.211239761440872,
+      "holdout_pf": 2.2680350525336586,
+      "holdout_trades": 27,
+      "holdout_win_rate_pct": 44.44444444444444,
+      "holdout_mean_r": 0.4915785917936346,
+      "holdout_max_dd_pct": 3.605938062966052,
+      "year_2025_return_pct": 6.789022610782114,
+      "year_2026_return_pct": 3.204652563524113,
+      "stress_return_pct": 9.492105412359408,
+      "checks": {
+        "validation_profit": true,
+        "year_2025_profit": true,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": true,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": true,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "status": "FAIL",
+      "failed": "validation_profit",
+      "validation_return_pct": -0.28608589544163454,
+      "validation_pf": 0.9650911601420131,
+      "holdout_return_pct": 3.49266442831373,
+      "holdout_pf": 1.2032198545803838,
+      "holdout_trades": 40,
+      "holdout_win_rate_pct": 32.5,
+      "holdout_mean_r": 0.12515943589642778,
+      "holdout_max_dd_pct": 6.029229239933464,
+      "year_2025_return_pct": 0.5030465184516775,
+      "year_2026_return_pct": 2.9746540163965607,
+      "stress_return_pct": 2.811785352434182,
+      "checks": {
+        "validation_profit": false,
+        "year_2025_profit": true,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": true,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": true,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "WLDUSDT",
+      "status": "PASS",
+      "failed": "",
+      "validation_return_pct": 4.361250741476108,
+      "validation_pf": 1.441225309009277,
+      "holdout_return_pct": 3.1773061101802336,
+      "holdout_pf": 1.1906896910868294,
+      "holdout_trades": 42,
+      "holdout_win_rate_pct": 33.33333333333333,
+      "holdout_mean_r": 0.10792912122554142,
+      "holdout_max_dd_pct": 4.6260759794148125,
+      "year_2025_return_pct": 2.6769600482769107,
+      "year_2026_return_pct": 0.487301203374213,
+      "stress_return_pct": 1.8167512505745664,
+      "checks": {
+        "validation_profit": true,
+        "year_2025_profit": true,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": true,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": true,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "NEARUSDT",
+      "status": "FAIL",
+      "failed": "validation_profit,year_2025_profit,holdout_profit,holdout_pf_1_15,stress_profit",
+      "validation_return_pct": -0.9397659190565122,
+      "validation_pf": 0.9066562966990972,
+      "holdout_return_pct": -1.669660512143889,
+      "holdout_pf": 0.8974631538289958,
+      "holdout_trades": 42,
+      "holdout_win_rate_pct": 33.33333333333333,
+      "holdout_mean_r": -0.04693589763220946,
+      "holdout_max_dd_pct": 8.055613840734555,
+      "year_2025_return_pct": -4.290081823243863,
+      "year_2026_return_pct": 2.7378785407178086,
+      "stress_return_pct": -2.283245968633907,
+      "checks": {
+        "validation_profit": false,
+        "year_2025_profit": false,
+        "year_2026_profit": true,
+        "holdout_profit": false,
+        "holdout_pf_1_15": false,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": false,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "status": "FAIL",
+      "failed": "validation_profit,year_2025_profit,holdout_profit,holdout_pf_1_15,stress_profit",
+      "validation_return_pct": -3.822935615221823,
+      "validation_pf": 0.6351103376492273,
+      "holdout_return_pct": -3.9602262376299824,
+      "holdout_pf": 0.8185796257702611,
+      "holdout_trades": 50,
+      "holdout_win_rate_pct": 26.0,
+      "holdout_mean_r": -0.10008250828070436,
+      "holdout_max_dd_pct": 10.336133047161567,
+      "year_2025_return_pct": -5.082174422758379,
+      "year_2026_return_pct": 1.1820205301852127,
+      "stress_return_pct": -4.683189339092109,
+      "checks": {
+        "validation_profit": false,
+        "year_2025_profit": false,
+        "year_2026_profit": true,
+        "holdout_profit": false,
+        "holdout_pf_1_15": false,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": false,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "status": "FAIL",
+      "failed": "validation_profit",
+      "validation_return_pct": -6.135195714191866,
+      "validation_pf": 0.5359145430570639,
+      "holdout_return_pct": 3.404723563991152,
+      "holdout_pf": 1.2885945935809249,
+      "holdout_trades": 29,
+      "holdout_win_rate_pct": 37.93103448275862,
+      "holdout_mean_r": 0.16371016780412123,
+      "holdout_max_dd_pct": 5.947678071869089,
+      "year_2025_return_pct": 1.3976889773847478,
+      "year_2026_return_pct": 1.979369162007294,
+      "stress_return_pct": 2.808336856921434,
+      "checks": {
+        "validation_profit": false,
+        "year_2025_profit": true,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": true,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": true,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "FILUSDT",
+      "status": "FAIL",
+      "failed": "validation_profit,year_2025_profit,year_2026_profit,holdout_profit,holdout_pf_1_15,holdout_dd_12,stress_profit",
+      "validation_return_pct": -1.1219269888397942,
+      "validation_pf": 0.9154178793597131,
+      "holdout_return_pct": -12.511500173054891,
+      "holdout_pf": 0.3850624536786819,
+      "holdout_trades": 37,
+      "holdout_win_rate_pct": 10.81081081081081,
+      "holdout_mean_r": -0.47518974332382646,
+      "holdout_max_dd_pct": 14.107182318956202,
+      "year_2025_return_pct": -7.407374342558237,
+      "year_2026_return_pct": -5.512453928437044,
+      "stress_return_pct": -12.74102412206205,
+      "checks": {
+        "validation_profit": false,
+        "year_2025_profit": false,
+        "year_2026_profit": false,
+        "holdout_profit": false,
+        "holdout_pf_1_15": false,
+        "holdout_trades_20": true,
+        "holdout_dd_12": false,
+        "stress_profit": false,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "XLMUSDT",
+      "status": "FAIL",
+      "failed": "validation_profit",
+      "validation_return_pct": -2.212603934874846,
+      "validation_pf": 0.8009569151473679,
+      "holdout_return_pct": 11.015014596794437,
+      "holdout_pf": 1.8539331556033372,
+      "holdout_trades": 35,
+      "holdout_win_rate_pct": 37.142857142857146,
+      "holdout_mean_r": 0.4097914572824808,
+      "holdout_max_dd_pct": 4.183091402845629,
+      "year_2025_return_pct": 10.657723681008434,
+      "year_2026_return_pct": 0.32287932907058003,
+      "stress_return_pct": 10.00562747155158,
+      "checks": {
+        "validation_profit": false,
+        "year_2025_profit": true,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": true,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": true,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "ARBUSDT",
+      "status": "FAIL",
+      "failed": "year_2025_profit",
+      "validation_return_pct": 4.3558030255618,
+      "validation_pf": 1.568021404640455,
+      "holdout_return_pct": 2.676481134622244,
+      "holdout_pf": 1.1630628323174719,
+      "holdout_trades": 43,
+      "holdout_win_rate_pct": 37.2093023255814,
+      "holdout_mean_r": 0.09005503862535524,
+      "holdout_max_dd_pct": 6.519582992007855,
+      "year_2025_return_pct": -1.9753613544798876,
+      "year_2026_return_pct": 4.745584940051928,
+      "stress_return_pct": 1.9083355547527825,
+      "checks": {
+        "validation_profit": true,
+        "year_2025_profit": false,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": true,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": true,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "INJUSDT",
+      "status": "FAIL",
+      "failed": "validation_profit",
+      "validation_return_pct": -3.8216860848353296,
+      "validation_pf": 0.529556024813481,
+      "holdout_return_pct": 8.382402460869098,
+      "holdout_pf": 1.784033842753336,
+      "holdout_trades": 37,
+      "holdout_win_rate_pct": 35.13513513513514,
+      "holdout_mean_r": 0.2987418298549217,
+      "holdout_max_dd_pct": 4.186459821463496,
+      "year_2025_return_pct": 5.852852200878744,
+      "year_2026_return_pct": 2.3896854996311223,
+      "stress_return_pct": 7.6043687425288775,
+      "checks": {
+        "validation_profit": false,
+        "year_2025_profit": true,
+        "year_2026_profit": true,
+        "holdout_profit": true,
+        "holdout_pf_1_15": true,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": true,
+        "no_liquidation_flag": true
+      }
+    },
+    {
+      "symbol": "APTUSDT",
+      "status": "FAIL",
+      "failed": "year_2026_profit,holdout_pf_1_15,stress_profit",
+      "validation_return_pct": 0.9879976002743929,
+      "validation_pf": 1.100806414794562,
+      "holdout_return_pct": 0.39870704061666373,
+      "holdout_pf": 1.0395313143039349,
+      "holdout_trades": 28,
+      "holdout_win_rate_pct": 32.142857142857146,
+      "holdout_mean_r": 0.025375351864527457,
+      "holdout_max_dd_pct": 5.916846186030689,
+      "year_2025_return_pct": 0.7165869761315502,
+      "year_2026_return_pct": -0.3156182561966703,
+      "stress_return_pct": -0.03717977377719617,
+      "checks": {
+        "validation_profit": true,
+        "year_2025_profit": true,
+        "year_2026_profit": false,
+        "holdout_profit": true,
+        "holdout_pf_1_15": false,
+        "holdout_trades_20": true,
+        "holdout_dd_12": true,
+        "stress_profit": false,
+        "no_liquidation_flag": true
+      }
+    }
+  ]
+}

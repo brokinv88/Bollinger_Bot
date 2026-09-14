@@ -1,0 +1,29 @@
+{
+  "mode": "PAPER_ONLY",
+  "tests_passed": 56,
+  "source_hash": "9d2a52ca0b35d0042989d3188fb65517fe3a477d3de8f2bb8bc3842e3cde9567",
+  "initial_public_refresh": 1788759113376,
+  "scan_symbols": 12,
+  "scan_errors": {},
+  "positions": 0,
+  "closed_trades": 0,
+  "cash": 1000.0,
+  "reconciliation_error": 0.0,
+  "verified": [
+    "public Binance H4 and exchange filters",
+    "signal to ticket to approval with synthetic fixtures",
+    "shared corrected research lifecycle long and short",
+    "no backdated approval",
+    "restart idempotence and funding once",
+    "gap stop and causal trailing",
+    "missing data fails atomically",
+    "menu opens and exits",
+    "old bot sources unchanged"
+  ],
+  "not_verified": [
+    "real exchange order placement (not implemented)",
+    "tick fills or exact liquidation",
+    "historical performance of approval/next-H1-entry protocol",
+    "Pine runtime parity"
+  ]
+}

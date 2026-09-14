@@ -1,0 +1,46 @@
+//@version=6
+indicator("BASE / B D1 — research entry monitor", overlay=true)
+profile = input.string("B_SAFE", "Profile", options=["BASE", "B", "B_SAFE", "B_REGIME"])
+btc = input.symbol("BINANCE:BTCUSDT", "BTC regime source")
+if timeframe.in_seconds() != 86400
+    runtime.error("Use standard Binance spot candles on 1D.")
+upper = ta.sma(high, 20) + 1.5 * ta.stdev(high, 20, false)
+lower = ta.sma(low, 20) - 1.5 * ta.stdev(low, 20, false)
+s50 = ta.sma(close, 50)
+s100 = ta.sma(close, 100)
+s150 = ta.sma(close, 150)
+s200 = ta.sma(close, 200)
+atr = ta.sma(ta.tr(true), 14)
+roc5 = ta.roc(close, 5)
+roc20 = ta.roc(close, 20)
+// Same-timeframe BTC value is consumed only at the confirmed daily close.
+[btcClose, btcSma] = request.security(btc, "1D", [close, ta.sma(close, 200)], gaps=barmerge.gaps_on, lookahead=barmerge.lookahead_off)
+crossUp = ta.crossover(close, upper)
+crossLow = ta.crossunder(close, lower)
+x50 = ta.crossunder(close, s50)
+x100 = ta.crossunder(close, s100)
+x150 = ta.crossunder(close, s150)
+x200 = ta.crossunder(close, s200)
+trend = close > s50 and close > s100 and close > s150 and close > s200
+bFilter = roc5 < 20 and roc20 < 40 and atr / close * 100 < 6
+regime = profile != "B_REGIME" or (not na(btcSma) and btcClose > btcSma)
+entryCandidate = barstate.isconfirmed and bar_index >= 199 and trend and crossUp and (profile == "BASE" or bFilter) and regime
+exitCandidate = barstate.isconfirmed and (crossLow or x50 or x100 or x150 or x200)
+float stopRef = lower
+stopRef := not na(s50) and s50 < close ? math.max(stopRef, s50) : stopRef
+stopRef := not na(s100) and s100 < close ? math.max(stopRef, s100) : stopRef
+stopRef := not na(s150) and s150 < close ? math.max(stopRef, s150) : stopRef
+stopRef := not na(s200) and s200 < close ? math.max(stopRef, s200) : stopRef
+stopRef *= 0.99
+plot(upper, "Upper high band", color=color.teal)
+plot(lower, "Lower low band", color=color.orange)
+plot(s200, "SMA200", color=color.gray)
+plot(barstate.isconfirmed ? stopRef : stopRef[1], "Reference stop — not position stop", color=color.red, style=plot.style_stepline)
+plotshape(entryCandidate, "Entry filter", shape.triangleup, location.belowbar, color=color.teal, text="CHECK", size=size.tiny)
+plotshape(exitCandidate, "Daily exit filter", shape.triangledown, location.abovebar, color=color.orange, text="EXIT?", size=size.tiny)
+alertcondition(entryCandidate, "Spot entry filter", "Spot D1 filter {{ticker}}. Check account, pyramid profit and next-open execution; not an order.")
+alertcondition(exitCandidate, "Spot exit filter", "Spot D1 exit filter {{ticker}}. Check whether a position exists.")
+var table info = table.new(position.top_right, 1, 2)
+if barstate.islast
+    table.cell(info, 0, 0, profile + " | D1 filters only", bgcolor=color.new(color.teal, 80))
+    table.cell(info, 0, 1, "No position / pyramid / cash ledger\nB_SAFE management is in Python research")

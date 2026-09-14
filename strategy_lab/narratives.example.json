@@ -1,0 +1,10 @@
+{
+  "note": "Chỉ là ví dụ nhãn tự nhập, không khẳng định narrative đang thịnh hành. Chỉnh sửa symbols theo nghiên cứu của bạn; không dùng narrative để thay đổi trigger đã đóng băng.",
+  "symbols": {
+    "BTCUSDT": ["BTC"],
+    "ETHUSDT": ["smart-contract-platform"],
+    "SOLUSDT": ["smart-contract-platform"],
+    "LINKUSDT": ["oracle"],
+    "UNIUSDT": ["dex"]
+  }
+}

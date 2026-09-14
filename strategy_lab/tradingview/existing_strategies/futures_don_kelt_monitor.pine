@@ -1,0 +1,58 @@
+//@version=6
+indicator("Donchian55 / Keltner H4 — price monitor", overlay=true)
+profile = input.string("DON55", "Profile", options=["DON55", "KELTNER", "DON55_TREND", "KELTNER_TREND"])
+if timeframe.in_seconds() != 14400
+    runtime.error("Use standard Binance USD-M perpetual candles on 4H.")
+// Legacy EWM seeded with first valid observation, not Wilder SMA initialization.
+ewm14(float x) =>
+    var float y = na
+    y := na(x) ? y : na(y[1]) ? x : y[1] + (x - y[1]) / 14.0
+    y
+atr = ta.sma(ta.tr(true), 14)
+up = ta.change(high)
+down = -ta.change(low)
+plus = not na(up) and up > down and up > 0 ? up : 0.0
+minus = not na(down) and down > up and down > 0 ? down : 0.0
+trE = ewm14(ta.tr(true))
+pdi = 100 * ewm14(plus) / trE
+mdi = 100 * ewm14(minus) / trE
+dx = pdi + mdi > 0 ? 100 * math.abs(pdi - mdi) / (pdi + mdi) : na
+adx = ewm14(dx)
+atrPct = atr / close * 100
+atrMean = ta.sma(atrPct, 50)
+ema20 = ta.ema(close, 20)
+ema50 = ta.ema(close, 50)
+donHigh = ta.highest(high, 55)[1]
+donLow = ta.lowest(low, 55)[1]
+kHigh = ema20 + 1.5 * atr
+kLow = ema20 - 1.5 * atr
+isDon = profile == "DON55" or profile == "DON55_TREND"
+isTrend = profile == "DON55_TREND" or profile == "KELTNER_TREND"
+upper = isDon ? donHigh : kHigh
+lower = isDon ? donLow : kLow
+crossLong = ta.crossover(close, upper)
+crossShort = ta.crossunder(close, lower)
+// [1] with lookahead_on supplies the daily candle already known at H4 OPEN.
+[dClose, dEma, dCount] = request.security(syminfo.tickerid, "1D", [close[1], ta.ema(close, 200)[1], bar_index[1] + 1], lookahead=barmerge.lookahead_on)
+base = bar_index >= 199 and atr > 0 and (isDon ? adx >= 20 and atrPct > atrMean : adx >= 18)
+longFilter = close > upper and (not isDon or close > ema50) and (not isTrend or (crossLong and dCount >= 200 and dClose > dEma))
+shortFilter = close < lower and (not isDon or close < ema50) and (not isTrend or (crossShort and dCount >= 200 and dClose < dEma))
+longCandidate = barstate.isconfirmed and base and longFilter
+shortCandidate = barstate.isconfirmed and base and shortFilter
+plot(upper, "Upper boundary", color=color.teal)
+plot(lower, "Lower boundary", color=color.orange)
+plot(isTrend ? dEma : na, "Confirmed D1 EMA200", color=color.gray)
+plot(atr, "SMA ATR14", display=display.data_window)
+plot(adx, "Legacy ADX", display=display.data_window)
+plot(2 * atr, "Initial stop distance", display=display.data_window)
+plot((isDon ? 7 : 6) * atr, "Initial target distance", display=display.data_window)
+plot((isTrend ? 4 : 2) * atr, "BE favorable close distance", display=display.data_window)
+plotshape(longCandidate, "Long price candidate", shape.triangleup, location.belowbar, color=color.teal, text="CHECK", size=size.tiny)
+plotshape(shortCandidate, "Short price candidate", shape.triangledown, location.abovebar, color=color.orange, text="CHECK", size=size.tiny)
+alertcondition(longCandidate, "Long PRICE filter — funding unchecked", "H4 long PRICE filter {{ticker}}. Funding and portfolio capacity NOT checked. Confirm with Python scanner.")
+alertcondition(shortCandidate, "Short PRICE filter — funding unchecked", "H4 short PRICE filter {{ticker}}. Funding and portfolio capacity NOT checked. Confirm with Python scanner.")
+var table info = table.new(position.top_right, 1, 3)
+if barstate.islast
+    table.cell(info, 0, 0, profile + " | H4 price filters", bgcolor=color.new(color.teal, 80))
+    table.cell(info, 0, 1, "FUNDING NOT CHECKED | No account ledger")
+    table.cell(info, 0, 2, "SL 2ATR | TP " + (isDon ? "7ATR = 3.5R" : "6ATR = 3R") + "\nBE " + (isTrend ? "4ATR = 2R" : "2ATR = 1R"))

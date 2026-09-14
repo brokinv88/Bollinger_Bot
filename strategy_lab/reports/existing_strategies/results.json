@@ -1,0 +1,3285 @@
+{
+  "created_utc": "2026-09-07T03:56:35.172786+00:00",
+  "spec_sha256": "245045a7666703caf7280d5a4ad68beaa9dba77982d0706a2126142681b1f02d",
+  "validation_note": "Retrospective reused later-time sample; no claim of pristine holdout.",
+  "data_verification": {
+    "status": "verified",
+    "files": 48,
+    "verified_utc": "2026-09-07T03:56:34.015124+00:00",
+    "errors": []
+  },
+  "source_audit": {
+    "source_hashes": {
+      "config.py": "61ca122cfda56572299f70273175c941e3617f6a104e7dc8ca73a08e160192b1",
+      "daily_scanner.py": "f41c2f431ff19eeabf82328b7e34519d3ae341b22bb965c34c737104ddc851be",
+      "auto_trade.py": "bc41922605195b2f690fb8af3857c281fc7f7dac62a5074fbd678b1463af1b4d",
+      "research_improvements.py": "f707d9e7a1af550b2f527262d08a5460d83f0215d6ef6a481b51f1208b597e7e",
+      "research_futures_framework.py": "f3342b95ccc6748a4cf4d6a52b1db50153fe2b50d5cdf8b4f9d3c42ea1cfa95f",
+      "research_futures_strategy.py": "d334ba7ff92dad285e0a4d1f9d6933f661207b32371cc93b31572ed72606fc9b",
+      "futures_paper.py": "2b69cc70b4284d0b3bbf3299181312a94d8b740c7d164875b6dc0a4cff45f7f3",
+      "futures_sizing_validate.py": "41b35e8a18d0c2ac66a847eb441fa7f5305493f79f9a326bcc8644183175853f",
+      "research_futures_report.md": "520428fc5d10f673535795675e7e1c62f77567a04d22ab3532c9e0a0ef59c255",
+      "improvement_proposals_report.csv": "91323d2001a242b47194bcfaac448dbb8734d08ca26ab5881374ad6ebfbd4248",
+      "futures_trading_plan.md": "87ef82e4474363f5b21e5e5340fdc40fec550d81160885fda64dd583812f212a"
+    },
+    "paper_evidence": {
+      "database_volume.db": {
+        "open_positions": 10,
+        "closed_trades": 1
+      },
+      "database_marketcap.db": {
+        "open_positions": 7,
+        "closed_trades": 0
+      },
+      "database_volume_stratb.db": {
+        "open_positions": 2,
+        "closed_trades": 0
+      },
+      "database_marketcap_stratb.db": {
+        "open_positions": 2,
+        "closed_trades": 0
+      },
+      "paper_trades.csv": {
+        "closed_trades": 0
+      },
+      "bridge_trades.csv": {
+        "closed_trades": 0
+      }
+    },
+    "unreachable_fill_example": {
+      "description": "Original Keltner BE uses abs(adverse close change). Entry120; next candle O100 H105 L95 C100; returns exit120, above bar high105.",
+      "original_trade": {
+        "direction": 1,
+        "entry": 120.0,
+        "entry_idx": 200,
+        "exit": 120.0,
+        "exit_idx": 201,
+        "reason": "TRAIL"
+      },
+      "next_bar": {
+        "open": 100,
+        "high": 105,
+        "low": 95,
+        "close": 100
+      }
+    }
+  },
+  "strategies": {
+    "BASE": {
+      "name": "BASE",
+      "market": "spot",
+      "family": "BASE",
+      "safe": false,
+      "regime": false,
+      "risk_sized": false,
+      "fresh_cross": false,
+      "be_atr": 2.0,
+      "trail_atr": 4.0,
+      "target_atr": 7.0,
+      "risk": 0.0075
+    },
+    "B": {
+      "name": "B",
+      "market": "spot",
+      "family": "B",
+      "safe": false,
+      "regime": false,
+      "risk_sized": false,
+      "fresh_cross": false,
+      "be_atr": 2.0,
+      "trail_atr": 4.0,
+      "target_atr": 7.0,
+      "risk": 0.0075
+    },
+    "B_SAFE": {
+      "name": "B_SAFE",
+      "market": "spot",
+      "family": "B",
+      "safe": true,
+      "regime": false,
+      "risk_sized": false,
+      "fresh_cross": false,
+      "be_atr": 2.0,
+      "trail_atr": 4.0,
+      "target_atr": 7.0,
+      "risk": 0.0075
+    },
+    "B_REGIME": {
+      "name": "B_REGIME",
+      "market": "spot",
+      "family": "B",
+      "safe": true,
+      "regime": true,
+      "risk_sized": true,
+      "fresh_cross": false,
+      "be_atr": 2.0,
+      "trail_atr": 4.0,
+      "target_atr": 7.0,
+      "risk": 0.0075
+    },
+    "DON55": {
+      "name": "DON55",
+      "market": "futures",
+      "family": "DON",
+      "safe": false,
+      "regime": false,
+      "risk_sized": false,
+      "fresh_cross": false,
+      "be_atr": 2.0,
+      "trail_atr": 4.0,
+      "target_atr": 7.0,
+      "risk": 0.0075
+    },
+    "KELTNER": {
+      "name": "KELTNER",
+      "market": "futures",
+      "family": "KELT",
+      "safe": false,
+      "regime": false,
+      "risk_sized": false,
+      "fresh_cross": false,
+      "be_atr": 2.0,
+      "trail_atr": 3.5,
+      "target_atr": 6.0,
+      "risk": 0.006
+    },
+    "DON55_TREND": {
+      "name": "DON55_TREND",
+      "market": "futures",
+      "family": "DON",
+      "safe": true,
+      "regime": true,
+      "risk_sized": false,
+      "fresh_cross": true,
+      "be_atr": 4.0,
+      "trail_atr": 4.0,
+      "target_atr": 7.0,
+      "risk": 0.0075
+    },
+    "KELTNER_TREND": {
+      "name": "KELTNER_TREND",
+      "market": "futures",
+      "family": "KELT",
+      "safe": true,
+      "regime": true,
+      "risk_sized": false,
+      "fresh_cross": true,
+      "be_atr": 4.0,
+      "trail_atr": 3.5,
+      "target_atr": 6.0,
+      "risk": 0.006
+    }
+  },
+  "runs": {
+    "BASE": {
+      "development": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 69,
+          "net_pnl": 440.38054625838413,
+          "end_equity": 3440.380546258384,
+          "return_pct": 14.67935154194613,
+          "max_drawdown_pct": 7.063928712379896,
+          "adverse_bar_drawdown_pct": 8.269571191281354,
+          "profit_factor": 2.466173033492186,
+          "win_rate_pct": 15.942028985507244,
+          "mean_r": -0.229106787009597,
+          "fees": 11.240832167636809,
+          "funding": 0.0,
+          "max_losing_streak": 24,
+          "longest_underwater_days": 667.3333333333334,
+          "sharpe_daily": 0.8102321797892419,
+          "exposure_pct": 44.08675799086758,
+          "reconciliation_error": 2.8421709430404007e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1198,
+          "loosened_stop_updates": 199,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 18,
+          "position_limit": 1
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 48,
+          "net_pnl": 673.4970669777249,
+          "end_equity": 3673.497066977725,
+          "return_pct": 22.449902232590823,
+          "max_drawdown_pct": 12.1729646019335,
+          "adverse_bar_drawdown_pct": 12.663112123076436,
+          "profit_factor": 4.867051975870085,
+          "win_rate_pct": 33.33333333333333,
+          "mean_r": 0.21081810759644634,
+          "fees": 9.97418053822524,
+          "funding": 0.0,
+          "max_losing_streak": 18,
+          "longest_underwater_days": 250.16666666666666,
+          "sharpe_daily": 1.1911173285051024,
+          "exposure_pct": 62.75045537340619,
+          "reconciliation_error": 1.1368683772161603e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1141,
+          "loosened_stop_updates": 114,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 18,
+          "position_limit": 11
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 49,
+          "net_pnl": -3.607550858937884,
+          "end_equity": 2996.392449141062,
+          "return_pct": -0.12025169529793489,
+          "max_drawdown_pct": 5.544240061669525,
+          "adverse_bar_drawdown_pct": 5.591084042974903,
+          "profit_factor": 0.9771062069094016,
+          "win_rate_pct": 18.367346938775512,
+          "mean_r": -0.09463833014096387,
+          "fees": 6.896395737985941,
+          "funding": 0.0,
+          "max_losing_streak": 22,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.021241044250967935,
+          "exposure_pct": 38.651315789473685,
+          "reconciliation_error": 1.7408297026122455e-12,
+          "net_without_best_5_trades": -133.06308872146548
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 752,
+          "loosened_stop_updates": 110,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 11
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 163,
+          "net_pnl": 1066.5504677423187,
+          "end_equity": 4066.5504677423187,
+          "return_pct": 35.5516822580773,
+          "max_drawdown_pct": 11.30749218979945,
+          "adverse_bar_drawdown_pct": 11.76279124376146,
+          "profit_factor": 2.6452966039940233,
+          "win_rate_pct": 20.858895705521473,
+          "mean_r": -0.09471621958115044,
+          "fees": 27.467644485854542,
+          "funding": 0.0,
+          "max_losing_streak": 24,
+          "longest_underwater_days": 667.3333333333334,
+          "sharpe_daily": 0.6644812246376816,
+          "exposure_pct": 47.54499217527386,
+          "reconciliation_error": 5.4569682106375694e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 3175,
+          "loosened_stop_updates": 432,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 53,
+          "position_limit": 12
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 49,
+          "net_pnl": -13.931252976887208,
+          "end_equity": 2986.068747023113,
+          "return_pct": -0.46437509922957476,
+          "max_drawdown_pct": 5.683856188398462,
+          "adverse_bar_drawdown_pct": 5.730708383071592,
+          "profit_factor": 0.9155138787927096,
+          "win_rate_pct": 18.367346938775512,
+          "mean_r": -0.15604376114799426,
+          "fees": 13.772136857581748,
+          "funding": 0.0,
+          "max_losing_streak": 22,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": -0.010481669504022318,
+          "exposure_pct": 38.651315789473685,
+          "reconciliation_error": 7.780442956573097e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 752,
+          "loosened_stop_updates": 110,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 11
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 49,
+          "net_pnl": -3.607550858937884,
+          "end_equity": 2996.392449141062,
+          "return_pct": -0.12025169529793489,
+          "max_drawdown_pct": 5.544240061669525,
+          "adverse_bar_drawdown_pct": 5.591084042974903,
+          "profit_factor": 0.9771062069094016,
+          "win_rate_pct": 18.367346938775512,
+          "mean_r": -0.09463833014096387,
+          "fees": 6.896395737985941,
+          "funding": 0.0,
+          "max_losing_streak": 22,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.021241044250967935,
+          "exposure_pct": 38.651315789473685,
+          "reconciliation_error": 1.7408297026122455e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 752,
+          "loosened_stop_updates": 110,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 11
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 49,
+          "net_pnl": 6.747153367472038,
+          "end_equity": 3006.747153367472,
+          "return_pct": 0.22490511224906307,
+          "max_drawdown_pct": 5.404640905417923,
+          "adverse_bar_drawdown_pct": 5.451476648368958,
+          "profit_factor": 1.0449093436002135,
+          "win_rate_pct": 18.367346938775512,
+          "mean_r": -0.01665040096664996,
+          "fees": 0.0,
+          "funding": 0.0,
+          "max_losing_streak": 22,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.05309271555044455,
+          "exposure_pct": 38.651315789473685,
+          "reconciliation_error": 1.3447021274259896e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 752,
+          "loosened_stop_updates": 110,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 11
+        }
+      },
+      "no_hard_stop_later": {
+        "config": {
+          "names": [
+            "BASE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": false,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 47,
+          "net_pnl": 20.974073052152107,
+          "end_equity": 3020.974073052152,
+          "return_pct": 0.6991357684050792,
+          "max_drawdown_pct": 5.515862952996098,
+          "adverse_bar_drawdown_pct": 6.269302441886204,
+          "profit_factor": 1.1184681711407216,
+          "win_rate_pct": 25.53191489361702,
+          "mean_r": 0.20575979381437595,
+          "fees": 6.821001868127075,
+          "funding": 0.0,
+          "max_losing_streak": 15,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.09547957458492005,
+          "exposure_pct": 47.834429824561404,
+          "reconciliation_error": -7.887024366937112e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 905,
+          "loosened_stop_updates": 189,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 12
+        }
+      }
+    },
+    "B": {
+      "development": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 47,
+          "net_pnl": 181.05671506080535,
+          "end_equity": 3181.0567150608053,
+          "return_pct": 6.035223835360171,
+          "max_drawdown_pct": 5.773776980887801,
+          "adverse_bar_drawdown_pct": 6.658929765209209,
+          "profit_factor": 1.9435343372040275,
+          "win_rate_pct": 19.148936170212767,
+          "mean_r": -0.1538340939010688,
+          "fees": 7.681245453021319,
+          "funding": 0.0,
+          "max_losing_streak": 18,
+          "longest_underwater_days": 273.3333333333333,
+          "sharpe_daily": 0.5176158723640205,
+          "exposure_pct": 40.93607305936073,
+          "reconciliation_error": 1.1368683772161603e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 852,
+          "loosened_stop_updates": 143,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 7
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 38,
+          "net_pnl": 530.2265310192497,
+          "end_equity": 3530.2265310192497,
+          "return_pct": 17.67421770064166,
+          "max_drawdown_pct": 9.094526288744476,
+          "adverse_bar_drawdown_pct": 9.876456461808225,
+          "profit_factor": 5.51537800237586,
+          "win_rate_pct": 34.21052631578947,
+          "mean_r": 2.241052088258766,
+          "fees": 6.930763688313958,
+          "funding": 0.0,
+          "max_losing_streak": 14,
+          "longest_underwater_days": 253.5,
+          "sharpe_daily": 1.305469292069398,
+          "exposure_pct": 61.338797814207645,
+          "reconciliation_error": 7.958078640513122e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 888,
+          "loosened_stop_updates": 98,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 12,
+          "position_limit": 3
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 50.00127343131544,
+          "end_equity": 3050.0012734313154,
+          "return_pct": 1.666709114377185,
+          "max_drawdown_pct": 3.745583528772667,
+          "adverse_bar_drawdown_pct": 4.041368164726333,
+          "profit_factor": 1.5254616470328937,
+          "win_rate_pct": 24.242424242424242,
+          "mean_r": 0.28651501219767933,
+          "fees": 4.650055924760672,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.2358134202080985,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 8.526512829121202e-13,
+          "net_without_best_5_trades": -79.12546190891791
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 597,
+          "loosened_stop_updates": 77,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 10
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 116,
+          "net_pnl": 767.3439371759246,
+          "end_equity": 3767.3439371759246,
+          "return_pct": 25.578131239197475,
+          "max_drawdown_pct": 8.882663959123494,
+          "adverse_bar_drawdown_pct": 9.645288254544393,
+          "profit_factor": 2.878311583712897,
+          "win_rate_pct": 24.137931034482758,
+          "mean_r": 0.8188145052234412,
+          "fees": 18.86813014924325,
+          "funding": 0.0,
+          "max_losing_streak": 18,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.678910161184297,
+          "exposure_pct": 45.16823161189358,
+          "reconciliation_error": 2.8421709430404007e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 2419,
+          "loosened_stop_updates": 324,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 33,
+          "position_limit": 3
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 42.961821749092906,
+          "end_equity": 3042.961821749093,
+          "return_pct": 1.4320607249697526,
+          "max_drawdown_pct": 3.8522105469480317,
+          "adverse_bar_drawdown_pct": 4.1078711883331565,
+          "profit_factor": 1.431063923639183,
+          "win_rate_pct": 24.242424242424242,
+          "mean_r": 0.19239437481535815,
+          "fees": 9.286132635315724,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.20580083400416982,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 5.755396159656812e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 597,
+          "loosened_stop_updates": 77,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 10
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 50.00127343131544,
+          "end_equity": 3050.0012734313154,
+          "return_pct": 1.666709114377185,
+          "max_drawdown_pct": 3.745583528772667,
+          "adverse_bar_drawdown_pct": 4.041368164726333,
+          "profit_factor": 1.5254616470328937,
+          "win_rate_pct": 24.242424242424242,
+          "mean_r": 0.28651501219767933,
+          "fees": 4.650055924760672,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.2358134202080985,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 8.526512829121202e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 597,
+          "loosened_stop_updates": 77,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 10
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 57.06186460807885,
+          "end_equity": 3057.061864608079,
+          "return_pct": 1.9020621536026239,
+          "max_drawdown_pct": 3.6388471968710756,
+          "adverse_bar_drawdown_pct": 3.974789031829007,
+          "profit_factor": 1.6295749560624622,
+          "win_rate_pct": 24.242424242424242,
+          "mean_r": 0.40576366109573847,
+          "fees": 0.0,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.26595406868040034,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 1.0160761121369433e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 597,
+          "loosened_stop_updates": 77,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 10
+        }
+      },
+      "no_hard_stop_later": {
+        "config": {
+          "names": [
+            "B"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": false,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 32,
+          "net_pnl": 77.2825452291554,
+          "end_equity": 3077.2825452291554,
+          "return_pct": 2.5760848409718484,
+          "max_drawdown_pct": 3.8612233820937147,
+          "adverse_bar_drawdown_pct": 4.635871264398473,
+          "profit_factor": 1.7507611596881214,
+          "win_rate_pct": 31.25,
+          "mean_r": 0.7882325944264996,
+          "fees": 4.677364505138891,
+          "funding": 0.0,
+          "max_losing_streak": 8,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.3446904926760416,
+          "exposure_pct": 44.38048245614035,
+          "reconciliation_error": -8.526512829121202e-14
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 711,
+          "loosened_stop_updates": 126,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_limit": 10
+        }
+      }
+    },
+    "B_SAFE": {
+      "development": {
+        "config": {
+          "names": [
+            "B_SAFE"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 47,
+          "net_pnl": 143.557240965662,
+          "end_equity": 3143.557240965662,
+          "return_pct": 4.785241365522075,
+          "max_drawdown_pct": 4.914069606865656,
+          "adverse_bar_drawdown_pct": 5.605523288205827,
+          "profit_factor": 1.8990807671444199,
+          "win_rate_pct": 17.02127659574468,
+          "mean_r": -0.22069482955471317,
+          "fees": 6.443707241913868,
+          "funding": 0.0,
+          "max_losing_streak": 18,
+          "longest_underwater_days": 366.3333333333333,
+          "sharpe_daily": 0.48785411177127125,
+          "exposure_pct": 40.821917808219176,
+          "reconciliation_error": 1.4779288903810084e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 682,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 15,
+          "pyramid_limit": 4
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "B_SAFE"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 38,
+          "net_pnl": 484.88429550153614,
+          "end_equity": 3484.884295501536,
+          "return_pct": 16.162809850051207,
+          "max_drawdown_pct": 7.495938386753787,
+          "adverse_bar_drawdown_pct": 8.173754919077558,
+          "profit_factor": 6.875816876385179,
+          "win_rate_pct": 34.21052631578947,
+          "mean_r": 2.175610950398692,
+          "fees": 5.785374965172004,
+          "funding": 0.0,
+          "max_losing_streak": 14,
+          "longest_underwater_days": 236.0,
+          "sharpe_daily": 1.3842180409386589,
+          "exposure_pct": 61.338797814207645,
+          "reconciliation_error": 2.2737367544323206e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 746,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 17,
+          "pyramid_limit": 6,
+          "position_limit": 3
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "B_SAFE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 43.5035083439825,
+          "end_equity": 3043.5035083439825,
+          "return_pct": 1.4501169447994178,
+          "max_drawdown_pct": 3.5672774924660144,
+          "adverse_bar_drawdown_pct": 3.6899660055379924,
+          "profit_factor": 1.6200711733557196,
+          "win_rate_pct": 27.27272727272727,
+          "mean_r": 0.18441018237896722,
+          "fees": 4.1435511554034825,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.2260284159396784,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 8.881784197001252e-13,
+          "net_without_best_5_trades": -53.58689874930479
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 503,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 9,
+          "pyramid_limit": 6
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "B_SAFE"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 116,
+          "net_pnl": 712.9181225896027,
+          "end_equity": 3712.9181225896027,
+          "return_pct": 23.763937419653413,
+          "max_drawdown_pct": 7.467364971628642,
+          "adverse_bar_drawdown_pct": 8.139337947256886,
+          "profit_factor": 3.2732707871956244,
+          "win_rate_pct": 25.0,
+          "mean_r": 0.786712032751295,
+          "fees": 16.113647154359345,
+          "funding": 0.0,
+          "max_losing_streak": 18,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.7243194160344248,
+          "exposure_pct": 45.11932707355243,
+          "reconciliation_error": 2.7284841053187847e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 2004,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 38,
+          "pyramid_limit": 22,
+          "position_limit": 3
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "B_SAFE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 37.23239821303741,
+          "end_equity": 3037.2323982130374,
+          "return_pct": 1.2410799404345862,
+          "max_drawdown_pct": 3.570649462752551,
+          "adverse_bar_drawdown_pct": 3.746856116229935,
+          "profit_factor": 1.5042109699259567,
+          "win_rate_pct": 27.27272727272727,
+          "mean_r": 0.09625741986713952,
+          "fees": 8.274646824606222,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.19636464761419004,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 1.4210854715202004e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 503,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 9,
+          "pyramid_limit": 6
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "B_SAFE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 43.5035083439825,
+          "end_equity": 3043.5035083439825,
+          "return_pct": 1.4501169447994178,
+          "max_drawdown_pct": 3.5672774924660144,
+          "adverse_bar_drawdown_pct": 3.6899660055379924,
+          "profit_factor": 1.6200711733557196,
+          "win_rate_pct": 27.27272727272727,
+          "mean_r": 0.18441018237896722,
+          "fees": 4.1435511554034825,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.2260284159396784,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 8.881784197001252e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 503,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 9,
+          "pyramid_limit": 6
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "B_SAFE"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 33,
+          "net_pnl": 49.79345063748269,
+          "end_equity": 3049.7934506374827,
+          "return_pct": 1.6597816879160954,
+          "max_drawdown_pct": 3.5638962706305954,
+          "adverse_bar_drawdown_pct": 3.653450540218095,
+          "profit_factor": 1.749181170208409,
+          "win_rate_pct": 27.27272727272727,
+          "mean_r": 0.29707418404297986,
+          "fees": 0.0,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.255824905408116,
+          "exposure_pct": 34.56688596491228,
+          "reconciliation_error": 1.9184653865522705e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 503,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 9,
+          "pyramid_limit": 6
+        }
+      }
+    },
+    "B_REGIME": {
+      "development": {
+        "config": {
+          "names": [
+            "B_REGIME"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 20,
+          "net_pnl": -31.98551236526373,
+          "end_equity": 2968.0144876347363,
+          "return_pct": -1.0661837455087864,
+          "max_drawdown_pct": 6.891938736677483,
+          "adverse_bar_drawdown_pct": 7.038591585120734,
+          "profit_factor": 0.8548492306606157,
+          "win_rate_pct": 20.0,
+          "mean_r": -0.06517938332218735,
+          "fees": 10.325785061576612,
+          "funding": 0.0,
+          "max_losing_streak": 14,
+          "longest_underwater_days": 320.8333333333333,
+          "sharpe_daily": -0.11338445189698187,
+          "exposure_pct": 32.48858447488585,
+          "reconciliation_error": 1.2470025012589758e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 322,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "risk_cap": 45,
+          "pyramid_not_profitable_1R": 3
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "B_REGIME"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 13,
+          "net_pnl": 187.35995535008806,
+          "end_equity": 3187.359955350088,
+          "return_pct": 6.245331845002933,
+          "max_drawdown_pct": 5.718441744641877,
+          "adverse_bar_drawdown_pct": 5.990814820889357,
+          "profit_factor": 2.511440282447818,
+          "win_rate_pct": 30.76923076923077,
+          "mean_r": 0.6748498485333827,
+          "fees": 9.455975367203356,
+          "funding": 0.0,
+          "max_losing_streak": 7,
+          "longest_underwater_days": 180.16666666666666,
+          "sharpe_daily": 0.8749933370224887,
+          "exposure_pct": 57.87795992714025,
+          "reconciliation_error": -1.3642420526593924e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 248,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 5,
+          "risk_cap": 59
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "B_REGIME"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 16,
+          "net_pnl": 188.717230063844,
+          "end_equity": 3188.717230063844,
+          "return_pct": 6.290574335461474,
+          "max_drawdown_pct": 6.984391631151654,
+          "adverse_bar_drawdown_pct": 7.3902434907126,
+          "profit_factor": 2.183412936077064,
+          "win_rate_pct": 31.25,
+          "mean_r": 0.7565944944238455,
+          "fees": 12.001358252567261,
+          "funding": 0.0,
+          "max_losing_streak": 8,
+          "longest_underwater_days": 401.8333333333333,
+          "sharpe_daily": 0.5072781816599574,
+          "exposure_pct": 27.960526315789476,
+          "reconciliation_error": -2.5579538487363607e-13,
+          "net_without_best_5_trades": -159.46862190760677
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 246,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "risk_cap": 29,
+          "pyramid_not_profitable_1R": 6
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "B_REGIME"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 47,
+          "net_pnl": 467.4379158459783,
+          "end_equity": 3467.4379158459783,
+          "return_pct": 15.581263861532602,
+          "max_drawdown_pct": 6.984391631151654,
+          "adverse_bar_drawdown_pct": 7.390243490712612,
+          "profit_factor": 1.9514563106632288,
+          "win_rate_pct": 27.659574468085108,
+          "mean_r": 0.5291694462072605,
+          "fees": 32.45724013181589,
+          "funding": 0.0,
+          "max_losing_streak": 14,
+          "longest_underwater_days": 401.8333333333333,
+          "sharpe_daily": 0.5079252196097814,
+          "exposure_pct": 37.1283255086072,
+          "reconciliation_error": 1.7053025658242404e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 900,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "risk_cap": 133,
+          "pyramid_not_profitable_1R": 16
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "B_REGIME"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 16,
+          "net_pnl": 161.13666467077383,
+          "end_equity": 3161.136664670774,
+          "return_pct": 5.371222155692457,
+          "max_drawdown_pct": 6.424521193905619,
+          "adverse_bar_drawdown_pct": 6.80173716501743,
+          "profit_factor": 1.9881091331960732,
+          "win_rate_pct": 31.25,
+          "mean_r": 0.6081422399798869,
+          "fees": 22.898815567667935,
+          "funding": 0.0,
+          "max_losing_streak": 8,
+          "longest_underwater_days": 399.3333333333333,
+          "sharpe_daily": 0.4628251983184985,
+          "exposure_pct": 27.960526315789476,
+          "reconciliation_error": 1.3073986337985843e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 246,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "risk_cap": 29,
+          "pyramid_not_profitable_1R": 6
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "B_REGIME"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 30,
+          "net_pnl": 53.384464675512845,
+          "end_equity": 3053.384464675513,
+          "return_pct": 1.7794821558504204,
+          "max_drawdown_pct": 3.5672774924660144,
+          "adverse_bar_drawdown_pct": 3.6899660055379924,
+          "profit_factor": 1.8856385247203162,
+          "win_rate_pct": 30.0,
+          "mean_r": 0.2841463834432929,
+          "fees": 3.8534417025818906,
+          "funding": 0.0,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 382.8333333333333,
+          "sharpe_daily": 0.2727550814589628,
+          "exposure_pct": 27.960526315789476,
+          "reconciliation_error": 7.958078640513122e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 476,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "pyramid_not_profitable_1R": 8,
+          "pyramid_limit": 6
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "B_REGIME"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 15,
+          "net_pnl": 121.38844777099348,
+          "end_equity": 3121.3884477709935,
+          "return_pct": 4.046281592366441,
+          "max_drawdown_pct": 7.652132964313418,
+          "adverse_bar_drawdown_pct": 8.091916155580392,
+          "profit_factor": 1.7890491375078437,
+          "win_rate_pct": 26.666666666666668,
+          "mean_r": 0.39058361433078836,
+          "fees": 0.0,
+          "funding": 0.0,
+          "max_losing_streak": 8,
+          "longest_underwater_days": 406.3333333333333,
+          "sharpe_daily": 0.33985242337436644,
+          "exposure_pct": 27.960526315789476,
+          "reconciliation_error": 4.547473508864641e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 236,
+          "loosened_stop_updates": 0,
+          "be_activations": 0,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "risk_cap": 30,
+          "pyramid_not_profitable_1R": 6
+        }
+      }
+    },
+    "DON55": {
+      "development": {
+        "config": {
+          "names": [
+            "DON55"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 318,
+          "net_pnl": 177.17208605786686,
+          "end_equity": 1177.1720860578669,
+          "return_pct": 17.717208605786695,
+          "max_drawdown_pct": 25.231412360895344,
+          "adverse_bar_drawdown_pct": 25.690297463514444,
+          "profit_factor": 1.1211240656515782,
+          "win_rate_pct": 30.81761006289308,
+          "mean_r": 0.08522237242210427,
+          "fees": 55.23268399282057,
+          "funding": 12.852358441241307,
+          "max_losing_streak": 15,
+          "longest_underwater_days": 351.625,
+          "sharpe_daily": 0.5249008754894378,
+          "exposure_pct": 75.06849315068493,
+          "reconciliation_error": -3.353761712787673e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 452,
+          "loosened_stop_updates": 0,
+          "be_activations": 130,
+          "funding_proxy_events": 3175,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 658
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "DON55"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 162,
+          "net_pnl": 190.0931854196599,
+          "end_equity": 1190.09318541966,
+          "return_pct": 19.009318541965992,
+          "max_drawdown_pct": 19.074465092300443,
+          "adverse_bar_drawdown_pct": 19.493595819044607,
+          "profit_factor": 1.2996921029752022,
+          "win_rate_pct": 33.33333333333333,
+          "mean_r": 0.1592659485862764,
+          "fees": 25.988147513069897,
+          "funding": 11.597296955061013,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 136.875,
+          "sharpe_daily": 1.0895591695474527,
+          "exposure_pct": 70.0136612021858,
+          "reconciliation_error": -7.673861546209082e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 269,
+          "loosened_stop_updates": 0,
+          "be_activations": 79,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 298
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "DON55"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 245,
+          "net_pnl": 393.0539280891246,
+          "end_equity": 1393.0539280891246,
+          "return_pct": 39.30539280891245,
+          "max_drawdown_pct": 13.865286047035552,
+          "adverse_bar_drawdown_pct": 14.068290877220091,
+          "profit_factor": 1.3774285779301803,
+          "win_rate_pct": 35.51020408163265,
+          "mean_r": 0.19675965895213438,
+          "fees": 45.515601918865315,
+          "funding": 9.503544504632353,
+          "max_losing_streak": 11,
+          "longest_underwater_days": 159.29166666666666,
+          "sharpe_daily": 1.163807253686175,
+          "exposure_pct": 82.25054824561403,
+          "reconciliation_error": 2.0463630789890885e-12,
+          "net_without_best_5_trades": 233.81478075773944
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 416,
+          "loosened_stop_updates": 0,
+          "be_activations": 107,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 645
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "DON55"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 725,
+          "net_pnl": 951.591207672059,
+          "end_equity": 1951.591207672059,
+          "return_pct": 95.15912076720589,
+          "max_drawdown_pct": 25.231412360895344,
+          "adverse_bar_drawdown_pct": 25.690297463514444,
+          "profit_factor": 1.2594058201649423,
+          "win_rate_pct": 32.96551724137931,
+          "mean_r": 0.1394591924751433,
+          "fees": 149.5900369702452,
+          "funding": 39.818310882649136,
+          "max_losing_streak": 15,
+          "longest_underwater_days": 455.4166666666667,
+          "sharpe_daily": 0.8685732584000189,
+          "exposure_pct": 76.54538341158059,
+          "reconciliation_error": -5.4569682106375694e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1137,
+          "loosened_stop_updates": 0,
+          "be_activations": 316,
+          "funding_proxy_events": 3175,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 1601
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "DON55"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 244,
+          "net_pnl": 283.55127393489647,
+          "end_equity": 1283.5512739348965,
+          "return_pct": 28.355127393489642,
+          "max_drawdown_pct": 15.860782688838182,
+          "adverse_bar_drawdown_pct": 15.97188140337743,
+          "profit_factor": 1.2802257215670103,
+          "win_rate_pct": 34.42622950819672,
+          "mean_r": 0.1516568371272331,
+          "fees": 84.20675504930047,
+          "funding": 8.719371464570642,
+          "max_losing_streak": 12,
+          "longest_underwater_days": 270.7916666666667,
+          "sharpe_daily": 0.920706860830347,
+          "exposure_pct": 82.3670504385965,
+          "reconciliation_error": 6.139089236967266e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 409,
+          "loosened_stop_updates": 0,
+          "be_activations": 106,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 649
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "DON55"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 245,
+          "net_pnl": 393.0539280891246,
+          "end_equity": 1393.0539280891246,
+          "return_pct": 39.30539280891245,
+          "max_drawdown_pct": 13.865286047035552,
+          "adverse_bar_drawdown_pct": 14.068290877220091,
+          "profit_factor": 1.3774285779301803,
+          "win_rate_pct": 35.51020408163265,
+          "mean_r": 0.19675965895213438,
+          "fees": 45.515601918865315,
+          "funding": 9.503544504632353,
+          "max_losing_streak": 11,
+          "longest_underwater_days": 159.29166666666666,
+          "sharpe_daily": 1.163807253686175,
+          "exposure_pct": 82.25054824561403,
+          "reconciliation_error": 2.0463630789890885e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 416,
+          "loosened_stop_updates": 0,
+          "be_activations": 107,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 645
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "DON55"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 244,
+          "net_pnl": 521.8357018720835,
+          "end_equity": 1521.8357018720835,
+          "return_pct": 52.18357018720836,
+          "max_drawdown_pct": 12.117370870084587,
+          "adverse_bar_drawdown_pct": 12.518923654248336,
+          "profit_factor": 1.4921639887234133,
+          "win_rate_pct": 38.9344262295082,
+          "mean_r": 0.24708584200472278,
+          "fees": 0.0,
+          "funding": 10.991077391065875,
+          "max_losing_streak": 10,
+          "longest_underwater_days": 152.875,
+          "sharpe_daily": 1.4074524682778184,
+          "exposure_pct": 82.94956140350878,
+          "reconciliation_error": 1.9326762412674725e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 422,
+          "loosened_stop_updates": 0,
+          "be_activations": 108,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 645
+        }
+      }
+    },
+    "KELTNER": {
+      "development": {
+        "config": {
+          "names": [
+            "KELTNER"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 597,
+          "net_pnl": 26.720829154694,
+          "end_equity": 1026.720829154694,
+          "return_pct": 2.6720829154694092,
+          "max_drawdown_pct": 24.27418968490859,
+          "adverse_bar_drawdown_pct": 24.341584936915506,
+          "profit_factor": 1.012436438784115,
+          "win_rate_pct": 32.32830820770519,
+          "mean_r": 0.017528003951820123,
+          "fees": 95.41917838297628,
+          "funding": 17.567241240869528,
+          "max_losing_streak": 17,
+          "longest_underwater_days": 351.7083333333333,
+          "sharpe_daily": 0.16302290630850855,
+          "exposure_pct": 97.20319634703196,
+          "reconciliation_error": -6.508571459562518e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1044,
+          "loosened_stop_updates": 0,
+          "be_activations": 229,
+          "funding_proxy_events": 5313,
+          "liquidation_risk_bars": 1,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 6185
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "KELTNER"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 310,
+          "net_pnl": 73.93062229385941,
+          "end_equity": 1073.9306222938594,
+          "return_pct": 7.393062229385938,
+          "max_drawdown_pct": 12.738124925692762,
+          "adverse_bar_drawdown_pct": 12.910135777127563,
+          "profit_factor": 1.077175527980043,
+          "win_rate_pct": 35.16129032258065,
+          "mean_r": 0.04944940651286988,
+          "fees": 40.183642017307946,
+          "funding": 12.805244624705786,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 215.58333333333334,
+          "sharpe_daily": 0.45776092234234683,
+          "exposure_pct": 98.75910746812386,
+          "reconciliation_error": 3.410605131648481e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 552,
+          "loosened_stop_updates": 0,
+          "be_activations": 124,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 3165
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "KELTNER"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 442,
+          "net_pnl": 174.20664955173834,
+          "end_equity": 1174.2066495517383,
+          "return_pct": 17.420664955173827,
+          "max_drawdown_pct": 24.72510878985733,
+          "adverse_bar_drawdown_pct": 24.833008551252412,
+          "profit_factor": 1.1078966656007065,
+          "win_rate_pct": 34.16289592760181,
+          "mean_r": 0.07208754506130993,
+          "fees": 76.39971177839044,
+          "funding": 12.031774297893946,
+          "max_losing_streak": 20,
+          "longest_underwater_days": 201.54166666666666,
+          "sharpe_daily": 0.6243658964491116,
+          "exposure_pct": 98.02631578947368,
+          "reconciliation_error": -1.8758328224066645e-12,
+          "net_without_best_5_trades": 64.68186959401389
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 886,
+          "loosened_stop_updates": 0,
+          "be_activations": 172,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 5615
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "KELTNER"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 1348,
+          "net_pnl": 250.02944822642985,
+          "end_equity": 1250.0294482264298,
+          "return_pct": 25.00294482264298,
+          "max_drawdown_pct": 30.627570717600292,
+          "adverse_bar_drawdown_pct": 30.767454271641114,
+          "profit_factor": 1.0513001182800437,
+          "win_rate_pct": 33.23442136498516,
+          "mean_r": 0.038457114768849374,
+          "fees": 217.8403578129141,
+          "funding": 43.833131317306666,
+          "max_losing_streak": 20,
+          "longest_underwater_days": 1025.375,
+          "sharpe_daily": 0.3489972556666835,
+          "exposure_pct": 97.87265258215963,
+          "reconciliation_error": -3.609557097661309e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 2472,
+          "loosened_stop_updates": 0,
+          "be_activations": 523,
+          "funding_proxy_events": 5313,
+          "liquidation_risk_bars": 1,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 14979
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "KELTNER"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 441,
+          "net_pnl": 80.53291846720617,
+          "end_equity": 1080.5329184672062,
+          "return_pct": 8.053291846720612,
+          "max_drawdown_pct": 25.341981545163815,
+          "adverse_bar_drawdown_pct": 25.444900094515145,
+          "profit_factor": 1.0519475791782655,
+          "win_rate_pct": 32.6530612244898,
+          "mean_r": 0.04004009580518636,
+          "fees": 140.74697380189153,
+          "funding": 11.25125224435276,
+          "max_losing_streak": 20,
+          "longest_underwater_days": 282.4166666666667,
+          "sharpe_daily": 0.35223273857545023,
+          "exposure_pct": 97.9577850877193,
+          "reconciliation_error": -3.694822225952521e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 886,
+          "loosened_stop_updates": 0,
+          "be_activations": 174,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 5601
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "KELTNER"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 443,
+          "net_pnl": 167.52433645734072,
+          "end_equity": 1167.5243364573407,
+          "return_pct": 16.752433645734065,
+          "max_drawdown_pct": 29.949058204856094,
+          "adverse_bar_drawdown_pct": 30.074987908130225,
+          "profit_factor": 1.0801956206961694,
+          "win_rate_pct": 33.86004514672686,
+          "mean_r": 0.06095051370777955,
+          "fees": 98.77054279533749,
+          "funding": 15.101864146809058,
+          "max_losing_streak": 20,
+          "longest_underwater_days": 201.54166666666666,
+          "sharpe_daily": 0.524729320052577,
+          "exposure_pct": 98.02631578947368,
+          "reconciliation_error": -1.3642420526593924e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 884,
+          "loosened_stop_updates": 0,
+          "be_activations": 172,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 5617,
+          "margin_cap": 2
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "KELTNER"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 442,
+          "net_pnl": 317.88012764989503,
+          "end_equity": 1317.880127649895,
+          "return_pct": 31.788012764989503,
+          "max_drawdown_pct": 24.070707068878818,
+          "adverse_bar_drawdown_pct": 24.184058249830176,
+          "profit_factor": 1.1890276861934854,
+          "win_rate_pct": 36.87782805429865,
+          "mean_r": 0.11647848904631264,
+          "fees": 0.0,
+          "funding": 13.370957749694774,
+          "max_losing_streak": 15,
+          "longest_underwater_days": 201.54166666666666,
+          "sharpe_daily": 0.9809553436463625,
+          "exposure_pct": 98.05372807017544,
+          "reconciliation_error": 5.5138116294983774e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 884,
+          "loosened_stop_updates": 0,
+          "be_activations": 175,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 5618
+        }
+      }
+    },
+    "DON55_TREND": {
+      "development": {
+        "config": {
+          "names": [
+            "DON55_TREND"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 204,
+          "net_pnl": 169.80617259071937,
+          "end_equity": 1169.8061725907194,
+          "return_pct": 16.98061725907194,
+          "max_drawdown_pct": 14.397502093884619,
+          "adverse_bar_drawdown_pct": 14.496465937943304,
+          "profit_factor": 1.1757421036436677,
+          "win_rate_pct": 35.78431372549019,
+          "mean_r": 0.11717603798512415,
+          "fees": 33.98642147099193,
+          "funding": 8.728720628154326,
+          "max_losing_streak": 12,
+          "longest_underwater_days": 510.4166666666667,
+          "sharpe_daily": 0.5844507689529448,
+          "exposure_pct": 65.18835616438356,
+          "reconciliation_error": 1.5916157281026244e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 366,
+          "loosened_stop_updates": 0,
+          "be_activations": 47,
+          "funding_proxy_events": 2428,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 235
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "DON55_TREND"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 116,
+          "net_pnl": 135.3889542599336,
+          "end_equity": 1135.3889542599336,
+          "return_pct": 13.538895425993358,
+          "max_drawdown_pct": 15.690896868056804,
+          "adverse_bar_drawdown_pct": 16.127551821368446,
+          "profit_factor": 1.2599502373783047,
+          "win_rate_pct": 31.03448275862069,
+          "mean_r": 0.16242946336225256,
+          "fees": 17.966189819927354,
+          "funding": 12.296174801970588,
+          "max_losing_streak": 16,
+          "longest_underwater_days": 148.45833333333334,
+          "sharpe_daily": 0.8355758203149618,
+          "exposure_pct": 63.2172131147541,
+          "reconciliation_error": -1.9895196601282805e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 249,
+          "loosened_stop_updates": 0,
+          "be_activations": 25,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 105
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "DON55_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 161,
+          "net_pnl": 154.02471801284196,
+          "end_equity": 1154.024718012842,
+          "return_pct": 15.4024718012842,
+          "max_drawdown_pct": 13.658215618576207,
+          "adverse_bar_drawdown_pct": 13.874756244319952,
+          "profit_factor": 1.2250377732163564,
+          "win_rate_pct": 37.267080745341616,
+          "mean_r": 0.1355445484598084,
+          "fees": 27.405820238911183,
+          "funding": 5.28130868777861,
+          "max_losing_streak": 11,
+          "longest_underwater_days": 291.0833333333333,
+          "sharpe_daily": 0.6382252691704151,
+          "exposure_pct": 65.54276315789474,
+          "reconciliation_error": 2.1032064978498966e-12,
+          "net_without_best_5_trades": 15.72458033639279
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 356,
+          "loosened_stop_updates": 0,
+          "be_activations": 44,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 227
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "DON55_TREND"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 481,
+          "net_pnl": 532.7583281542818,
+          "end_equity": 1532.7583281542818,
+          "return_pct": 53.27583281542818,
+          "max_drawdown_pct": 15.69089686805658,
+          "adverse_bar_drawdown_pct": 16.127551821368215,
+          "profit_factor": 1.2144283487282748,
+          "win_rate_pct": 35.13513513513514,
+          "mean_r": 0.13423784158215335,
+          "fees": 91.40338076571642,
+          "funding": 30.127416827119077,
+          "max_losing_streak": 16,
+          "longest_underwater_days": 510.4166666666667,
+          "sharpe_daily": 0.661348154837134,
+          "exposure_pct": 64.89143192488262,
+          "reconciliation_error": 6.366462912410498e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 971,
+          "loosened_stop_updates": 0,
+          "be_activations": 116,
+          "funding_proxy_events": 2428,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 567
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "DON55_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 161,
+          "net_pnl": 91.64642811113754,
+          "end_equity": 1091.6464281111375,
+          "return_pct": 9.164642811113755,
+          "max_drawdown_pct": 14.16540854874222,
+          "adverse_bar_drawdown_pct": 14.370015588363783,
+          "profit_factor": 1.1358722855351262,
+          "win_rate_pct": 36.64596273291926,
+          "mean_r": 0.08756975129385534,
+          "fees": 51.753344538278014,
+          "funding": 4.994169231078651,
+          "max_losing_streak": 11,
+          "longest_underwater_days": 367.25,
+          "sharpe_daily": 0.42786896347732095,
+          "exposure_pct": 65.52905701754386,
+          "reconciliation_error": -8.100187187665142e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 356,
+          "loosened_stop_updates": 0,
+          "be_activations": 44,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 227
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "DON55_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 161,
+          "net_pnl": 154.02471801284196,
+          "end_equity": 1154.024718012842,
+          "return_pct": 15.4024718012842,
+          "max_drawdown_pct": 13.658215618576207,
+          "adverse_bar_drawdown_pct": 13.874756244319952,
+          "profit_factor": 1.2250377732163564,
+          "win_rate_pct": 37.267080745341616,
+          "mean_r": 0.1355445484598084,
+          "fees": 27.405820238911183,
+          "funding": 5.28130868777861,
+          "max_losing_streak": 11,
+          "longest_underwater_days": 291.0833333333333,
+          "sharpe_daily": 0.6382252691704151,
+          "exposure_pct": 65.54276315789474,
+          "reconciliation_error": 2.1032064978498966e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 356,
+          "loosened_stop_updates": 0,
+          "be_activations": 44,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 227
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "DON55_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 160,
+          "net_pnl": 216.7505552536295,
+          "end_equity": 1216.7505552536295,
+          "return_pct": 21.67505552536295,
+          "max_drawdown_pct": 12.454469472136786,
+          "adverse_bar_drawdown_pct": 12.685447001151019,
+          "profit_factor": 1.3143062564530736,
+          "win_rate_pct": 38.75,
+          "mean_r": 0.18165070427131264,
+          "fees": 0.0,
+          "funding": 5.9449971885341,
+          "max_losing_streak": 10,
+          "longest_underwater_days": 165.0,
+          "sharpe_daily": 0.8262794589930749,
+          "exposure_pct": 66.38569078947368,
+          "reconciliation_error": -4.661160346586257e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 359,
+          "loosened_stop_updates": 0,
+          "be_activations": 44,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 227
+        }
+      }
+    },
+    "KELTNER_TREND": {
+      "development": {
+        "config": {
+          "names": [
+            "KELTNER_TREND"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 344,
+          "net_pnl": 214.37440003428696,
+          "end_equity": 1214.374400034287,
+          "return_pct": 21.437440003428687,
+          "max_drawdown_pct": 12.332885400398242,
+          "adverse_bar_drawdown_pct": 14.06083754324008,
+          "profit_factor": 1.1779335148618055,
+          "win_rate_pct": 34.593023255813954,
+          "mean_r": 0.10457410277260072,
+          "fees": 54.04294671079476,
+          "funding": 17.98597892248635,
+          "max_losing_streak": 15,
+          "longest_underwater_days": 463.6666666666667,
+          "sharpe_daily": 0.7294737081925877,
+          "exposure_pct": 87.56849315068493,
+          "reconciliation_error": -6.252776074688882e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 756,
+          "loosened_stop_updates": 0,
+          "be_activations": 53,
+          "funding_proxy_events": 4010,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 762
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "KELTNER_TREND"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 207,
+          "net_pnl": 94.60460024869167,
+          "end_equity": 1094.6046002486917,
+          "return_pct": 9.460460024869178,
+          "max_drawdown_pct": 9.246400316063951,
+          "adverse_bar_drawdown_pct": 9.400613388683665,
+          "profit_factor": 1.142599097810953,
+          "win_rate_pct": 33.81642512077295,
+          "mean_r": 0.0818222361833514,
+          "fees": 29.97426714437608,
+          "funding": 16.39816769259991,
+          "max_losing_streak": 12,
+          "longest_underwater_days": 109.16666666666667,
+          "sharpe_daily": 0.663808447556205,
+          "exposure_pct": 90.33469945355192,
+          "reconciliation_error": -8.526512829121202e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 493,
+          "loosened_stop_updates": 0,
+          "be_activations": 38,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 352
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "KELTNER_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 259,
+          "net_pnl": 137.00703583286645,
+          "end_equity": 1137.0070358328664,
+          "return_pct": 13.700703583286655,
+          "max_drawdown_pct": 13.193979419716129,
+          "adverse_bar_drawdown_pct": 13.22108494276437,
+          "profit_factor": 1.1582053957258196,
+          "win_rate_pct": 35.521235521235525,
+          "mean_r": 0.0946026549112752,
+          "fees": 40.05611525314913,
+          "funding": 8.801972376354612,
+          "max_losing_streak": 10,
+          "longest_underwater_days": 129.125,
+          "sharpe_daily": 0.6214853825084689,
+          "exposure_pct": 88.69243421052632,
+          "reconciliation_error": 3.922195901395753e-12,
+          "net_without_best_5_trades": 40.71842385714555
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 673,
+          "loosened_stop_updates": 0,
+          "be_activations": 52,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 724
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "KELTNER_TREND"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 810,
+          "net_pnl": 511.37775039574694,
+          "end_equity": 1511.377750395747,
+          "return_pct": 51.137775039574684,
+          "max_drawdown_pct": 13.193979419716262,
+          "adverse_bar_drawdown_pct": 14.06083754324008,
+          "profit_factor": 1.161746380775176,
+          "win_rate_pct": 34.69135802469136,
+          "mean_r": 0.09557133563672675,
+          "fees": 143.687913329227,
+          "funding": 49.59960205783263,
+          "max_losing_streak": 15,
+          "longest_underwater_days": 463.6666666666667,
+          "sharpe_daily": 0.6782346914890848,
+          "exposure_pct": 88.56367370892019,
+          "reconciliation_error": 3.183231456205249e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1922,
+          "loosened_stop_updates": 0,
+          "be_activations": 143,
+          "funding_proxy_events": 4010,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 1838
+        }
+      },
+      "stress_later": {
+        "config": {
+          "names": [
+            "KELTNER_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 2,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 259,
+          "net_pnl": 58.859028395269206,
+          "end_equity": 1058.8590283952692,
+          "return_pct": 5.885902839526924,
+          "max_drawdown_pct": 13.397365817245799,
+          "adverse_bar_drawdown_pct": 13.423176482910272,
+          "profit_factor": 1.0698048320593123,
+          "win_rate_pct": 33.204633204633204,
+          "mean_r": 0.047562192159877836,
+          "fees": 75.01837131494486,
+          "funding": 8.343367589497012,
+          "max_losing_streak": 20,
+          "longest_underwater_days": 282.75,
+          "sharpe_daily": 0.32010951952224315,
+          "exposure_pct": 88.6170504385965,
+          "reconciliation_error": 1.7763568394002505e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 675,
+          "loosened_stop_updates": 0,
+          "be_activations": 53,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 724
+        }
+      },
+      "equal_size_later": {
+        "config": {
+          "names": [
+            "KELTNER_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": true,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 259,
+          "net_pnl": 167.44325256074035,
+          "end_equity": 1167.4432525607403,
+          "return_pct": 16.744325256074035,
+          "max_drawdown_pct": 16.240403885307174,
+          "adverse_bar_drawdown_pct": 16.273240645215637,
+          "profit_factor": 1.152971288118703,
+          "win_rate_pct": 35.521235521235525,
+          "mean_r": 0.09460265491127524,
+          "fees": 50.6052168561018,
+          "funding": 11.105746009978215,
+          "max_losing_streak": 10,
+          "longest_underwater_days": 129.16666666666666,
+          "sharpe_daily": 0.6198922276957284,
+          "exposure_pct": 88.69243421052632,
+          "reconciliation_error": -4.945377440890297e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 673,
+          "loosened_stop_updates": 0,
+          "be_activations": 52,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 724
+        }
+      },
+      "gross_later": {
+        "config": {
+          "names": [
+            "KELTNER_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 259,
+          "net_pnl": 208.58353523673736,
+          "end_equity": 1208.5835352367374,
+          "return_pct": 20.858353523673735,
+          "max_drawdown_pct": 12.975354436775998,
+          "adverse_bar_drawdown_pct": 13.003890060676982,
+          "profit_factor": 1.2362444216810842,
+          "win_rate_pct": 36.293436293436294,
+          "mean_r": 0.1347314332464054,
+          "fees": 0.0,
+          "funding": 9.271236134859208,
+          "max_losing_streak": 10,
+          "longest_underwater_days": 128.91666666666666,
+          "sharpe_daily": 0.8629594318583312,
+          "exposure_pct": 88.70614035087719,
+          "reconciliation_error": -1.6484591469634324e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 675,
+          "loosened_stop_updates": 0,
+          "be_activations": 52,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 724
+        }
+      }
+    }
+  },
+  "gate": {
+    "BASE": {
+      "status": "RESEARCH_ONLY",
+      "failed": [
+        "later_profit",
+        "profit_factor",
+        "sample100",
+        "cost_stress"
+      ]
+    },
+    "B": {
+      "status": "RESEARCH_ONLY",
+      "failed": [
+        "sample100"
+      ]
+    },
+    "B_SAFE": {
+      "status": "RESEARCH_ONLY",
+      "failed": [
+        "sample100"
+      ]
+    },
+    "B_REGIME": {
+      "status": "RESEARCH_ONLY",
+      "failed": [
+        "sample100"
+      ]
+    },
+    "DON55": {
+      "status": "PAPER_CANDIDATE",
+      "failed": []
+    },
+    "KELTNER": {
+      "status": "RESEARCH_ONLY",
+      "failed": [
+        "profit_factor",
+        "sleeve_dd20"
+      ]
+    },
+    "DON55_TREND": {
+      "status": "PAPER_CANDIDATE",
+      "failed": []
+    },
+    "KELTNER_TREND": {
+      "status": "PAPER_CANDIDATE",
+      "failed": []
+    }
+  },
+  "bootstrap": {
+    "BASE": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -10.652305738235693,
+      "return_pct_p95": 11.487558049268854,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "B": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -6.657864281366084,
+      "return_pct_p95": 10.164084325872281,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "B_SAFE": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -5.956381969952459,
+      "return_pct_p95": 9.025855371427062,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "B_REGIME": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -10.113862985243756,
+      "return_pct_p95": 28.608912966970735,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "DON55": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -3.6465713517668057,
+      "return_pct_p95": 99.77176384148105,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "KELTNER": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -19.650074621795675,
+      "return_pct_p95": 73.85767050632403,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "DON55_TREND": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -15.922498330660522,
+      "return_pct_p95": 62.129974602887806,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "KELTNER_TREND": {
+      "block_days": 7,
+      "samples": 1000,
+      "return_pct_p05": -14.516403573417362,
+      "return_pct_p95": 52.67586294159225,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    }
+  },
+  "shared_futures": {
+    "DON_KELT": {
+      "development": {
+        "config": {
+          "names": [
+            "DON55",
+            "KELTNER"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 803,
+          "net_pnl": 290.51488156961636,
+          "end_equity": 1290.5148815696164,
+          "return_pct": 29.051488156961636,
+          "max_drawdown_pct": 29.87346863440783,
+          "adverse_bar_drawdown_pct": 30.82858622931848,
+          "profit_factor": 1.0831037851407483,
+          "win_rate_pct": 32.25404732254047,
+          "mean_r": 0.058461320426248554,
+          "fees": 146.9130236013138,
+          "funding": 31.486326747164064,
+          "max_losing_streak": 19,
+          "longest_underwater_days": 351.625,
+          "sharpe_daily": 0.5648358080357871,
+          "exposure_pct": 98.60159817351598,
+          "reconciliation_error": 1.5916157281026244e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1349,
+          "loosened_stop_updates": 0,
+          "be_activations": 309,
+          "funding_proxy_events": 7969,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 2709,
+          "position_limit": 2036,
+          "margin_cap": 100
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "DON55",
+            "KELTNER"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 436,
+          "net_pnl": 152.92085829488565,
+          "end_equity": 1152.9208582948856,
+          "return_pct": 15.292085829488556,
+          "max_drawdown_pct": 20.5169319753186,
+          "adverse_bar_drawdown_pct": 21.06074609950832,
+          "profit_factor": 1.1046150811652422,
+          "win_rate_pct": 34.63302752293578,
+          "mean_r": 0.06190106310772844,
+          "fees": 61.786009119465525,
+          "funding": 20.326546327525783,
+          "max_losing_streak": 13,
+          "longest_underwater_days": 112.70833333333333,
+          "sharpe_daily": 0.6336877259514851,
+          "exposure_pct": 99.07786885245902,
+          "reconciliation_error": -6.252776074688882e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 782,
+          "loosened_stop_updates": 0,
+          "be_activations": 186,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 1421,
+          "position_limit": 928,
+          "margin_cap": 14
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "DON55",
+            "KELTNER"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 627,
+          "net_pnl": 254.92198904825045,
+          "end_equity": 1254.9219890482505,
+          "return_pct": 25.492198904825038,
+          "max_drawdown_pct": 33.99815697641879,
+          "adverse_bar_drawdown_pct": 34.12772724653015,
+          "profit_factor": 1.1004157375898458,
+          "win_rate_pct": 33.652312599681025,
+          "mean_r": 0.06585787855186612,
+          "fees": 115.16648205531762,
+          "funding": 20.723641546670716,
+          "max_losing_streak": 19,
+          "longest_underwater_days": 206.95833333333334,
+          "sharpe_daily": 0.5961548138011601,
+          "exposure_pct": 99.3421052631579,
+          "reconciliation_error": -3.183231456205249e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1192,
+          "loosened_stop_updates": 0,
+          "be_activations": 255,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 2322,
+          "position_limit": 1957,
+          "margin_cap": 105
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "DON55",
+            "KELTNER"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 1866,
+          "net_pnl": 842.5679399983601,
+          "end_equity": 1842.56793999836,
+          "return_pct": 84.256793999836,
+          "max_drawdown_pct": 33.998156976418656,
+          "adverse_bar_drawdown_pct": 34.12772724653001,
+          "profit_factor": 1.092420939298529,
+          "win_rate_pct": 33.17256162915327,
+          "mean_r": 0.0605795854741466,
+          "fees": 395.75552448583835,
+          "funding": 88.06676260421938,
+          "max_losing_streak": 19,
+          "longest_underwater_days": 568.8333333333334,
+          "sharpe_daily": 0.5813042378715719,
+          "exposure_pct": 99.00968309859155,
+          "reconciliation_error": -7.958078640513122e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 3324,
+          "loosened_stop_updates": 0,
+          "be_activations": 750,
+          "funding_proxy_events": 7969,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 6452,
+          "position_limit": 4921,
+          "margin_cap": 219
+        }
+      }
+    },
+    "TREND_PAIR": {
+      "development": {
+        "config": {
+          "names": [
+            "DON55_TREND",
+            "KELTNER_TREND"
+          ],
+          "start": "2022-01-01",
+          "end": "2024-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 484,
+          "net_pnl": 480.5203829535967,
+          "end_equity": 1480.5203829535967,
+          "return_pct": 48.052038295359665,
+          "max_drawdown_pct": 17.014680495577583,
+          "adverse_bar_drawdown_pct": 18.37994568936012,
+          "profit_factor": 1.2197895390499562,
+          "win_rate_pct": 35.74380165289256,
+          "mean_r": 0.1410000748820264,
+          "fees": 90.9059656015124,
+          "funding": 30.327788519371445,
+          "max_losing_streak": 18,
+          "longest_underwater_days": 429.7916666666667,
+          "sharpe_daily": 0.9134622006024791,
+          "exposure_pct": 90.47374429223744,
+          "reconciliation_error": -6.0254023992456496e-12
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 1016,
+          "loosened_stop_updates": 0,
+          "be_activations": 91,
+          "funding_proxy_events": 5746,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 472,
+          "position_limit": 203,
+          "margin_cap": 12
+        }
+      },
+      "validation": {
+        "config": {
+          "names": [
+            "DON55_TREND",
+            "KELTNER_TREND"
+          ],
+          "start": "2024-01-01",
+          "end": "2025-01-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 285,
+          "net_pnl": 283.2229550321067,
+          "end_equity": 1283.2229550321067,
+          "return_pct": 28.322295503210682,
+          "max_drawdown_pct": 13.742674332970328,
+          "adverse_bar_drawdown_pct": 14.292154001799496,
+          "profit_factor": 1.2628183194451565,
+          "win_rate_pct": 35.08771929824561,
+          "mean_r": 0.15121591655479927,
+          "fees": 44.788892760130274,
+          "funding": 24.72837773302961,
+          "max_losing_streak": 14,
+          "longest_underwater_days": 98.79166666666667,
+          "sharpe_daily": 1.1349959193240318,
+          "exposure_pct": 91.78051001821494,
+          "reconciliation_error": -5.684341886080801e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 646,
+          "loosened_stop_updates": 0,
+          "be_activations": 63,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 0,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 215,
+          "margin_cap": 8,
+          "position_limit": 53
+        }
+      },
+      "holdout": {
+        "config": {
+          "names": [
+            "DON55_TREND",
+            "KELTNER_TREND"
+          ],
+          "start": "2025-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 393,
+          "net_pnl": 60.889508061908145,
+          "end_equity": 1060.8895080619081,
+          "return_pct": 6.088950806190807,
+          "max_drawdown_pct": 18.254305716433873,
+          "adverse_bar_drawdown_pct": 18.280026191012688,
+          "profit_factor": 1.04183988205711,
+          "win_rate_pct": 33.33333333333333,
+          "mean_r": 0.045019797544586404,
+          "fees": 61.59745109313038,
+          "funding": 13.612577188269572,
+          "max_losing_streak": 16,
+          "longest_underwater_days": 173.58333333333334,
+          "sharpe_daily": 0.26604603683847905,
+          "exposure_pct": 90.16584429824562,
+          "reconciliation_error": -6.963318810448982e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 923,
+          "loosened_stop_updates": 0,
+          "be_activations": 81,
+          "funding_proxy_events": 0,
+          "liquidation_risk_bars": 1,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 425,
+          "position_limit": 227,
+          "margin_cap": 15
+        }
+      },
+      "full": {
+        "config": {
+          "names": [
+            "DON55_TREND",
+            "KELTNER_TREND"
+          ],
+          "start": "2022-01-01",
+          "end": "2026-09-01",
+          "costs": 1.0,
+          "equal_size": false,
+          "hard_stop": true,
+          "fixed_cash": 50.0
+        },
+        "metrics": {
+          "trades": 1162,
+          "net_pnl": 1007.7560288270122,
+          "end_equity": 2007.7560288270122,
+          "return_pct": 100.7756028827012,
+          "max_drawdown_pct": 18.254305716433873,
+          "adverse_bar_drawdown_pct": 18.37994568936012,
+          "profit_factor": 1.1542478878705897,
+          "win_rate_pct": 34.6815834767642,
+          "mean_r": 0.1106160841040083,
+          "fees": 273.5369396340145,
+          "funding": 92.136271056975,
+          "max_losing_streak": 18,
+          "longest_underwater_days": 429.7916666666667,
+          "sharpe_daily": 0.7319144239645411,
+          "exposure_pct": 90.75459702660407,
+          "reconciliation_error": -4.547473508864641e-13
+        },
+        "audit": {
+          "ambiguous_bars": 0,
+          "shortened_stop_updates": 2585,
+          "loosened_stop_updates": 0,
+          "be_activations": 235,
+          "funding_proxy_events": 5746,
+          "liquidation_risk_bars": 1,
+          "lookahead_errors": 0
+        },
+        "skips": {
+          "strategy_slots": 1112,
+          "position_limit": 483,
+          "margin_cap": 35
+        }
+      }
+    }
+  },
+  "account_comparisons": {
+    "BASE_AND_DON_KELT": {
+      "development": {
+        "end_equity": 5730.895427828001,
+        "return_pct": 14.617908556560021,
+        "max_drawdown_pct": 10.507348311667641
+      },
+      "validation": {
+        "end_equity": 5826.417925272611,
+        "return_pct": 16.528358505452225,
+        "max_drawdown_pct": 8.989995182167632
+      },
+      "holdout": {
+        "end_equity": 5251.314438189313,
+        "return_pct": 5.026288763786257,
+        "max_drawdown_pct": 9.994721466921996
+      },
+      "full": {
+        "end_equity": 6909.118407740679,
+        "return_pct": 38.182368154813574,
+        "max_drawdown_pct": 10.507348311667641
+      }
+    },
+    "B_AND_DON_KELT": {
+      "development": {
+        "end_equity": 5471.5715966304215,
+        "return_pct": 9.431431932608426,
+        "max_drawdown_pct": 9.862707759907853
+      },
+      "validation": {
+        "end_equity": 5683.147389314136,
+        "return_pct": 13.66294778628272,
+        "max_drawdown_pct": 5.638515752091077
+      },
+      "holdout": {
+        "end_equity": 5304.923262479566,
+        "return_pct": 6.098465249591323,
+        "max_drawdown_pct": 8.952799489096241
+      },
+      "full": {
+        "end_equity": 6609.911877174285,
+        "return_pct": 32.198237543485696,
+        "max_drawdown_pct": 10.26323022736484
+      }
+    },
+    "B_REGIME_AND_TREND": {
+      "development": {
+        "end_equity": 5448.534870588333,
+        "return_pct": 8.97069741176666,
+        "max_drawdown_pct": 7.102723032083413
+      },
+      "validation": {
+        "end_equity": 5470.582910382194,
+        "return_pct": 9.411658207643892,
+        "max_drawdown_pct": 3.613437518156304
+      },
+      "holdout": {
+        "end_equity": 5249.606738125753,
+        "return_pct": 4.992134762515055,
+        "max_drawdown_pct": 6.737610364596335
+      },
+      "full": {
+        "end_equity": 6475.19394467299,
+        "return_pct": 29.5038788934598,
+        "max_drawdown_pct": 8.128337326916368
+      }
+    }
+  },
+  "benchmarks": {
+    "development": {
+      "return_pct": -5.270809660842279,
+      "end_equity": 4736.459516957886,
+      "max_drawdown_pct": 40.89804121617745
+    },
+    "validation": {
+      "return_pct": 72.38570518567991,
+      "end_equity": 8619.285259283995,
+      "max_drawdown_pct": 21.666776873051475
+    },
+    "holdout": {
+      "return_pct": -9.765388988397794,
+      "end_equity": 4511.7305505801105,
+      "max_drawdown_pct": 35.67480156666837
+    },
+    "full": {
+      "return_pct": 41.710649323130866,
+      "end_equity": 7085.532466156544,
+      "max_drawdown_pct": 42.893413161798875
+    }
+  }
+}

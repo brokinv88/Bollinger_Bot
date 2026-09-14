@@ -1,0 +1,14 @@
+{
+  "status": "PASS_INTERNAL_ONLY",
+  "bars": 10786,
+  "closed_entries": 174,
+  "entry_signals": 208,
+  "exit_signals": 937,
+  "max_equity_difference": 1.8189894035458565e-11,
+  "limitations": [
+    "Same local OHLC input; does not validate feed against TradingView",
+    "BTCUSDT step .00001 inferred from 7 visible trades",
+    "No full TradingView trade export parity",
+    "Intrabar DD not independently validated"
+  ]
+}

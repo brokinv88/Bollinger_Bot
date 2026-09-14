@@ -1,0 +1,5 @@
+# Local downloaded raw market data; provenance manifest is retained.
+data/spot/*.csv
+data/futures/*.csv
+__pycache__/
+*.log

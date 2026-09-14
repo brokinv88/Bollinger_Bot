@@ -1,0 +1,152 @@
+{
+  "created_utc": "2026-09-08T05:19:24.501633+00:00",
+  "symbols": [
+    "ZECUSDT",
+    "SUIUSDT",
+    "1000PEPEUSDT",
+    "WLDUSDT",
+    "NEARUSDT",
+    "AAVEUSDT",
+    "AVAXUSDT",
+    "FILUSDT",
+    "XLMUSDT",
+    "ARBUSDT",
+    "INJUSDT",
+    "APTUSDT"
+  ],
+  "data_start": "2023-11-01",
+  "test_start": "2024-01-01",
+  "split": "2025-01-01",
+  "test_end_exclusive": "2026-09-01",
+  "sources": {
+    "bars": "https://fapi.binance.com/fapi/v1/klines",
+    "mark": "https://fapi.binance.com/fapi/v1/markPriceKlines",
+    "funding": "https://fapi.binance.com/fapi/v1/fundingRate"
+  },
+  "results": [
+    {
+      "symbol": "ZECUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "SUIUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "1000PEPEUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "WLDUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "NEARUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "AAVEUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "AVAXUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "FILUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "XLMUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "ARBUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "INJUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    },
+    {
+      "symbol": "APTUSDT",
+      "status": "downloaded",
+      "bars": 24840,
+      "mark": 24840,
+      "funding": 3105
+    }
+  ],
+  "errors": [],
+  "files": {
+    "1000PEPEUSDT_bars.csv": "23686e7131236c711219c33d8fc084365f1324f69c17fe1017d496824a4ae966",
+    "1000PEPEUSDT_funding.csv": "0ab26ea6c4ad3fcf991d16e9e6774ba60c5e17026848bb0506e9cfd797ae5b8a",
+    "1000PEPEUSDT_mark.csv": "d2738815bbc5792463626b099bc1be7f8c0fa1e2cdd34eade29ce7b6d728fd23",
+    "AAVEUSDT_bars.csv": "4c96b61263be86e3e08b8f78c78246ce28ae7f9362956646c2996efc84a37e2f",
+    "AAVEUSDT_funding.csv": "ca6253409d14b11868e90b5ada164b673540fcef2348da6c0d7b9c750bf38ac3",
+    "AAVEUSDT_mark.csv": "43b71aec78517b073c7753676a35ed78e2f4d35cf3e87a266c2db85f17aae158",
+    "APTUSDT_bars.csv": "5233e289533c8899b7034840a677a8db5c0eb97436b34866fa3be21cdb886d38",
+    "APTUSDT_funding.csv": "43ea91d205824ada99af84e35243e85e5d89ef8d96a4e9aac6518e71e95e2d59",
+    "APTUSDT_mark.csv": "059a0f6dc0d3c9bb7e0cd8cf45754ec79d6349c0a8523f501dc0e97518b40fe4",
+    "ARBUSDT_bars.csv": "cc6bb41e6dbbb682c781cab5338d6611310adfb653a2ca3d21717fa89f636cc5",
+    "ARBUSDT_funding.csv": "6a1719057db70f03b4ce5496b5d9a86eb23bcc2a0e782b69eccb59262dcbf03e",
+    "ARBUSDT_mark.csv": "9dab8ec61296e7135562a8089e0519a53c05cc040d19676f5ae0db4ffecff1ac",
+    "AVAXUSDT_bars.csv": "f6caf68e369ea7d01b2f0644accd0cd1ba6020d1c42f97ce22abcf648d14f7cb",
+    "AVAXUSDT_funding.csv": "d4b1384fe1059bd8a0c8a923ecc9191d31f1c790e5277e38c5152d3f71e88dbe",
+    "AVAXUSDT_mark.csv": "7278973b437f26308b664f02ffd26b37aa0f1ecdca47bf0fd78fefa450c6f7f2",
+    "FILUSDT_bars.csv": "eb3e520bd36f2d265f8e083fd3cbe1cb9db7dd6530627fa8397e3259bc20d8a5",
+    "FILUSDT_funding.csv": "40aa3c71a746ed95d9694896bbdd07c5aaade9ee55a90bcdeb410173d8144c18",
+    "FILUSDT_mark.csv": "d669807d5ae53cd7e58d03074bd2eba1deaff02bf5fbbd4cac669953fca44844",
+    "INJUSDT_bars.csv": "f70a8d0baa96c942365c42175ad836159d35a96a46ee7ce90e047d615198a4ca",
+    "INJUSDT_funding.csv": "fbfb0d59059765f918632a9d756a2ee12ce437bf07a3c9b9a05f5dc6d23006d4",
+    "INJUSDT_mark.csv": "3073bb336e13d55136bf0d9f512d97af38dfa841cfe6a16281546074e74a02fb",
+    "NEARUSDT_bars.csv": "24188cdb170e11c7090cd4a2fe7cec7b95d8a238282a329f058967d0273b0214",
+    "NEARUSDT_funding.csv": "9f90189b8544e0e5a27319b4cfe6b6787a72bd7809f1ebfeac738d8683819cf9",
+    "NEARUSDT_mark.csv": "0437b90919ca5f818a561646f2017113a2cc9722a3a43844e2081eb61a860fee",
+    "SUIUSDT_bars.csv": "43112936c0ff2bb7bf28ede27413aee2450cc28ab5558861884eb3531d359e4f",
+    "SUIUSDT_funding.csv": "37fade0c01c2bff8f8ebcf890b7b64030df987584a63d03a6342a0702867d2d0",
+    "SUIUSDT_mark.csv": "a8fad4245bff6ea84512a4cb391fe3fbd59f058ea5097169a42e41a92ce8976e",
+    "WLDUSDT_bars.csv": "69988f4b96e8e3e4bfc8f659305f506b0f864610d84416a3ae479548a56baa8f",
+    "WLDUSDT_funding.csv": "868805c80ce52f3da6223ba1001cad72f36f4e5049522567fe1038705aefe1b7",
+    "WLDUSDT_mark.csv": "540c9804ec36a794f8104c7e80331e84d7e8d88a1401842e86a6b2ebb0671f89",
+    "XLMUSDT_bars.csv": "712c66acd088553bf8d516eb20c17715349c09588af2a8f268bf62174cd9ba06",
+    "XLMUSDT_funding.csv": "a79a6b16fbf4546d006dd6ad3162e3ad4515d0c375bdb23135d260cc710975f3",
+    "XLMUSDT_mark.csv": "86bb2af37b75749c0b24447febb086fc2a5b7f168203d202ba6eb96fa978678b",
+    "ZECUSDT_bars.csv": "53cd83b13fe8158fd813eee4f1de57274855b556079617904228bed813921ef1",
+    "ZECUSDT_funding.csv": "07711301103136ae6796545351dcca21971b6871a977980da87d82290e97877f",
+    "ZECUSDT_mark.csv": "4bd2376293af6b1d095c12697c9471bdb9ece9af90dd82f80eefdb2cb2653793"
+  },
+  "status": "complete"
+}

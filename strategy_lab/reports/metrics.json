@@ -1,0 +1,597 @@
+{
+  "created_utc": "2026-09-06T23:44:22.079315+00:00",
+  "spec_sha256": "abf34ab797a02894c77ba427b545ac5c6e454bc1999026332f26e504c0441e6d",
+  "runs": {
+    "spot": {
+      "development": {
+        "metrics": {
+          "trades": 77,
+          "net_pnl": 170.0773200440217,
+          "end_equity": 3170.0773200440217,
+          "return_pct": 5.6692440014673995,
+          "max_drawdown_pct": 9.288527695805538,
+          "adverse_bar_drawdown_pct": 9.395928176911706,
+          "profit_factor": 1.1644906626861289,
+          "win_rate_pct": 32.467532467532465,
+          "mean_r": 0.13762006668900414,
+          "fees": 75.98468528741431,
+          "funding": 0.0,
+          "max_losing_streak": 8,
+          "longest_underwater_days": 201.33333333333334,
+          "sharpe_daily": 0.38590721051510485,
+          "exposure_pct": 18.538812785388128,
+          "reconciliation_error": 1.0800249583553523e-12
+        },
+        "audit": {
+          "settings": {
+            "market": "spot",
+            "start": "2022-01-01",
+            "end": "2024-01-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 22
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "validation": {
+        "metrics": {
+          "trades": 101,
+          "net_pnl": 488.7862456779585,
+          "end_equity": 3488.7862456779585,
+          "return_pct": 16.29287485593196,
+          "max_drawdown_pct": 16.341535226824732,
+          "adverse_bar_drawdown_pct": 17.146296095278522,
+          "profit_factor": 1.369233688724206,
+          "win_rate_pct": 34.65346534653465,
+          "mean_r": 0.24563604829881405,
+          "fees": 91.11249063817074,
+          "funding": 0.0,
+          "max_losing_streak": 10,
+          "longest_underwater_days": 271.1666666666667,
+          "sharpe_daily": 1.1032029321650472,
+          "exposure_pct": 63.52459016393443,
+          "reconciliation_error": 2.5011104298755527e-12
+        },
+        "audit": {
+          "settings": {
+            "market": "spot",
+            "start": "2024-01-01",
+            "end": "2025-01-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 81
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "holdout": {
+        "metrics": {
+          "trades": 85,
+          "net_pnl": 436.3549159094173,
+          "end_equity": 3436.3549159094173,
+          "return_pct": 14.545163863647236,
+          "max_drawdown_pct": 10.195579388038588,
+          "adverse_bar_drawdown_pct": 10.388859056436194,
+          "profit_factor": 1.407819690261168,
+          "win_rate_pct": 35.294117647058826,
+          "mean_r": 0.26227703778750594,
+          "fees": 96.0424290658337,
+          "funding": 0.0,
+          "max_losing_streak": 12,
+          "longest_underwater_days": 322.6666666666667,
+          "sharpe_daily": 0.918953897280455,
+          "exposure_pct": 22.94407894736842,
+          "reconciliation_error": 1.9895196601282805e-12
+        },
+        "audit": {
+          "settings": {
+            "market": "spot",
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 60
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "full": {
+        "metrics": {
+          "trades": 263,
+          "net_pnl": 1222.7922872546378,
+          "end_equity": 4222.792287254638,
+          "return_pct": 40.759742908487915,
+          "max_drawdown_pct": 16.3415352268248,
+          "adverse_bar_drawdown_pct": 17.146296095278558,
+          "profit_factor": 1.326283364193077,
+          "win_rate_pct": 34.22053231939163,
+          "mean_r": 0.2193898639740362,
+          "fees": 290.28507425369764,
+          "funding": 0.0,
+          "max_losing_streak": 12,
+          "longest_underwater_days": 322.6666666666667,
+          "sharpe_daily": 0.7692708316888224,
+          "exposure_pct": 29.77308294209703,
+          "reconciliation_error": 2.2737367544323206e-13
+        },
+        "audit": {
+          "settings": {
+            "market": "spot",
+            "start": "2022-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 163
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "stress_holdout": {
+        "metrics": {
+          "trades": 85,
+          "net_pnl": 286.8376411800982,
+          "end_equity": 3286.837641180098,
+          "return_pct": 9.561254706003265,
+          "max_drawdown_pct": 10.7500498515258,
+          "adverse_bar_drawdown_pct": 10.933869576934585,
+          "profit_factor": 1.2667207635496698,
+          "win_rate_pct": 35.294117647058826,
+          "mean_r": 0.17409571923495615,
+          "fees": 180.12786854302593,
+          "funding": 0.0,
+          "max_losing_streak": 12,
+          "longest_underwater_days": 322.6666666666667,
+          "sharpe_daily": 0.6642866672849448,
+          "exposure_pct": 23.05372807017544,
+          "reconciliation_error": 9.094947017729282e-13
+        },
+        "audit": {
+          "settings": {
+            "market": "spot",
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 2.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 60
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "guarded_full": {
+        "metrics": {
+          "trades": 125,
+          "net_pnl": 163.16712174397526,
+          "end_equity": 3163.1671217439753,
+          "return_pct": 5.438904058132499,
+          "max_drawdown_pct": 12.248153849420284,
+          "adverse_bar_drawdown_pct": 12.363413705828119,
+          "profit_factor": 1.0993131928348459,
+          "win_rate_pct": 31.2,
+          "mean_r": 0.07010254503577132,
+          "fees": 115.95634950292407,
+          "funding": 0.0,
+          "max_losing_streak": 11,
+          "longest_underwater_days": 909.3333333333334,
+          "sharpe_daily": 0.2037444463530637,
+          "exposure_pct": 15.160406885758999,
+          "reconciliation_error": -4.263256414560601e-13
+        },
+        "audit": {
+          "settings": {
+            "market": "spot",
+            "start": "2022-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": true,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 72,
+            "drawdown_halt": 379
+          },
+          "halted": true,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      }
+    },
+    "futures": {
+      "development": {
+        "metrics": {
+          "trades": 497,
+          "net_pnl": 16.455240212844274,
+          "end_equity": 1016.4552402128443,
+          "return_pct": 1.6455240212844169,
+          "max_drawdown_pct": 38.35282815323574,
+          "adverse_bar_drawdown_pct": 38.44648861296675,
+          "profit_factor": 1.0040163633591541,
+          "win_rate_pct": 31.790744466800803,
+          "mean_r": 0.022058392019708405,
+          "fees": 281.73171867798953,
+          "funding": 18.352132258434306,
+          "max_losing_streak": 17,
+          "longest_underwater_days": 561.125,
+          "sharpe_daily": 0.17525602402617085,
+          "exposure_pct": 71.95776255707761,
+          "reconciliation_error": -1.900701818158268e-12
+        },
+        "audit": {
+          "settings": {
+            "market": "futures",
+            "start": "2022-01-01",
+            "end": "2024-01-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 7046,
+            "position_limit": 3
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 1451,
+          "ambiguous_bars": 0
+        }
+      },
+      "validation": {
+        "metrics": {
+          "trades": 279,
+          "net_pnl": -60.84903347213026,
+          "end_equity": 939.1509665278697,
+          "return_pct": -6.084903347213022,
+          "max_drawdown_pct": 22.920660720683173,
+          "adverse_bar_drawdown_pct": 23.03864613807822,
+          "profit_factor": 0.9749072549066465,
+          "win_rate_pct": 30.824372759856633,
+          "mean_r": 0.005696390748180566,
+          "fees": 159.83900663189706,
+          "funding": 11.363114304445055,
+          "max_losing_streak": 11,
+          "longest_underwater_days": 261.5,
+          "sharpe_daily": -0.05309132552986555,
+          "exposure_pct": 78.87067395264117,
+          "reconciliation_error": -5.542233338928781e-13
+        },
+        "audit": {
+          "settings": {
+            "market": "futures",
+            "start": "2024-01-01",
+            "end": "2025-01-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 3436,
+            "position_limit": 1
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "holdout": {
+        "metrics": {
+          "trades": 464,
+          "net_pnl": -572.4632231827069,
+          "end_equity": 427.5367768172931,
+          "return_pct": -57.24632231827069,
+          "max_drawdown_pct": 68.2991377602988,
+          "adverse_bar_drawdown_pct": 68.5141223346498,
+          "profit_factor": 0.756828491698963,
+          "win_rate_pct": 26.939655172413797,
+          "mean_r": -0.12720570373939807,
+          "fees": 161.85294361380977,
+          "funding": 10.450567051156957,
+          "max_losing_streak": 16,
+          "longest_underwater_days": 591.125,
+          "sharpe_daily": -1.5031971187748883,
+          "exposure_pct": 72.62198464912281,
+          "reconciliation_error": 2.2737367544323206e-13
+        },
+        "audit": {
+          "settings": {
+            "market": "futures",
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 5294,
+            "position_limit": 100
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "full": {
+        "metrics": {
+          "trades": 1239,
+          "net_pnl": -593.0988750894849,
+          "end_equity": 406.90112491051514,
+          "return_pct": -59.30988750894849,
+          "max_drawdown_pct": 74.63024973795574,
+          "adverse_bar_drawdown_pct": 74.80229884249543,
+          "profit_factor": 0.932783133277564,
+          "win_rate_pct": 29.782082324455207,
+          "mean_r": -0.03770493956418746,
+          "fees": 599.3325299765789,
+          "funding": 40.10889896990375,
+          "max_losing_streak": 17,
+          "longest_underwater_days": 1535.125,
+          "sharpe_daily": -0.4835293249397502,
+          "exposure_pct": 73.7455985915493,
+          "reconciliation_error": 2.5011104298755527e-12
+        },
+        "audit": {
+          "settings": {
+            "market": "futures",
+            "start": "2022-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 15780,
+            "position_limit": 104
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 1451,
+          "ambiguous_bars": 0
+        }
+      },
+      "stress_holdout": {
+        "metrics": {
+          "trades": 461,
+          "net_pnl": -757.0265619837168,
+          "end_equity": 242.97343801628324,
+          "return_pct": -75.70265619837167,
+          "max_drawdown_pct": 78.83368944757638,
+          "adverse_bar_drawdown_pct": 78.91294482218377,
+          "profit_factor": 0.6297272689064061,
+          "win_rate_pct": 24.945770065075923,
+          "mean_r": -0.24037073807778586,
+          "fees": 251.5369706339146,
+          "funding": 7.869224064219152,
+          "max_losing_streak": 16,
+          "longest_underwater_days": 591.125,
+          "sharpe_daily": -2.7654286799876817,
+          "exposure_pct": 72.40953947368422,
+          "reconciliation_error": 1.3642420526593924e-12
+        },
+        "audit": {
+          "settings": {
+            "market": "futures",
+            "start": "2025-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 2.0,
+            "guardrails": false,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 5382,
+            "position_limit": 30
+          },
+          "halted": false,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 0,
+          "ambiguous_bars": 0
+        }
+      },
+      "guarded_full": {
+        "metrics": {
+          "trades": 135,
+          "net_pnl": 90.0604747565776,
+          "end_equity": 1090.0604747565776,
+          "return_pct": 9.006047475657763,
+          "max_drawdown_pct": 12.208243688234187,
+          "adverse_bar_drawdown_pct": 12.307088911231878,
+          "profit_factor": 1.0908203254047362,
+          "win_rate_pct": 32.592592592592595,
+          "mean_r": 0.07805522774806742,
+          "fees": 49.677701366676466,
+          "funding": 4.256267262263963,
+          "max_losing_streak": 12,
+          "longest_underwater_days": 1535.125,
+          "sharpe_daily": 0.25735057448192394,
+          "exposure_pct": 8.193955399061032,
+          "reconciliation_error": 1.8900436771218665e-12
+        },
+        "audit": {
+          "settings": {
+            "market": "futures",
+            "start": "2022-01-01",
+            "end": "2026-09-01",
+            "stop_atr": 2.0,
+            "reward_r": 3.0,
+            "costs": 1.0,
+            "guardrails": true,
+            "strict_data": true
+          },
+          "skips": {
+            "aggregate_risk": 2287,
+            "position_limit": 48,
+            "drawdown_halt": 17131
+          },
+          "halted": true,
+          "data_gap_exits": 0,
+          "liquidation_risk_bars": 0,
+          "funding_price_proxy_events": 432,
+          "ambiguous_bars": 0
+        }
+      }
+    }
+  },
+  "combined": {
+    "development": {
+      "end_equity": 5186.532560256866,
+      "return_pct": 3.7306512051373364,
+      "max_drawdown_pct": 11.043507620206261
+    },
+    "validation": {
+      "end_equity": 5427.9372122058285,
+      "return_pct": 8.558744244116578,
+      "max_drawdown_pct": 11.979214127662974
+    },
+    "holdout": {
+      "end_equity": 4863.891692726711,
+      "return_pct": -2.7221661454657764,
+      "max_drawdown_pct": 14.364119748016924
+    },
+    "full": {
+      "end_equity": 5629.693412165153,
+      "return_pct": 12.593868243303064,
+      "max_drawdown_pct": 13.421639423372033
+    }
+  },
+  "benchmarks": {
+    "development": {
+      "return_pct": -5.270809660842279,
+      "end_equity": 4736.459516957886,
+      "max_drawdown_pct": 40.89804121617745
+    },
+    "validation": {
+      "return_pct": 72.38570518567991,
+      "end_equity": 8619.285259283995,
+      "max_drawdown_pct": 21.666776873051475
+    },
+    "holdout": {
+      "return_pct": -9.765388988397794,
+      "end_equity": 4511.7305505801105,
+      "max_drawdown_pct": 35.67480156666837
+    },
+    "full": {
+      "return_pct": 41.710649323130866,
+      "end_equity": 7085.532466156544,
+      "max_drawdown_pct": 42.893413161798875
+    }
+  },
+  "acceptance": {
+    "spot": {
+      "status": "FAILED",
+      "failed_checks": [
+        "sample_100"
+      ]
+    },
+    "futures": {
+      "status": "FAILED",
+      "failed_checks": [
+        "net_profit",
+        "profit_factor",
+        "drawdown_15",
+        "double_cost_profit"
+      ]
+    }
+  },
+  "bootstrap": {
+    "spot": {
+      "block_days": 7,
+      "samples": 2000,
+      "return_pct_p05": -7.0837686693257185,
+      "return_pct_p95": 42.62923030196706,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    },
+    "futures": {
+      "block_days": 7,
+      "samples": 2000,
+      "return_pct_p05": -78.96542864405774,
+      "return_pct_p95": -11.972403793693783,
+      "note": "Descriptive resampling, not forecast or independent evidence"
+    }
+  },
+  "spot_plus_cash": {
+    "development": {
+      "end_equity": 5170.077320044022,
+      "return_pct": 3.4015464008804397,
+      "max_drawdown_pct": 5.601868852115166
+    },
+    "validation": {
+      "end_equity": 5488.7862456779585,
+      "return_pct": 9.77572491355918,
+      "max_drawdown_pct": 10.337574234777602
+    },
+    "holdout": {
+      "end_equity": 5436.354915909417,
+      "return_pct": 8.727098318188343,
+      "max_drawdown_pct": 6.252264409373498
+    },
+    "full": {
+      "end_equity": 6222.792287254638,
+      "return_pct": 24.455845745092763,
+      "max_drawdown_pct": 10.545441607822125
+    }
+  }
+}
