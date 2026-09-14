@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Early Discovery — Dashboard 2026-09-14 → 2026-09-14</title>
+<style>
+:root{
+    --bg:#0f1419; --panel:#171e26; --panel2:#1c2530; --line:#26303c;
+    --txt:#e6edf3; --mut:#8b98a5; --dim:#6b7683;
+    --ac:#58a6ff; --grn:#3fb950; --red:#f85149; --yel:#d29922; --pur:#bc8cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px}
+  h1{font-size:24px;margin:0 0 4px;letter-spacing:.2px}
+  h2{font-size:18px;margin:34px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);
+     color:#fff;display:flex;align-items:center;gap:8px}
+  h2 .tag{font-size:11px;font-weight:600;color:var(--bg);background:var(--ac);border-radius:4px;padding:2px 7px}
+  h3{font-size:15px;margin:18px 0 6px}
+  .meta{color:var(--mut);font-size:13px}
+  .meta b{color:#c9d4de}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:14px 0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .kpi{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .kpi .v{font-size:20px;font-weight:700;color:#fff}
+  .kpi .l{font-size:12px;color:var(--mut);margin-top:2px}
+  .kpi .s{font-size:11px;color:var(--dim)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+  th{text-align:left;color:#fff;background:var(--panel2);padding:8px 10px;border:1px solid var(--line);font-size:12px;white-space:nowrap}
+  td{padding:8px 10px;border:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .pos{color:var(--grn)} .neg{color:var(--red)} .warn{color:var(--yel)} .blu{color:var(--ac)} .pur{color:var(--pur)}
+  .tier1{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700}
+  .t1{background:rgba(188,140,255,.15);color:var(--pur);border:1px solid rgba(188,140,255,.4)}
+  .t2{background:rgba(63,185,80,.15);color:var(--grn);border:1px solid rgba(63,185,80,.4)}
+  .t3{background:rgba(210,153,34,.15);color:var(--yel);border:1px solid rgba(210,153,34,.4)}
+  ul{margin:8px 0;padding-left:20px}
+  li{margin:4px 0}
+  .src{color:var(--mut);font-size:11.5px}
+  .src a{color:var(--ac);text-decoration:none;word-break:break-all}
+  .flag{color:var(--red);font-weight:600}
+  .ok{color:var(--grn);font-weight:600}
+  .note{background:rgba(88,166,255,.07);border-left:3px solid var(--ac);padding:10px 14px;border-radius:6px;font-size:13px;color:#cfd9e3;margin:10px 0}
+  .warnbox{background:rgba(248,81,73,.07);border-left:3px solid var(--red);padding:10px 14px;border-radius:6px;font-size:13px;color:#dfc7c7;margin:10px 0}
+  .foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);color:var(--dim);font-size:12px;text-align:center}
+  .pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:2px 10px;font-size:12px;color:var(--mut);margin:2px 3px 2px 0}
+  @media(max-width:760px){
+    body{font-size:14px}
+    .grid2{grid-template-columns:1fr}
+    h1{font-size:20px}
+    .wrap{padding:18px 12px 40px}
+    table{font-size:12px}
+    th,td{padding:6px 7px}
+  }
+
+.dash-top{position:sticky;top:0;z-index:50;background:rgba(11,17,25,.85);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border-bottom:1px solid #242f3d}
+.dash-in{max-width:1120px;margin:0 auto;padding:12px 20px}
+.dash-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dash-logo{width:34px;height:34px;border-radius:10px;flex:0 0 34px;
+  background:linear-gradient(135deg,#58a6ff,#bc8cff);display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#0b1119;font-weight:800}
+.dash-title{font-size:16px;font-weight:700;color:#fff;letter-spacing:.2px}
+.dash-sub{font-size:12px;color:#8b98a5}
+.dash-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.dbtn{border:1px solid #2a3745;background:#141c26;color:#c9d4de;border-radius:8px;
+  padding:5px 11px;font-size:12px;cursor:pointer;transition:.15s}
+.dbtn:hover{border-color:#58a6ff;color:#fff}
+.dbtn.on{background:linear-gradient(135deg,#58a6ff,#bc8cff);color:#0b1119;border-color:transparent;font-weight:700}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 0 8px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid #2a3745;background:#121a24;color:#aab6c2;border-radius:20px;
+  padding:5px 13px;font-size:12.5px;cursor:pointer;font-variant-numeric:tabular-nums;transition:.15s;white-space:nowrap}
+.tab:hover{border-color:#58a6ff;color:#fff}
+.tab.active{background:linear-gradient(135deg,#58a6ff,#bc8cff);color:#0b1119;border-color:transparent;font-weight:700}
+.day{display:none}
+.day.show{display:block;animation:fadein .25s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.dash-nav{display:flex;justify-content:center;gap:8px;margin:26px 0 4px}
+.dbtn-nav{min-width:96px}
+.dash-count{position:absolute;right:14px;top:10px;font-size:11px;color:#5b6775}
+.empty{padding:80px 20px;text-align:center;color:#8b98a5;font-size:15px}
+body{background:radial-gradient(1100px 560px at 18% -8%,rgba(88,166,255,.10),transparent 58%),
+  radial-gradient(900px 500px at 92% -4%,rgba(188,140,255,.09),transparent 55%),#0b1119}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:44px 44px}
+.wrap{position:relative;z-index:1}
+.dash-foot{margin-top:34px}
+@media(max-width:640px){.dash-in{padding:10px 14px}.dash-head{gap:10px}}
+
+</style>
+</head>
+<body>
+<div class="dash-top">
+  <div class="dash-in">
+    <div class="dash-head">
+      <div class="dash-logo">ED</div>
+      <div>
+        <div class="dash-title">Early Discovery — Dashboard</div>
+        <div class="dash-sub">Báo cáo quét thị trường crypto theo ngày · 1 báo cáo</div>
+      </div>
+      <div class="dash-actions">
+        <button class="dbtn" id="btnToday" title="Xem từng ngày">Ngày</button>
+        <button class="dbtn" id="btnAll" title="Xem tất cả các ngày liên tiếp">Tất cả</button>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs"><button class="tab active" data-d="2026-09-14">14/09 · T2</button></nav>
+  </div>
+</div>
+<div class="wrap">
+  <div class="dcount" style="position:static;margin:16px 0 -8px"></div>
+</div>
+<section id="2026-09-14" class="day show"><h1>Early Discovery — Quét thị trường crypto</h1>
+<div class="meta"><b>Ngày quét:</b> 2026-09-14 (Chủ nhật) &nbsp;·&nbsp; <b>Người chạy:</b> skill <code>crypto-early-discovery</code> &nbsp;·&nbsp; <b>Mọi số có nguồn + ngày ở cột nguồn &amp; bảng nguồn cuối trang.</b></div>
+
+<div class="card">
+<h3 style="margin-top:0">1. Phạm vi đã quét</h3>
+<p style="margin:6px 0 8px">Kênh đã chạy: <b>A1+A2</b> (DeFiLlama Fees, xếp theo phí 24h — <i>proxy cho doanh thu, xem ghi chú phương pháp</i>), <b>B</b> (chains theo TVL 7d/30d, lọc chain &lt;6 tháng), <b>C</b> (mô hình thắng tuần → bản sao trên chain khác), <b>F</b> (llms.txt/docs diff — baseline đầu tiên), <b>H</b> (take rate theo methodology), đối chiếu <b>D/E/I/J/K</b>.</p>
+<p style="margin:0 0 6px">Category đã quét: Launchpad · DEX · Derivatives/Perps · Prediction Market · Telegram Bot · Trading App · Gamified Mining · Lending · Liquid Staking · Stablecoin Issuer · Chain.</p>
+<p style="margin:0">
+<span class="pill">A1: protocol &lt;90 ngày trong top-20 phí 24h → Pons V2, o1, Native Core, AZverse, PredictStreet…</span>
+<span class="pill">A2: change_1m&gt;50% &amp; phí 30d&gt;$250K → 99 protocol, lọc còn 9 ứng viên</span>
+<span class="pill">B: Robinhood Chain (74 ngày, TVL +75%/30d), Native Core (mới, CLOB)</span>
+<span class="pill">C: launchpad + tokenized-equity đang thắng → tái xuất trên RH Chain</span>
+<span class="pill">F: docs.ponsfamily.com · docs.o1.exchange · native.org — baseline đã lưu</span>
+<span class="pill">H: stonkFun/fomo take-rate thật; SLVR/HASHCATS revenue-off</span>
+</p>
+</div>
+
+<div class="note"><b>Ghi chú phương pháp (quan trọng):</b> API free của DeFiLlama hiện chỉ trả <b>fees</b> (phí gom được), không trả riêng chuỗi revenue theo thời gian (endpoint <code>historicalFees</code> đã 404). Vì vậy cột “Doanh thu ngày” trong bảng dùng <b>phí 24h</b> làm đơn vị đo kinh tế; phần <i>take rate</i> (doanh thu ÷ phí) được ước theo methodology từng protocol (Kênh H). Số “MC÷DT” vì thế của các launchpad đều mang tính biến động (phí theo sự kiện launch). Số liệu web lấy ngày 2026-09-14.</div>
+
+<h2><span class="tag">KẾT QUẢ</span>2. Bảng ứng viên theo tầng</h2>
+
+<h3>Tầng 2 — Xác nhận <span class="src">(doanh thu tăng đều, đủ dữ kiện)</span></h3>
+<table>
+<thead><tr>
+<th>Ứng viên / ticker</th><th>Chain · Category</th><th>Phát hiện qua</th><th>Tuổi</th>
+<th class="num">MC (USD)</th><th class="num">Phí/DT 24h</th><th class="num">Phí 7d</th><th class="num">Phí 30d</th>
+<th class="num">MC÷DT</th><th class="num">%DT đời trong 7d</th><th>Take rate (H)</th><th>Nguồn</th>
+</tr></thead>
+<tbody>
+
+<tr>
+<td><b>Pons V2</b> — PONS<br/><span class="src">Launchpad pump.fun-style, RH Chain</span></td>
+<td>Robinhood Chain · Launchpad</td>
+<td><b>A1</b> (top-3 phí 24h toàn DeFiLlama, protocol mới) + <b>A2</b></td>
+<td>~45 ngày (protocol); token TGE hồi Jul–Aug 2026</td>
+<td class="num">$388.7M <span class="src">(CMC)</span></td>
+<td class="num">$6.22M</td>
+<td class="num">$46.7M</td>
+<td class="num">$111.8M</td>
+<td class="num"><b>62.5x</b></td>
+<td class="num">39.0%</td>
+<td>Doanh thu = launch fee (0.0005 ETH) + phần swap fee; 80% phí buy-back &amp; burn PONS. Take rate chi tiết chưa công bố → <span class="warn">H không kết luận được xu hướng</span></td>
+<td class="src"><a href="https://defillama.com/fees">DeFiLlama 14/09</a> · <a href="https://coinmarketcap.com/currencies/pons/">CMC</a> · <a href="https://www.datawallet.com/crypto/pons-explained">DataWallet 03/09</a></td>
+</tr>
+
+<tr>
+<td><b>StonkFun</b> — STONK<br/><span class="src">Launchpad ghép tokenized-equity (xStock)</span></td>
+<td>Solana · Launchpad</td>
+<td><b>A2</b> + <b>C</b> (mô hình stock-paired)</td>
+<td>Token mới (2026); protocol trẻ</td>
+<td class="num">$140–183M <span class="src">(Block 06/09: $140M; DeFiLlama mcap: $183M)</span></td>
+<td class="num">$663K</td>
+<td class="num">$7.39M</td>
+<td class="num">$9.93M</td>
+<td class="num"><b>276x</b> <span class="src">(mcap $183M)</span></td>
+<td class="num"><b>69.8%</b></td>
+<td>Revenue = Fees (giữ toàn bộ phí platform 1%). Take rate trọn 100% → <span class="ok">doanh thu thật, không có chia sẻ mờ</span></td>
+<td class="src"><a href="https://www.theblock.co/news/defi/2026-09-06-...">The Block 06/09</a> · <a href="https://coinmarketcap.com/cmc-ai/stonk-fun/latest-updates/">CMC 13/09</a></td>
+</tr>
+
+</tbody>
+</table>
+
+<h3>Tầng 1 — Hạt giống <span class="src">(live, có phí thật dù nhỏ, ít chú ý)</span></h3>
+<table>
+<thead><tr>
+<th>Ứng viên</th><th>Chain · Category</th><th>Phát hiện qua</th><th>Tuổi</th>
+<th class="num">Phí/DT 24h</th><th class="num">Phí 7d</th><th class="num">Phí 30d</th>
+<th class="num">MC÷DT</th><th class="num">%DT đời trong 7d</th><th>Take rate (H)</th><th>Nguồn</th>
+</tr></thead>
+<tbody>
+
+<tr>
+<td><b>Native Core CLOB</b> — (chưa có token)<br/><span class="src">spot CLOB, matching 50ms, native.org</span></td>
+<td>Native Core (chain mới) · DEX/CLOB</td>
+<td><b>A2</b> + <b>B</b> + <b>F</b> (docs.native.org/llms.txt)</td>
+<td>13 ngày (protocol)</td>
+<td class="num">$29.5K</td>
+<td class="num">$174K</td>
+<td class="num">$666K</td>
+<td class="num">— (chưa token)</td>
+<td class="num">22.8%</td>
+<td>Revenue = maker/taker fees trừ yield trả LP (có thể âm). Cấu trúc trả gần hết cho LP → <span class="warn">H: ramp thị phần, doc chưa có tokenomics → nghi TGE sau</span></td>
+<td class="src"><a href="https://native.org/llms.txt">native.org (F)</a> · <a href="https://defillama.com/fees">DeFiLlama 14/09</a></td>
+</tr>
+
+<tr>
+<td><b>SLVR</b><br/><span class="src">“Gamified Mining” — wager + rake, RH Chain</span></td>
+<td>Robinhood Chain · Gamified Mining</td>
+<td><b>A2</b> + <b>C</b> (category mới nổi)</td>
+<td>62 ngày</td>
+<td class="num">$78K</td>
+<td class="num">$414K</td>
+<td class="num">$1.21M</td>
+<td class="num">— (chưa có mcap theo dõi)</td>
+<td class="num">9.6%</td>
+<td><b>ProtocolRevenue = 0 từ launch (vault fee-off)</b> → <span class="warn">H mạnh: phí thu nhưng protocol chưa lấy đồng nào = điểm cấu trúc ngay trước TGE</span></td>
+<td class="src"><a href="https://defillama.com/fees">DeFiLlama 14/09 (methodology)</a></td>
+</tr>
+
+<tr>
+<td><b>AZverse Perps</b><br/><span class="src">perp DEX báo cáo off-chain</span></td>
+<td>Off Chain · Derivatives</td>
+<td><b>A1</b> + <b>A2</b></td>
+<td>45 ngày</td>
+<td class="num">$36.7K</td>
+<td class="num">$372K</td>
+<td class="num">$1.81M</td>
+<td class="num">—</td>
+<td class="num">9.6%</td>
+<td>Revenue = perp fees giữ lại sau builder-share. Trung bình sạch, không có tín hiệu ramp đặc biệt</td>
+<td class="src"><a href="https://defillama.com/fees">DeFiLlama 14/09</a></td>
+</tr>
+
+<tr>
+<td><b>Bankr</b><br/><span class="src">interface/launchpad Base + RH</span></td>
+<td>Base · RH Chain · Interface</td>
+<td><b>A2</b></td>
+<td>—</td>
+<td class="num">$17.6K</td>
+<td class="num">$388K</td>
+<td class="num">$1.31M</td>
+<td class="num">1251x <span class="src">(MC $22M)</span></td>
+<td class="num">1.1%</td>
+<td>Revenue = creator fee + launch fee; báo gộp trên Base. MC÷DT cao → đắt so với cùng nhóm</td>
+<td class="src"><a href="https://defillama.com/fees">DeFiLlama 14/09</a></td>
+</tr>
+
+<tr>
+<td><b>Sentry</b><br/><span class="src">launchpad fee-router, Ink + RH</span></td>
+<td>Ink · RH Chain · Launchpad</td>
+<td><b>A2</b> + <b>B</b> (Ink +39% TVL/30d)</td>
+<td>68 ngày</td>
+<td class="num">$6.8K</td>
+<td class="num">$72K</td>
+<td class="num">$338K</td>
+<td class="num">—</td>
+<td class="num">18.3%</td>
+<td>Revenue = app fee - referral + 30% LP fee. Cực nhỏ, seed thuần</td>
+<td class="src"><a href="https://defillama.com/fees">DeFiLlama 14/09</a></td>
+</tr>
+
+<tr>
+<td><b>Graphite Protocol</b><br/><span class="src">launchpad liên doanh Letsbonk (Solana)</span></td>
+<td>Solana · Launchpad</td>
+<td><b>A2</b> (chg_1m +2526%)</td>
+<td>cũ (đã có từ 2025)</td>
+<td class="num">$78K</td>
+<td class="num">$733K</td>
+<td class="num">$884K</td>
+<td class="num">—</td>
+<td class="num">2.4%</td>
+<td>Fees = phần JV với Letsbonk (40%); revenue = protocol + holder. <span class="warn">Phí 7d/30d = 0.83 → tăng đột biến gần đây, nghi sự kiện một-token</span></td>
+<td class="src"><a href="https://defillama.com/fees">DeFiLlama 14/09</a></td>
+</tr>
+
+</tbody>
+</table>
+
+<h3>Tham chiếu ngành <span class="src">(KHÔNG phải ứng viên — dùng so MC÷DT, cùng category)</span></h3>
+<table>
+<thead><tr><th>Tên</th><th>Category</th><th class="num">Phí 24h</th><th class="num">Phí 7d</th><th class="num">Phí 30d</th><th class="num">MC</th><th class="num">MC÷DT</th><th>Vai trò khi so sánh</th></tr></thead>
+<tbody>
+<tr><td>pump.fun</td><td>Launchpad (Solana)</td><td class="num">$1.55M</td><td class="num">$8.95M</td><td class="num">$45.6M</td><td class="num">— (không token)</td><td class="num">—</td><td>Sàn tham chiếu “king revenue” của model launchpad</td></tr>
+<tr><td>Raydium (RAY)</td><td>DEX + LaunchLab (Solana)</td><td class="num">$940K</td><td class="num">$10.8M</td><td class="num">$20.8M</td><td class="num">$378M</td><td class="num">402x</td><td>Benchmark đắt/trưởng thành cùng tier; LaunchLab fee30d $2.0M, 7d/30d = 0.94 (đang tăng tốc)</td></tr>
+<tr><td>Lighter (LIT)</td><td>Perps RH Wallet-native</td><td class="num">(RH leg) $38K</td><td class="num">$378K</td><td class="num">$1.29M</td><td class="num">~$550–939M</td><td class="num">—</td><td>Đã là top-59 mcap; revenue 30d ~$3.7M toàn nền. Không phải early</td></tr>
+<tr><td>fomo (app)</td><td>Trading App (Solana)</td><td class="num">$1.18M</td><td class="num">$9.04M</td><td class="num">$29.2M</td><td class="num">— (KHÔNG token)</td><td class="num">—</td><td>Vượt pump.fun 7d-revenue Sep 2026; mọi token “FOMO” là giả (xem Kênh I)</td></tr>
+</tbody>
+</table>
+
+<h2><span class="tag">ĐIỂM NHẤN</span>3. 1–3 cái đáng chú ý nhất</h2>
+
+<div class="card">
+<h3 style="margin-top:0">① Pons V2 (PONS) — cỗ máy phí của chain 28 triệu user retail</h3>
+<p>Launchpad phong cách pump.fun chạy trên <b>Robinhood Chain</b> (mainnet 01/07/2026): token launch cố định supply, trade trên bonding curve rồi “graduation” vào Uniswap V4 pool khoá vĩnh viễn, 1% swap fee, snipe tax 99%→0 trong 5 giây, 0.0005 ETH launch fee. Pons là protocol <b>trẻ nhất nằm trong top-3 phí 24h toàn cầu</b> ($6.2M/ngày; 30d $111.8M; chg_1m +1102%) — dữ kiện on-chain thuần, không phải tin đồn.</p>
+<p>Token PONS: MC ~$389M (CMC 14/09), circulating 690–712M/1B, ATH 0.97 USD, giờ 0.54 USD. <b>MC÷DT = 62.5x</b> — rẻ bất thường so với chuẩn ngành (Raydium 400x), đúng “khoảng lệch của sự non trẻ”. 80% phí protocol đi buy-back &amp; burn.</p>
+<p><b>Điều kiện lên tầng 3 / lý do thận trọng:</b> phí mang tính sự kiện (launch day) và đã thấy declining nhẹ (chg_7d −26%); PONS đang dính <b>áp lực mạo danh rất cao</b> (ponzfamily, pons.money, ponsfam.org…), CMC đã rank #95 và Robinhood crypto integration vừa xuất hiện (13/09) → mindshare đang tăng nhanh, cánh cửa “chưa ai biết” đang đóng. Kênh H: chưa đủ chuỗi revenue để xác nhận take-rate trend; nên đọc kỹ review trước khi động.</p>
+</div>
+
+<div class="card">
+<h3>② StonkFun (STONK) — mô hình đang thắng tuần này: launchpad ghép tokenized-equity</h3>
+<p>Launchpad trên Solana cho token thanh khoản nhận từ Raydium and nổi bật nhờ “stock-paired” — quote bằng tokenized equity (xStock). Cộng đồng tokenized equity trên Solana đạt kỷ lục $684M (11/09). StonkFun: <b>$9M revenue tích luỹ</b> từ launch, fee toàn đời $10.6M mà <b>69.8% đến trong 7 ngày cuối</b> — mức “sự kiện”, không phải mặt bằng; fee 7d/30d = 0.74.</p>
+<p>STONK +250% lên $140M (The Block, 06/09) sau khi công bố chuyển deployment qua <b>Raydium LaunchLab</b>; DeFiLlama snapshot mcap ~$183M. Revenue = Fees (take rate 100% — sạch, không chia sẻ mờ). Đây chính là <b>bản cấy ghép đang chạy ngược</b> về Robinhood Chain — nơi stock token là native (100+ cổ phiếu, 24/7).</p>
+<p><b>Điều kiện theo dõi:</b> đã ATH hôm 06/09 và có giới hạn — đang gần “đỉnh kỳ vọng”; cần check pool trùng tên STONK mới 7 ngày (Kênh I) trước khi xếp vào sổ, và chạy crypto-project-research đầy đủ. Đây là hiện tượng “tầng 3 sắp tới”, không còn là tầng 1.</p>
+</div>
+
+<div class="card">
+<h3>③ Native Core CLOB (native.org) — hạ tầng CLOB 50ms không-token, và SLVR — hai cấu trúc fee-off của Kênh H</h3>
+<p><b>Native</b> là nền tảng CLOB spot 50ms, phi lưu ký, “sovereign matching engine + Native Pool (LP một phía) + Native Relay (xuất thanh khoản cross-chain)”, đã deploy trên Robinhood Chain ngay 02/07 và mở chain riêng (Native Core). Protocol 13 ngày tuổi, phí 30d $666K, chg_7d +65%. Kênh F: <code>native.org/llms.txt</code> tồn tại, docs cực kỳ sạch sẽ nhưng <b>không có trang tokenomics</b> — kiểu bề mặt thường xuất hiện <b>trước khi TGE</b>. Take rate “có thể âm vì chia yield cho LP” — đang mua thị phần bằng cách trả giá trị cho LP, cấu trúc điển hình trước gọi hạ tầng.</p>
+<p><b>SLVR</b> (Gamified Mining, RH) thì tín hiệu Kênh H còn rõ hơn: phí thu $1.2M/30d (rake 8%→staker, 2%→jackpot/burn) nhưng <b>ProtocolRevenue = 0 từ lúc launch</b> (vault “fee-off”). Phí chạy nhưng protocol chưa lấy đồng nào = chuyển toàn giá trị cho user, cấu trúc ramp-points kinh điển trước một sự kiện token. Xếp tầng 1, đưa vào sổ chờ “revenue bật lên” hoặc thông báo TGE.</p>
+</div>
+
+<h2><span class="tag">BỘ LỌC</span>4. Đã loại và lý do</h2>
+<table>
+<thead><tr><th>Ứng viên / tên</th><th>Lý do loại</th><th>Kênh dùng để loại</th></tr></thead>
+<tbody>
+<tr><td>HASHCATS, Attention Mine, Valhalla (Gamified Mining)</td><td class="flag">Token &lt; 7 ngày tuổi (HASHCATS 2 ngày, Attention Mine 4 ngày) / vừa ra. Không đủ dữ liệu — degen trade, không phải research.</td><td>Bộ lọc nhanh</td></tr>
+<tr><td>o1 Launchpad / O (Base, RH, Monad)</td><td class="flag">TGE đã 3 tháng, O −43% so ATH (0.94 USD hồi 20/06); 84% (840M/1B) còn locked → FDV $527M. Phí sự kiện tụt dốc (chg_7d −69%, 7d/30d = 0.17). MC÷DT ~1569x — đắt. Đã lên Binance Alpha + Coinbase/Bybit = đã có đám đông.</td><td>A2 đối chiếu D/K</td></tr>
+<tr><td>Pons V1</td><td>Nhánh legacy cùng team, phí chuyển hết sang V2 (launch mới chỉ qua V2).</td><td>E (dấu vết nâng cấp)</td></tr>
+<tr><td>up v3 (DEX RH)</td><td>chg_7d −65%, phí đã xẹp sau đợt đầu; không còn chứng minh tăng tốc.</td><td>A2</td></tr>
+<tr><td>PredictStreet (ADI)</td><td>Chain ADI mới 53 ngày nhưng TVL đang <b>−54%/7d</b> và chỉ $2M — chain không giữ nổi TVL, tín hiệu B phủ định.</td><td>B</td></tr>
+<tr><td>MegaETH (chain + NOXA Fun)</td><td>TVL −75%/90d, −37%/7d — chain thụt dù mới 258 ngày.</td><td>B</td></tr>
+<tr><td>Meridian (RWA perp / prediction, ex-Ethereal)</td><td>Chưa có domain/token minh bạch (meridianfi.com là trang rao bán GoDaddy); đổi từ Ethereal 05/2026. Không đủ dữ kiện xác nhận.</td><td>F đối chiếu (webs)</td></tr>
+<tr><td>fomo Wallet (app Solana)</td><td class="flag">KHÔNG có token. Mọi token “FOMO” trên Solana là giả mạo (MC $4K-$84, unverified). App thật vượt pump.fun về 7d revenue nhưng không phải ứng viên token.</td><td>I (impersonation) + D</td></tr>
+<tr><td>StonkBrokers (RH/Base)</td><td>Fees nhỏ ($67K/ngày) + cấu trúc gồm 10+ nguồn phí phức tạp — nghi over-engineered; chưa đủ sạch để theo dõi sớm.</td><td>A + thẩm định</td></tr>
+<tr><td>BONK.fun Launchpad</td><td>Dựa brand BONK (FXBY), phí đột biến theo lần launch nhưng không có luận điểm mới; chủ yếu là bản sao của Solana pad meta.</td><td>C (chỉ đối chiếu)</td></tr>
+<tr><td>Lighter (LIT), pump.fun, Raydium (RAY), GMGN, Hyperliquid, PumpSwap, Polymarket</td><td>“Đã được công nhận” — top mcap / báo lớn / CEX lớn. Không còn “sớm”; dùng làm benchmark, không phải candidate.</td><td>Bộ lọc tầng 3</td></tr>
+<tr><td>Graphite Protocol</td><td>Giữ ở tầng 1 nhưng loại khỏi ưu tiên tiếp theo: phí 30d chỉ $884K với alltime $30M — phí cũ đang mờ; JV Letsbonk phức tạp. Cần research trước khi quyết.</td><td>H + thẩm định</td></tr>
+</tbody>
+</table>
+
+<h2><span class="tag">BÀN GIAO</span>5. Bước tiếp theo</h2>
+<div class="card">
+<p style="margin-top:0"><b>Nên chạy <code>crypto-project-research</code> ngay tuần này (theo thứ tự ưu tiên):</b></p>
+<ul>
+<li><b>1 — Pons V2 (PONS):</b> protocol phí #1 trong nhóm trẻ, MC÷DT 62x, nhưng cần kiểm: cấu trúc buyback/burn thật, vesting PONS, hợp đồng V2 (docs cung cấp đủ địa chỉ: factory 0x7eD5…07e7, meme hook, buyback vault 0x42df…1219c), và độ pha loãng sắp tới. <b>Điều kiện lên sổ:</b> chạy DYOR V1+V2 qua skill.</li>
+<li><b>2 — StonkFun (STONK):</b> đã gần tầng 3, vào research để quyết theo dõi hay bỏ — kiểm quantify “% fees 7d/alltime 70%”, holder trend, và trùng tên STONK pool mới (I).</li>
+<li><b>3 — SLVR:</b> candidate Kênh H đọc sạch nhất tuần này (protocol revenue = 0). Research xem vòng gọi vốn (K) + độ lỏng của re-geo token.</li>
+<li><b>4 — Native Core / native.org:</b> nếu theo hướng hạ tầng no-token, theo dõi trang docs (Kênh F diff mỗi tuần — bề mặt tokenomics xuất hiện trước TGE).</li>
+</ul>
+<p style="margin-bottom:0">Xếp vào <b>sổ theo dõi tuần này:</b> Pons V2, StonkFun, SLVR, Native Core, AZverse Perps, Sentry, Bankr, Graphite (8 mục — đừng phình thêm; cái nào 3 tuần không tiến triển thì bỏ). Chain đang canh: Robinhood Chain (subsidy 90 ngày hết ~cuối tháng 9/2026 — sự kiện chuyển mình), Native Core, Arc (Circle L1 sắp lên; fomo dự định tích hợp ngay khi launch = dấu vết G).</p>
+</div>
+
+<h2><span class="tag">NGUỒN</span>6. Bảng nguồn</h2>
+<table>
+<thead><tr><th>#</th><th>Nguồn</th><th>Dữ liệu lấy</th><th>Ngày truy cập / giá trị</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><a href="https://api.llama.fi/overview/fees">DeFiLlama — Overview Fees</a> (API free)</td><td>Phí 24h/7d/30d/alltime, change_1m/7d, category, chains, methodology của 2.690 protocol</td><td>2026-09-14</td></tr>
+<tr><td>2</td><td><a href="https://api.llama.fi/protocols">DeFiLlama — Protocols</a> (API free)</td><td>listedAt (tuổi protocol), mcap, symbol, chains</td><td>2026-09-14</td></tr>
+<tr><td>3</td><td><a href="https://api.llama.fi/v2/historicalChainTvl">DeFiLlama — historicalChainTvl</a></td><td>TVL theo chain: Robinhood Chain 925,9M (+2.4%/7d, +75.3%/30d), ADI −54%, Ink 163,6M (+39%/30d), Monad 1,02B, Native Core 404</td><td>2026-09-14</td></tr>
+<tr><td>4</td><td><a href="https://coinmarketcap.com/currencies/pons/">CoinMarketCap — PONS</a></td><td>Giá 0.54 USD, MC $388.7M, circulating 690.9M, rank #95</td><td>2026-09-14</td></tr>
+<tr><td>5</td><td><a href="https://www.btse.com/blog/pons-token-robinhood-chain/">BTSE Blog — PONS &amp; Robinhood Chain</a></td><td>PONS launchpad dominance, $116M volume, 98K wallets tuần đầu; mainnet 01/07/2026</td><td>2026-08-06</td></tr>
+<tr><td>6</td><td><a href="https://www.datawallet.com/crypto/pons-explained">DataWallet — Pons Explainer</a></td><td>80% phí protocol buy-back &amp; burn PONS; tokenomics</td><td>2026-09-03</td></tr>
+<tr><td>7</td><td><a href="https://www.theblock.co/news/defi/2026-09-06-stonk-surges-250...">The Block — STONK $140M</a></td><td>STONK +250% lên $140M; tích hợp Raydium LaunchLab; RAY +40%</td><td>2026-09-06</td></tr>
+<tr><td>8</td><td><a href="https://coinmarketcap.com/cmc-ai/stonk-fun/latest-updates/">CMC AI — STONK</a></td><td>$9M revenue, $30M rewards từ launch; tokenized equity Solana $684M</td><td>2026-09-13</td></tr>
+<tr><td>9</td><td><a href="https://www.kucoin.com/news/flash/fomo-surpasses-pump-fun-in-7-day-revenue-on-solana">KuCoin/CryptoBriefing — fomo</a></td><td>fomo vượt pump.fun 7d revenue ($1.76M vs $1.1M ngày 04/09); 30d $17.6M vs $57M; Series B $75M @ $550M valuation</td><td>2026-09-13</td></tr>
+<tr><td>10</td><td><a href="https://www.kucoin.com/news/flash/robinhood-chain-surpasses-polygon-in-defi-tvl-with-800m-locked">KuCoin — RH Chain vượt Polygon</a></td><td>TVL $791–802M vs Polygon 03/09; stablecoin USDG supply $868–872M; noti chain không có native token</td><td>2026-09-03</td></tr>
+<tr><td>11</td><td><a href="https://www.kucoin.com/news/flash/robinhood-chain-mainnet-launches...">KuCoin — RH Chain ecosystem</a></td><td>Arcus (dYdX+Robinhood), Lighter, Rialto, Native deploy 02/07; mainnet 01/07/2026 (Arbitrum Orbit, ETH gas)</td><td>2026-07-02/21</td></tr>
+<tr><td>12</td><td><a href="https://www.marketvector.com/insights/mvis-insights/why-robinhood-went-from-app-to-operating-system">MarketVector — RH Chain</a></td><td>Không có native token; 28M users; block time ~100ms; weekly fee chart Token Terminal</td><td>2026 (xem tại ngày scan)</td></tr>
+<tr><td>13</td><td><a href="https://docs.ponsfamily.com/llms.txt">Pons docs (Kênh F)</a></td><td>llms.txt baseline: contracts V1+V2, fee 1%, launch 0.0005 ETH, snipe tax, graduation 4.2 ETH</td><td>2026-09-14</td></tr>
+<tr><td>14</td><td><a href="https://docs.o1.exchange/llms.txt">o1 Exchange docs (Kênh F)</a></td><td>llms.txt baseline: Launchpad B20, Points seasons, stock-paired, contracts Base/RH/Monad/Arc</td><td>2026-09-14</td></tr>
+<tr><td>15</td><td><a href="https://native.org/llms.txt">Native docs (Kênh F)</a></td><td>llms.txt baseline: Native Core CLOB, Native Pool, Native Relay, 50ms block time</td><td>2026-09-14</td></tr>
+<tr><td>16</td><td>CryptoRank — o1.exchange (O)</td><td>MC $84.4M, circ 160M/1B, ATH $0.9276 (20/06), rank #269</td><td>2026-09-14</td></tr>
+<tr><td>17</td><td>OKX/CoinMarketCap — Raydium (RAY)</td><td>Giá $1.40, MC $377.6M</td><td>2026-09-14</td></tr>
+<tr><td>18</td><td>pricepredictions.com / CMC AI — Lighter (LIT)</td><td>LIT #59, MC ~$939M (24/08), $550–939M tuỳ snapshot; 15.5M LIT burned; unlock Dec 2026; RH Wallet 50/50 rev-share 12 năm</td><td>2026-08/09</td></tr>
+<tr><td>19</td><td>Coinness — Bonk Guy / Arc chain</td><td>Circle’s Arc L1 sắp launch; fomo dự định tích hợp ngay sau launch</td><td>2026-09-14</td></tr>
+<tr><td>20</td><td>DeFiLlama — Chain TVL series (scan)</td><td>Tổng phí 24h toàn DeFi $73.2M, 7d $586.6M, 30d $2.25B; BTC $80,9K; Fear&amp;Greed 71</td><td>2026-09-14</td></tr>
+</tbody>
+</table>
+
+<div class="foot">
+Đây là tổng hợp dữ liệu, không phải lời khuyên đầu tư.<br/>
+Report tạo tự động bằng HTML inline-CSS · desktop + mobile · skill <code>crypto-early-discovery</code> · quét user: 2026-09-14
+</div></section>
+<div class="wrap dash-foot">
+  <div class="foot">
+    Tổng hợp dữ liệu, không phải lời khuyên đầu tư.<br/>
+    Dashboard tạo tự động bởi crypto_report_index.py · cập nhật 14/09/2026 20:44 ·
+    phím &#8592;/&#8594; hoặc vuốt để đổi ngày
+  </div>
+</div>
+<script>
+
+const YES=()=>1;
+const days=[...document.querySelectorAll('.day')].map(s=>s.id);
+let cur=days.length-1, mode='day';
+const sec=id=>document.getElementById(id);
+const tabEl=d=>document.querySelector(`.tab[data-d="${d}"]`);
+function setCur(i){if(i<0||i>=days.length)return;sec(days[cur]).classList.remove('show');
+  tabEl(days[cur])&&tabEl(days[cur]).classList.remove('active');
+  cur=i;render();}
+function render(){days.forEach(d=>sec(d).classList.toggle('show',mode==='all'||d===days[cur]));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',mode==='day'&&t.dataset.d===days[cur]));
+  document.querySelector('.dcount')&&(document.querySelector('.dcount').textContent=
+    mode==='all'?`${days.length} ngày`:`${cur+1}/${days.length}`);}
+function setMode(m){mode=m;document.getElementById('btnAll').classList.toggle('on',m==='all');
+  document.getElementById('btnToday').classList.toggle('on',m==='day');render();
+  if(m==='all')window.scrollTo({top:0,behavior:'smooth'});else{sec(days[cur])&&sec(days[cur]).scrollIntoView({block:'start',behavior:'smooth'});}}
+document.addEventListener('keydown',e=>{if(mode!=='day')return;
+  if(e.key==='ArrowLeft')setCur(cur-1);if(e.key==='ArrowRight')setCur(cur+1);});
+let txs,txe;document.addEventListener('touchstart',e=>txs=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{if(mode!=='day')return;txe=e.changedTouches[0].clientX;const dx=txe-txs;
+  if(Math.abs(dx)>60){dx<0?setCur(cur+1):setCur(cur-1);}});
+render();
+document.getElementById('btnToday').addEventListener('click',()=>setMode('day'));
+document.getElementById('btnAll').addEventListener('click',()=>setMode('all'));
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{setMode('day');setCur(days.indexOf(t.dataset.d));}));
+
+</script>
+</body>
+</html>

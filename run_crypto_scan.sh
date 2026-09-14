@@ -52,6 +52,12 @@ Dùng websearch/webfetch để kiểm chứng và lấy tin/tình tiết, mọi 
 Xuất ra MỘT file HTML (tự render, có CSS inline đọc sạch, desktop + mobile) tại đường dẫn:
 $OUT
 
+BẮT BUỘC cấu trúc để báo cáo gộp chung hoạt động:
+- Toàn bộ nội dung nằm trong <div class="wrap">...</div> (một khối duy nhất, close trước </body>).
+- Giữ nguyên bộ class chuẩn khi có thể: card, kpi, note, warnbox, tier1/t2/t3 (badge), num,
+  pos/neg/warn/blu/pur, pill, src, foot, h1/h2/h3, meta, table/th/td.
+- Không dùng id trùng nhau và không đổi biến CSS màu nền body sang ảnh nền lớn (dashboard overlay sẽ xử lý nền).
+
 File HTML phải tuân đúng định dạng output của skill:
 1. Ngày quét + phạm vi đã quét (kênh nào, category nào)
 2. Bảng ứng viên theo tầng (1/2/3), kèm số liệu MC, doanh thu ngày, MC÷DT, % doanh thu đời trong 7d, và nguồn
@@ -72,6 +78,13 @@ if [ $RC -ne 0 ]; then
 fi
 
 echo "[$(date '+%F %T')] scan hoan tat: $OUT" >> "$LOG"
+
+# B2: Gộp tất cả báo cáo theo ngày thành 1 dashboard HTML (reports/crypto/index.html)
+if python3 "$PROJ/crypto_report_index.py" --dir "$PROJ/reports/crypto" --out index.html >> "$LOG" 2>&1; then
+  echo "[$(date '+%F %T')] dashboard cap nhat: reports/crypto/index.html" >> "$LOG"
+else
+  echo "[$(date '+%F %T')] CANH BAO: crypto_report_index.py that bai (mac dinh bo qua, van commit report)" >> "$LOG"
+fi
 
 # Auto-commit + push báo cáo (giữ lịch sử trên remote)
 git add reports/crypto/ >> "$LOG" 2>&1
