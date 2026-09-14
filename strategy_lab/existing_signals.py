@@ -36,8 +36,9 @@ def source_indicators(raw):
     b['atr_pct']=b.atr/c*100
     for n in [20,50,200]:b[f'ema{n}']=c.ewm(span=n,adjust=False).mean()
     for n in [50,100,150,200]:b[f'sma{n}']=c.rolling(n).mean()
-    b['upper']=b.high.rolling(20).mean()+1.5*b.high.rolling(20).std(ddof=1)
-    b['lower']=b.low.rolling(20).mean()-1.5*b.low.rolling(20).std(ddof=1)
+    hl2=(b.high+b.low)/2.0
+    b['upper']=hl2.rolling(20).mean()+2.0*hl2.rolling(20).std(ddof=0)
+    b['lower']=hl2.rolling(20).mean()-2.0*hl2.rolling(20).std(ddof=0)
     b['roc5']=c.pct_change(5,fill_method=None)*100
     b['roc20']=c.pct_change(20,fill_method=None)*100
     up=b.high.diff();down=-b.low.diff()

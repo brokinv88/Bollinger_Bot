@@ -40,7 +40,8 @@ class BaselineTests(unittest.TestCase):
     def test_population_std_and_causality(self):
         b=pd.DataFrame({'close':np.arange(250.)+10,'high':np.arange(250.)+11,'low':np.arange(250.)+9})
         a=signals(b)
-        self.assertAlmostEqual(a.upper.iloc[19],np.mean(b.high[:20])+1.5*np.std(b.high[:20],ddof=0))
+        hl2=(b.high+b.low)/2.0
+        self.assertAlmostEqual(a.upper.iloc[19],np.mean(hl2[:20])+2.0*np.std(hl2[:20],ddof=0))
         b.loc[220:,'high']=10000
         pd.testing.assert_frame_equal(a.iloc[:220],signals(b).iloc[:220])
 if __name__=='__main__':unittest.main()

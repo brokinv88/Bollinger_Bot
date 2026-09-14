@@ -21,7 +21,7 @@ class ExistingTests(unittest.TestCase):
         source_input['datetime']=pd.to_datetime(source_input.open_time,unit='ms')
         tree=ast.parse(Path('daily_scanner.py').read_text())
         fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='evaluate_signals')
-        ns={'pd':pd,'np':np,'config':SimpleNamespace(BB_LEN=20,BB_MULT=1.5,STRATEGY_B_MAX_ROC5=20,STRATEGY_B_MAX_ROC20=40,STRATEGY_B_MAX_ATR_PCT=6)}
+        ns={'pd':pd,'np':np,'config':SimpleNamespace(BB_LEN=20,BB_MULT=2.0,STRATEGY_B_MAX_ROC5=20,STRATEGY_B_MAX_ROC20=40,STRATEGY_B_MAX_ATR_PCT=6)}
         exec(compile(ast.Module(body=[fn],type_ignores=[]),'source_pure_function','exec'),ns)
         actual=ns['evaluate_signals'](source_input)
         self.assertAlmostEqual(actual['upper_band'],ours.upper.iloc[-1])

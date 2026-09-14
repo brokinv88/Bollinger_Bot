@@ -39,15 +39,14 @@ def evaluate_signals(df):
     bb_len = config.BB_LEN
     bb_mult = config.BB_MULT
     
-    # Bollinger Envelopes 24/7
-    df['sma_high'] = df['high'].rolling(bb_len).mean()
-    df['std_high'] = df['high'].rolling(bb_len).std()
-    df['upper_band'] = df['sma_high'] + bb_mult * df['std_high']
-    
-    df['sma_low'] = df['low'].rolling(bb_len).mean()
-    df['std_low'] = df['low'].rolling(bb_len).std()
-    df['lower_band'] = df['sma_low'] - bb_mult * df['std_low']
-    df['baseline'] = (df['upper_band'] + df['lower_band']) / 2.0
+    # Bollinger Envelopes — HL2 source (research-validated)
+    # upper & lower from same source: SMA((H+L)/2) ± mult × σ((H+L)/2)
+    df['hl2'] = (df['high'] + df['low']) / 2.0
+    df['sma_hl2'] = df['hl2'].rolling(bb_len).mean()
+    df['std_hl2'] = df['hl2'].rolling(bb_len).std(ddof=0)
+    df['upper_band'] = df['sma_hl2'] + bb_mult * df['std_hl2']
+    df['lower_band'] = df['sma_hl2'] - bb_mult * df['std_hl2']
+    df['baseline'] = df['sma_hl2']
     
     # SMAs
     df['sma50'] = df['close'].rolling(50).mean()

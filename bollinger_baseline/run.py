@@ -8,8 +8,10 @@ ROOT=Path(__file__).resolve().parent
 
 def signals(b):
     b=b.copy()
-    b['upper']=b.high.rolling(20).mean()+1.5*b.high.rolling(20).std(ddof=0)
-    b['lower']=b.low.rolling(20).mean()-1.5*b.low.rolling(20).std(ddof=0)
+    # HL2 source (research-validated): single series for both bands
+    hl2=(b.high+b.low)/2.0
+    b['upper']=hl2.rolling(20).mean()+2.0*hl2.rolling(20).std(ddof=0)
+    b['lower']=hl2.rolling(20).mean()-2.0*hl2.rolling(20).std(ddof=0)
     above=pd.Series(True,index=b.index)
     out=(b.close<b.lower)&(b.close.shift()>=b.lower.shift())
     for n in (50,100,150,200):

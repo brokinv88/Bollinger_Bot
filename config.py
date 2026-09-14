@@ -14,8 +14,10 @@ MAX_PYRAMID = 3             # Nhồi tối đa 3 lần ($150/mã)
 TOTAL_PORTFOLIO_CAP = 1500.0# Tổng vốn trần danh mục mỗi tài khoản
 
 # 3. Thông số kỹ thuật Bollinger Envelopes & SMA
+#    BB source: HL2 = (high+low)/2 (research-validated, replaces old HIGH/LOW separate bands)
+BB_SOURCE = "HL2"
 BB_LEN = 20
-BB_MULT = 1.5
+BB_MULT = 2.0       # raised from 1.5 per research: HL2 + mult=2.0 outperforms
 SMA_PERIODS = [50, 100, 150, 200]
 
 # 4. Cấu hình Telegram (Nhận thông báo chung hoặc riêng)
