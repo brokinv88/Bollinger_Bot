@@ -725,10 +725,11 @@ def render_strategy_logic():
 
     base_blocks = [
         ("📊", "Chỉ báo kỹ thuật",
-         f"Bollinger Envelopes 24/7 theo {bb} phiên (bội số {mult}σ), tính trên HIGH/LOW thay vì close:\n"
-         f"• Băng trên = SMA{bb}(HIGH) + {mult}×σ(HIGH)\n"
-         f"• Băng dưới = SMA{bb}(LOW) − {mult}×σ(LOW)\n"
-         f"• Baseline = trung bình (upper + lower)"),
+         f"Bollinger Envelopes 24/7 theo {bb} phiên (bội số {mult}σ), nguồn HL2 = (High+Low)/2 "
+         f"(research-validated, thay cho HIGH/LOW tách biệt trước đây):\n"
+         f"• Băng trên = SMA{bb}(HL2) + {mult}×σ(HL2)\n"
+         f"• Băng dưới = SMA{bb}(HL2) − {mult}×σ(HL2)\n"
+         f"• Baseline = SMA{bb}(HL2)"),
         ("📈", "Tín hiệu VÀO LỆNH (Mua mới hoặc nhồi)",
          f"Nến hôm qua đủ điều kiện:\n"
          f"• {sma_cond}\n"
