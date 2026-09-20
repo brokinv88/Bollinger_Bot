@@ -1,3 +1,5 @@
 {"ts_ms": 1789093220916, "verb": "CANCEL+CLOSE", "mode": "DRY_RUN", "order": {"symbol": "DASHUSDT", "side": "SELL", "type": "MARKET", "reduceOnly": true, "reason": "SL_REALTIME", "qty": 2.25515464, "price_hint": 54.69}}
 {"ts_ms": 1789093220916, "verb": "CANCEL+CLOSE", "mode": "DRY_RUN", "order": {"symbol": "ZENUSDT", "side": "SELL", "type": "MARKET", "reduceOnly": true, "reason": "SL_REALTIME", "qty": 21.65841584, "price_hint": 6.525}}
 {"ts_ms": 1789093220916, "verb": "CANCEL+CLOSE", "mode": "DRY_RUN", "order": {"symbol": "BNBUSDT", "side": "SELL", "type": "MARKET", "reduceOnly": true, "reason": "SL_REALTIME", "qty": 0.63470954, "price_hint": 712.62}}
+{"ts_ms": 1789933694986, "verb": "CANCEL+CLOSE", "mode": "DRY_RUN", "order": {"symbol": "ZECUSDT", "side": "SELL", "type": "TAKE_PROFIT_MARKET", "reduceOnly": true, "reason": "TP_REALTIME", "qty": 0.14424563, "price_hint": 1505.04}}
+{"ts_ms": 1789933694986, "verb": "CANCEL+CLOSE", "mode": "DRY_RUN", "order": {"symbol": "NEARUSDT", "side": "SELL", "type": "TAKE_PROFIT_MARKET", "reduceOnly": true, "reason": "TP_REALTIME", "qty": 76.15593835, "price_hint": 4.139}}

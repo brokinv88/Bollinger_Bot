@@ -1,39 +1,9 @@
 {
- "equity": 1951.6713753031424,
- "peak": 2000.0,
+ "equity": 2170.762047173432,
+ "peak": 2170.762047173432,
  "day_start_eq": 2000.0,
  "week_start_eq": 2000.0,
  "positions": [
-  {
-   "strategy": "KELT",
-   "symbol": "ZECUSDT",
-   "direction": 1,
-   "entry_time": 1788552000000,
-   "entry_px": 1022.34,
-   "atr": 41.59571428571429,
-   "trail": 939.1485714285715,
-   "tp": 1271.9142857142858,
-   "be_done": false,
-   "notional": 147.4680770683793,
-   "margin": 49.15602568945977,
-   "fund": 0.0105365941065357,
-   "last_i": 449
-  },
-  {
-   "strategy": "KELT",
-   "symbol": "NEARUSDT",
-   "direction": 1,
-   "entry_time": 1788552000000,
-   "entry_px": 2.172,
-   "atr": 0.0787857142857143,
-   "trail": 2.0144285714285717,
-   "tp": 2.644714285714286,
-   "be_done": false,
-   "notional": 165.4106980961015,
-   "margin": 55.136899365367164,
-   "fund": -0.033082139619220303,
-   "last_i": 449
-  },
   {
    "strategy": "KELT",
    "symbol": "FLOCKUSDT",
@@ -52,5 +22,5 @@
  ],
  "cursor": 1788652800000,
  "last_ts": 1788652800000,
- "n_trades": 3
+ "n_trades": 5
 }
