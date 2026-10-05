@@ -15,8 +15,9 @@ def main(argv=None):
     a.add_argument("address")
     a.add_argument("--note", default="")
     a.add_argument("--sniper", action="store_true", help="chỉ alert, không paper")
-    i = sub.add_parser("import", help="nhập ví từ CSV (cột: chain,address,note)")
+    i = sub.add_parser("import", help="nhập ví từ CSV (cột: chain,address,status,note)")
     i.add_argument("file")
+    i.add_argument("--chain", choices=list(config.CHAINS), help="chain cho các dòng để trống cột chain")
     r = sub.add_parser("remove", help="tắt ví")
     r.add_argument("chain", choices=list(config.CHAINS))
     r.add_argument("address")
@@ -57,8 +58,11 @@ def main(argv=None):
         n = 0
         with open(args.file, newline="") as f:
             for row in csv.DictReader(f):
-                if row.get("chain") in config.CHAINS and row.get("address"):
-                    n += db.add_wallet(conn, row["chain"], row["address"], note=row.get("note", ""))
+                chain = (row.get("chain") or "").strip() or args.chain
+                status = (row.get("status") or "").strip() or "active"
+                if chain in config.CHAINS and row.get("address") and status in ("active", "watch_only", "candidate",
+                                                                               "disabled"):
+                    n += db.add_wallet(conn, chain, row["address"], status=status, note=row.get("note", ""))
         print(f"Đã thêm {n} ví mới")
     elif args.cmd == "remove":
         print("Đã tắt" if db.set_status(conn, args.chain, args.address, "disabled") else "Không tìm thấy ví")
