@@ -25,8 +25,12 @@ def main(argv=None):
     d = sub.add_parser("discover", help="quét người mua sớm của 1 token (EVM)")
     d.add_argument("chain", choices=list(config.CHAINS))
     d.add_argument("token")
-    d.add_argument("--minutes", type=int, default=config.DISCOVERY_WINDOW_MIN)
+    d.add_argument("--minutes", type=int, default=None)
     sub.add_parser("monitor", help="chạy theo dõi liên tục")
+    for name, hlp in (("web", "chỉ chạy app web"), ("run", "chạy monitor + app web cùng lúc")):
+        wp = sub.add_parser(name, help=hlp)
+        wp.add_argument("--host", default="127.0.0.1", help="0.0.0.0 để mở từ điện thoại cùng wifi")
+        wp.add_argument("--port", type=int, default=5050)
     sub.add_parser("once", help="chạy 1 vòng theo dõi")
     sub.add_parser("daily", help="auto-discovery + tắt ví lỗ + báo cáo")
     sub.add_parser("report", help="thống kê paper trade")
@@ -69,6 +73,13 @@ def main(argv=None):
         telegram.send(msg)
     elif args.cmd == "monitor":
         Monitor(conn).run_forever()
+    elif args.cmd in ("web", "run"):
+        from .web import create_app
+        if args.cmd == "run":
+            import threading
+            threading.Thread(target=lambda: Monitor(db.connect()).run_forever(), daemon=True).start()
+        print(f"App: http://{'localhost' if args.host == '127.0.0.1' else args.host}:{args.port}")
+        create_app().run(host=args.host, port=args.port, debug=False, use_reloader=False)
     elif args.cmd == "once":
         Monitor(conn).run_once()
     elif args.cmd == "daily":

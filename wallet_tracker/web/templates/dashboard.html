@@ -1,0 +1,44 @@
+{% extends "base.html" %}{% from "_macros.html" import signed, signal_rows, wallet_link %}
+{% block content %}
+<div class="grid">
+{% for book, s in stats.items() %}
+<div class="card"><h3>Book {{ book }}</h3>
+<div class="big">{{ s.equity|money }}</div>
+<div class="{{ 'up' if s.equity >= capital else 'down' }}">{{ '%+.1f'|format((s.equity / capital - 1) * 100) }}% so với vốn {{ capital|money }}</div>
+<div class="mute">Đóng {{ s.closed }} · win {{ s.winrate|pct }} · PnL chốt {{ signed(s.pnl) }} · mở {{ s.open }} · tiền mặt {{ s.cash|money }}</div>
+</div>
+{% endfor %}
+<div class="card"><h3>Ví</h3>
+<div class="big">{{ counts.get('active', 0) }} <span class="mute" style="font-size:14px">smart money</span></div>
+<div class="mute">{{ counts.get('watch_only', 0) }} sniper · <a href="{{ url_for('wallets', status='candidate') }}">{{ counts.get('candidate', 0) }} ứng viên</a> · {{ counts.get('disabled', 0) }} tắt</div>
+<div class="mute">Chain chạy: {{ active_chains|join(', ') or 'chưa có' }}</div>
+</div>
+</div>
+
+<div class="card"><h3>Equity 30 ngày</h3>
+{% if series %}<canvas id="eq" height="90"></canvas>{% else %}<div class="mute">Chưa có dữ liệu (monitor ghi mỗi giờ)</div>{% endif %}
+</div>
+
+<div class="card"><h3>Lệnh paper đang mở</h3>
+<div class="tbl"><table>
+<tr><th>Book</th><th>Token</th><th>Chain</th><th>Ví nguồn</th><th>Vào</th><th>Giá vào</th><th>Giá hiện tại</th><th>Lãi/lỗ</th><th>Còn lại</th></tr>
+{% for p in positions %}{% set r = (p.last_price / p.entry_price - 1) if p.last_price else None %}
+<tr><td>{{ p.book }}</td><td><b>{{ p.symbol }}</b></td><td>{{ p.chain }}</td><td>{{ wallet_link(p.chain, p.wallet) }}</td>
+<td>{{ p.entry_ts|dt }}</td><td>{{ '%.6g'|format(p.entry_price) }}</td><td>{{ '%.6g'|format(p.last_price) if p.last_price else '—' }}</td>
+<td class="{{ 'up' if (r or 0) > 0 else 'down' }}">{{ r|pct }}</td><td>{{ ((p.remaining_qty or 0) / p.qty)|pct if p.qty else '—' }}</td></tr>
+{% else %}<tr><td colspan="9" class="mute">Không có lệnh mở</td></tr>{% endfor %}
+</table></div></div>
+
+<div class="card"><h3>Tín hiệu mới nhất · <a href="{{ url_for('signals') }}">xem tất cả</a></h3>{{ signal_rows(signals) }}</div>
+
+{% if series %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const series = {{ series|tojson }}, colors = ['#5b8cff', '#2fbf71', '#f0b429', '#ef5350'];
+new Chart(document.getElementById('eq'), {type: 'line',
+  data: {datasets: Object.entries(series).map(([k, v], i) => ({label: k, data: v, borderColor: colors[i % 4], pointRadius: 0, tension: .2}))},
+  options: {parsing: {xAxisKey: 'x', yAxisKey: 'y'}, scales: {x: {type: 'linear', ticks: {callback: v => new Date(v).toLocaleDateString('vi-VN')}}},
+            plugins: {tooltip: {callbacks: {title: i => new Date(i[0].parsed.x).toLocaleString('vi-VN')}}}}});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,43 +1,74 @@
 # Wallet Tracker
 
-Theo dõi ví mua sớm / smart money / sniper → **alert Telegram + paper trade**. Không dùng private key, không swap thật.
+Theo dõi ví mua sớm / smart money / sniper → **alert Telegram + paper trade + app web**. Không dùng private key.
 Plan: [`docs/wallet_tracker_plan.md`](../docs/wallet_tracker_plan.md).
 
 ## Cài đặt (máy local)
 ```bash
-cp wallet_tracker/.env.example wallet_tracker/.env   # điền Telegram bot riêng + HELIUS_API_KEY
-./.venv/bin/pip install requests
+cp wallet_tracker/.env.example wallet_tracker/.env   # điền Telegram bot riêng, HELIUS_API_KEY, ZERION_API_KEY
+./.venv/bin/pip install requests flask
+./run_wallet_tracker.command                         # = python -m wallet_tracker run  -> http://localhost:5050
 ```
-- Telegram: tạo bot mới qua @BotFather, nhắn 1 tin cho bot, lấy chat id ở `https://api.telegram.org/bot<TOKEN>/getUpdates`.
-- Solana cần `HELIUS_API_KEY` (free). EVM (Base/BSC/ETH) dùng RPC public sẵn. Robinhood Chain bật khi điền `ROBINHOOD_RPC_URL` + `ROBINHOOD_QUOTES`.
+- Telegram: tạo bot qua @BotFather, nhắn 1 tin cho bot, lấy chat id ở `https://api.telegram.org/bot<TOKEN>/getUpdates`.
+- `HELIUS_API_KEY` (free): bắt buộc cho Solana. `ZERION_API_KEY` (free dev): chấm PnL/winrate ví + phát hiện insider/bundler.
+  Không có Zerion -> chấm điểm chỉ dựa trên giao dịch bot đã thấy.
+- Mở app từ điện thoại cùng wifi: `python -m wallet_tracker run --host 0.0.0.0` và đặt `WT_WEB_PASSWORD` trong `.env`.
 
-## Dùng
+## App web
+| Màn hình | Nội dung |
+|---|---|
+| Tổng quan | Equity từng book, biểu đồ 30 ngày, lệnh đang mở, tín hiệu mới |
+| Ví | Thêm ví, quét người mua sớm (discover), **lọc kiểu Wallet Radar** (chain, trạng thái, nhãn, winrate/PnL/số token 30D, vào sớm), đổi trạng thái |
+| Chi tiết ví | PnL/winrate 7D-30D, thời gian giữ, nhãn + lý do, token vào sớm, tín hiệu, lệnh paper, link Explorer/GMGN/Zerion, chấm điểm ngay |
+| Tín hiệu | Mọi lệnh mua / mua thêm / bán một phần / bán hết, lý do bị chặn, kết quả paper |
+| Lệnh paper | Lọc book/trạng thái, từng lần khớp (TP nấc, trailing, bán theo ví) |
+| Cài đặt | Sửa mọi tham số (ngưỡng, luật thoát lệnh từng book), blacklist token |
+
+## CLI
 ```bash
-python -m wallet_tracker add base 0x0f9a... --note "vào sớm 6 phút"   # thêm ví smart money
-python -m wallet_tracker add solana <ví> --sniper                    # sniper: chỉ alert
-python -m wallet_tracker import wallet_tracker/wallets_manual.csv    # nhập hàng loạt (chain,address,note)
-python -m wallet_tracker discover base <token>                       # quét người mua sớm của token thắng
-python -m wallet_tracker list [--all]
-python -m wallet_tracker monitor                                     # chạy liên tục (hoặc ./run_wallet_tracker.command)
-python -m wallet_tracker report
+python -m wallet_tracker add base 0x0f9a... --note "kol"   # --sniper: chỉ alert
+python -m wallet_tracker import wallet_tracker/wallets_manual.csv
+python -m wallet_tracker discover base <token>
+python -m wallet_tracker score [chain ví]                  # chấm 1 ví hoặc các ví đến hạn
+python -m wallet_tracker blacklist add '*' <token> --reason scam
+python -m wallet_tracker set MIN_LIQUIDITY_USD 50000       # xem/sửa tham số (JSON)
+python -m wallet_tracker list [--all] | report | once | daily | monitor | web
 ```
-Telegram (chỉ nhận từ chat đã cấu hình): `/add <chain> <ví> [ghi chú]`, `/remove <chain> <ví>`, `/list`, `/stats`.
+Telegram: `/add <chain> <ví> [ghi chú]`, `/remove <chain> <ví>`, `/list`, `/stats`.
 
-## Cơ chế
-- **Phát hiện swap**: EVM theo ERC20 Transfer vào/ra ví trong tx do chính ví gửi (bỏ qua airdrop spam); Solana qua Helius parse.
-- **Lọc token**: thanh khoản ≥ $100k, không honeypot, tax ≤ 10% (GoPlus, EVM).
-- **Paper**: 2 book, mỗi book $1000, $100/lệnh, phí+trượt giá 1.5% mỗi chiều, giá vào = giá lúc bot *phát hiện*.
-  - `fixed`: TP +100%, SL −30%, tối đa 72h. `mirror`: bán khi ví nguồn bán, SL −50%, tối đa 7 ngày.
-- **Hợp lưu**: ≥ 2 ví theo dõi mua cùng token trong 1h → đánh dấu 🔥.
-- **Tự thêm ví**: người mua trong 60 phút đầu của token thắng → `candidate`; vào sớm ≥ 2 token → tự theo dõi
-  (`watch_only` nếu trễ trung vị < 60s = sniper, ngược lại `active`). Monitor tự chạy discovery mỗi 6h cho token mà
-  ví theo dõi mua rồi tăng ≥ 5x.
-- **Tự tắt ví**: ví discovery có ≥ 10 lệnh paper đóng mà tổng lỗ → `disabled` (ví nhập tay chỉ cảnh báo).
+## Kiến trúc (thêm tính năng rẻ)
+```
+chains/      adapter theo loại chain (registry ADAPTERS)        -> thêm chain: config.CHAINS hoặc 1 class
+providers/   nguồn lịch sử ví (Zerion, local)                    -> thêm Birdeye...: 1 class
+filters.py   bộ lọc tín hiệu (@signal_filter)                    -> thêm bộ lọc: 1 hàm
+exits.py     luật thoát lệnh (@rule)                             -> thêm luật: 1 hàm + khai báo trong BOOKS
+scoring.py   chỉ số + nhãn ví (@labeler)                         -> thêm nhãn: 1 hàm
+events.py    signal / position_fill / wallet_changed             -> tính năng mới = subscriber
+plugins.py   danh sách subscriber (paper, alerts, + WT_PLUGINS)  -> webhook / Discord / giao dịch thật
+settings.py  tham số lưu DB, sửa trên app                        -> thêm tham số: 1 dòng trong config.DEFAULTS
+web/         Flask: 1 route + 1 template mỗi màn hình
+```
+Luồng: `monitor` lấy swap từ adapter → dựng `Signal` (mua / mua thêm / bán %) → `filters` → lưu → `events.emit("signal")`
+→ `paper` mở/bán theo → `alerts` gửi Telegram. Mỗi 6h: chấm điểm ví → tự thêm ứng viên đạt chuẩn → auto-discovery → tắt ví lỗ.
 
-## Giới hạn Phase 1
-- Discovery chỉ EVM; Solana thêm ví bằng tay.
-- Lần đầu chạy chỉ đặt mốc, không quét lịch sử. Solana: > 100 tx mới giữa 2 vòng poll sẽ bị sót tx cũ.
-- RPC public có giới hạn tốc độ; nếu lỗi nhiều, điền RPC riêng (Alchemy/QuickNode free) trong `.env`.
+## Nhãn ví
+| Nhãn | Ý nghĩa | Mặc định |
+|---|---|---|
+| `sniper` | vào < 60s sau khi mở pool | chỉ alert |
+| `insider` | được creator token nạp tiền | chặn |
+| `bundler` | ≥ 3 ví mua sớm chung nguồn nạp tiền | chặn |
+| `wash_trader` | ≥ 10 lệnh/giờ cùng token, hòa vốn | chặn |
+| `bot_flipper` | ≥ 50% token bán trong < 60s | chặn |
+| `high_winrate` | win ≥ 60%, ≥ 10 token 30D, lãi | — |
+| `losing` | PnL 30D âm | — |
+
+Danh sách chặn sửa ở `BLOCK_LABELS`.
+
+## Giới hạn
+- Discovery chỉ EVM; Solana thêm ví bằng tay. Bundler có thể nhầm khi nguồn nạp tiền là ví sàn (CEX).
+- Lần đầu chạy chỉ đặt mốc, không quét lịch sử. Solana: > 100 tx mới giữa 2 vòng poll sẽ sót tx cũ.
+- RPC public có giới hạn; lỗi nhiều thì điền RPC riêng trong `.env`.
+- Định dạng Zerion API theo tài liệu công khai, chưa chạy thử với key thật.
 
 ## Test
 ```bash

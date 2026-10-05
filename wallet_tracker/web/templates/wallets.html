@@ -1,0 +1,43 @@
+{% extends "base.html" %}{% from "_macros.html" import signed, wallet_link %}
+{% block content %}
+<div class="card"><h3>Thêm ví</h3>
+<form method="post" action="{{ url_for('wallet_add') }}" class="row">
+<label>Chain<select name="chain">{% for c in chains %}<option>{{ c }}</option>{% endfor %}</select></label>
+<label style="flex:1;min-width:240px">Địa chỉ<input name="address" required></label>
+<label>Ghi chú<input name="note"></label>
+<label>Loại<select name="status"><option value="active">smart money (alert + paper)</option><option value="watch_only">sniper (chỉ alert)</option></select></label>
+<button>Thêm</button></form>
+<form method="post" action="{{ url_for('discover') }}" class="row" style="margin-top:10px">
+<label>Discover chain<select name="chain">{% for c in chains %}<option>{{ c }}</option>{% endfor %}</select></label>
+<label style="flex:1;min-width:240px">Token thắng lớn (quét người mua sớm)<input name="token" required></label>
+<label>Phút đầu<input name="minutes" value="60" size="4"></label>
+<button class="ghost">Quét</button></form>
+</div>
+
+<div class="card"><h3>Lọc ví</h3>
+<form class="row">
+<label>Chain<select name="chain"><option value="">tất cả</option>{% for c in chains %}<option {{ 'selected' if a.chain==c }}>{{ c }}</option>{% endfor %}</select></label>
+<label>Trạng thái<select name="status"><option value="">đang dùng</option>{% for s in statuses %}<option {{ 'selected' if a.status==s }}>{{ s }}</option>{% endfor %}</select></label>
+<label>Nhãn<select name="label"><option value="">—</option>{% for l in labels %}<option {{ 'selected' if a.label==l }}>{{ l }}</option>{% endfor %}</select></label>
+<label>Win 30D ≥ %<input name="min_winrate" value="{{ a.min_winrate or '' }}" size="4"></label>
+<label>PnL 30D ≥ $<input name="min_pnl" value="{{ a.min_pnl or '' }}" size="6"></label>
+<label>Token 30D ≥<input name="min_tokens" value="{{ a.min_tokens or '' }}" size="3"></label>
+<label>Vào sớm ≥<input name="min_hits" value="{{ a.min_hits or '' }}" size="3"></label>
+<label>Tìm<input name="q" value="{{ a.q or '' }}" placeholder="địa chỉ / ghi chú"></label>
+<label>Sắp xếp<select name="sort">{% for s in sorts %}<option {{ 'selected' if a.sort==s }}>{{ s }}</option>{% endfor %}</select></label>
+<button>Lọc</button></form></div>
+
+<div class="card"><h3>{{ rows|length }} ví</h3>
+<div class="tbl"><table>
+<tr><th>Ví</th><th>Chain</th><th>Trạng thái</th><th>Nhãn</th><th>Điểm</th><th>PnL 7D</th><th>PnL 30D</th><th>Win 30D</th><th>Token 30D</th><th>Giữ TB</th><th>Vào sớm</th><th>Paper PnL</th><th>Ghi chú</th><th></th></tr>
+{% for w in rows %}
+<tr><td>{{ wallet_link(w.chain, w.address) }}</td><td>{{ w.chain }}</td><td><span class="tag {{ w.status }}">{{ w.status }}</span></td>
+<td class="wrap">{% for l in (w.labels or '').split(',') if l %}<span class="tag {{ l }}">{{ l }}</span>{% endfor %}</td>
+<td>{{ '%.0f'|format(w.score) if w.score is not none else '—' }}</td><td>{{ signed(w.pnl_7d) }}</td><td>{{ signed(w.pnl_30d) }}</td>
+<td>{{ w.winrate_30d|pct }}</td><td>{{ w.tokens_30d if w.tokens_30d is not none else '—' }}</td><td>{{ w.avg_hold_s|hold }}</td>
+<td>{{ w.early_hits }}</td><td>{{ signed(w.paper_pnl) if w.paper_pnl is not none else '—' }}</td><td class="mute">{{ w.note }}</td>
+<td><form class="inline" method="post" action="{{ url_for('wallet_update', chain=w.chain, address=w.address) }}">
+<select name="status" onchange="this.form.submit()">{% for s in statuses %}<option {{ 'selected' if w.status==s }}>{{ s }}</option>{% endfor %}</select></form></td></tr>
+{% else %}<tr><td colspan="14" class="mute">Không có ví</td></tr>{% endfor %}
+</table></div></div>
+{% endblock %}

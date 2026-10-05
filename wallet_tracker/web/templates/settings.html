@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h3>Tham số (JSON) — đã sửa được đánh dấu ●</h3>
+<form method="post"><div class="tbl"><table>
+{% for k, v in values.items() %}
+<tr><td><b>{{ k }}</b>{% if k in overridden %} <span class="up">●</span>{% endif %}</td>
+<td style="width:100%">{% if k == 'BOOKS' %}<textarea name="{{ k }}" rows="18" style="width:100%;font-family:monospace">{{ v }}</textarea>
+{% else %}<input name="{{ k }}" value="{{ v }}" style="width:100%">{% endif %}</td>
+<td>{% if k in overridden %}<button class="ghost" formaction="{{ url_for('settings_reset', key=k) }}">Mặc định</button>{% endif %}</td></tr>
+{% endfor %}</table></div>
+<p class="mute">Luật thoát lệnh trong BOOKS: stop_loss, take_profit, take_profit_ladder, trailing_stop, time_stop. "mirror": true = bán theo tỷ lệ ví nguồn.</p>
+<button>Lưu cài đặt</button></form></div>
+
+<div class="card"><h3>Blacklist token</h3>
+<form method="post" action="{{ url_for('blacklist') }}" class="row">
+<label>Chain<select name="chain"><option value="*">mọi chain</option>{% for c in chains %}<option>{{ c }}</option>{% endfor %}</select></label>
+<label style="flex:1">Token<input name="token" required></label><label>Lý do<input name="reason"></label><button>Thêm</button></form>
+<div class="tbl"><table>{% for b in blacklist %}
+<tr><td>{{ b.chain }}</td><td><code>{{ b.token }}</code></td><td class="mute">{{ b.reason }}</td><td>
+<form class="inline" method="post" action="{{ url_for('blacklist') }}"><input type="hidden" name="action" value="remove">
+<input type="hidden" name="chain" value="{{ b.chain }}"><input type="hidden" name="token" value="{{ b.token }}"><button class="ghost">Xóa</button></form></td></tr>
+{% endfor %}</table></div></div>
+{% endblock %}

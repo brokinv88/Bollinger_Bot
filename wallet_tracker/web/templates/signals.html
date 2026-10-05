@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% from "_macros.html" import signal_rows %}
+{% block content %}
+<div class="card"><form class="row">
+<label>Chain<select name="chain"><option value="">tất cả</option>{% for c in chains %}<option {{ 'selected' if a.chain==c }}>{{ c }}</option>{% endfor %}</select></label>
+<label>Loại<select name="kind"><option value="">tất cả</option>{% for k in kinds %}<option {{ 'selected' if a.kind==k }}>{{ k }}</option>{% endfor %}</select></label>
+<label>Lọc token<select name="passed"><option value="">tất cả</option><option value="1" {{ 'selected' if a.passed=='1' }}>đạt</option><option value="0" {{ 'selected' if a.passed=='0' }}>bị chặn</option></select></label>
+<button>Lọc</button></form></div>
+<div class="card"><h3>{{ rows|length }} tín hiệu</h3>{{ signal_rows(rows) }}</div>
+{% endblock %}

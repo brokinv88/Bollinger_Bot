@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% from "_macros.html" import signed, wallet_link %}
+{% block content %}
+<div class="card"><form class="row">
+<label>Book<select name="book"><option value="">tất cả</option>{% for b in books %}<option {{ 'selected' if a.book==b }}>{{ b }}</option>{% endfor %}</select></label>
+<label>Trạng thái<select name="status"><option value="">tất cả</option>{% for s in ['open','closed'] %}<option {{ 'selected' if a.status==s }}>{{ s }}</option>{% endfor %}</select></label>
+<label>Chain<select name="chain"><option value="">tất cả</option>{% for c in chains %}<option {{ 'selected' if a.chain==c }}>{{ c }}</option>{% endfor %}</select></label>
+<button>Lọc</button></form></div>
+<div class="card"><h3>{{ rows|length }} lệnh</h3><div class="tbl"><table>
+<tr><th>#</th><th>Book</th><th>Token</th><th>Chain</th><th>Ví nguồn</th><th>Vào</th><th>Giá vào</th><th>Trạng thái</th><th>Lý do</th><th>Đã chốt</th><th>PnL</th><th>Khớp lệnh</th></tr>
+{% for p in rows %}
+<tr><td>{{ p.id }}</td><td>{{ p.book }}</td><td><b>{{ p.symbol }}</b></td><td>{{ p.chain }}</td><td>{{ wallet_link(p.chain, p.wallet) }}</td>
+<td>{{ p.entry_ts|dt }}</td><td>{{ '%.6g'|format(p.entry_price) }}</td><td>{{ p.status }}</td><td>{{ p.reason or '' }}</td>
+<td>{{ (p.realized_usd or 0)|money }}</td><td>{{ signed(p.pnl_usd) if p.pnl_usd is not none else '—' }}</td>
+<td><details><summary>{{ fills.get(p.id, [])|length }}</summary>{% for f in fills.get(p.id, []) %}
+<div class="mute">{{ f.ts|dt }} {{ f.side }} {{ f.usd|money }} @ {{ '%.6g'|format(f.price) }} — {{ f.reason }}</div>{% endfor %}</details></td></tr>
+{% else %}<tr><td colspan="12" class="mute">Không có lệnh</td></tr>{% endfor %}
+</table></div></div>
+{% endblock %}

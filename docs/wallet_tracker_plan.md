@@ -1,6 +1,6 @@
 # Plan: Wallet Tracker — theo dõi ví mua sớm / smart money / sniper để copy trade
 
-> Trạng thái: Phase 1 đã code (`wallet_tracker/`, xem `wallet_tracker/README.md`). Chế độ: **Alert Telegram + Paper trade** (không dùng private key, không swap thật).
+> Trạng thái: đã code Phase 1 + chấm ví (Zerion) + paper nâng cao + app web. Hướng dẫn và kiến trúc: `wallet_tracker/README.md`. Chế độ: **Alert Telegram + Paper trade** (không dùng private key, không swap thật).
 
 ## 1. Phạm vi đã chốt
 | Hạng mục | Quyết định |

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wallet Tracker</title>
+<style>
+:root{--bg:#0f1218;--card:#171b24;--line:#262c38;--text:#e6e9ef;--mute:#8b93a7;--acc:#5b8cff;--up:#2fbf71;--down:#ef5350;--warn:#f0b429}
+@media (prefers-color-scheme: light){:root{--bg:#f5f6f8;--card:#fff;--line:#e3e6ec;--text:#1b1f27;--mute:#69708a;--acc:#3a6df0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 -apple-system,Segoe UI,Roboto,sans-serif}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+nav{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:5}
+nav b{margin-right:12px}nav a{padding:6px 10px;border-radius:6px;color:var(--text)}nav a.on{background:var(--acc);color:#fff}
+main{max-width:1280px;margin:0 auto;padding:16px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.big{font-size:24px;font-weight:700}.mute{color:var(--mute)}.up{color:var(--up)}.down{color:var(--down)}
+.tbl{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{color:var(--mute);font-weight:600}
+td.wrap{white-space:normal;min-width:180px}
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;background:var(--line);margin:1px}
+.tag.insider,.tag.wash_trader,.tag.bundler,.tag.bot_flipper,.tag.losing{background:#5c1f24;color:#ffb3b3}
+.tag.high_winrate{background:#174d33;color:#9ff0c4}.tag.sniper{background:#4d3b0f;color:#ffd77a}
+.tag.active{background:#174d33;color:#9ff0c4}.tag.watch_only{background:#4d3b0f;color:#ffd77a}.tag.disabled{opacity:.6}
+form.inline{display:inline}input,select,textarea,button{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+button{background:var(--acc);color:#fff;border:0;cursor:pointer}button.ghost{background:transparent;color:var(--acc);border:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:end}.row label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--mute)}
+.flash{padding:10px 12px;border-radius:8px;margin-bottom:10px;background:#173a63;white-space:pre-line}.flash.error{background:#5c1f24}
+code{font-size:12px}
+</style>
+</head>
+<body>
+<nav>
+  <b>👛 Wallet Tracker</b>
+  {% set ep = request.endpoint %}
+  <a href="{{ url_for('dashboard') }}" class="{{ 'on' if ep=='dashboard' }}">Tổng quan</a>
+  <a href="{{ url_for('wallets') }}" class="{{ 'on' if ep in ('wallets','wallet_detail') }}">Ví</a>
+  <a href="{{ url_for('signals') }}" class="{{ 'on' if ep=='signals' }}">Tín hiệu</a>
+  <a href="{{ url_for('positions') }}" class="{{ 'on' if ep=='positions' }}">Lệnh paper</a>
+  <a href="{{ url_for('settings_page') }}" class="{{ 'on' if ep=='settings_page' }}">Cài đặt</a>
+</nav>
+<main>
+{% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}
+{% block content %}{{ body }}{% endblock %}
+</main>
+</body>
+</html>

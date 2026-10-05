@@ -1,0 +1,37 @@
+{% extends "base.html" %}{% from "_macros.html" import signed, signal_rows %}
+{% block content %}
+<div class="card">
+<h3>Ví {{ w.chain }}</h3>
+<div class="big" style="font-size:16px;word-break:break-all"><code>{{ w.address }}</code></div>
+<div style="margin:6px 0"><span class="tag {{ w.status }}">{{ w.status }}</span> <span class="mute">nguồn: {{ w.source }} · thêm {{ w.added_at|dt }} · vào sớm {{ w.early_hits }} token</span></div>
+<div>{% if w.chain in explorers %}<a target="_blank" href="{{ explorers[w.chain] }}{{ w.address }}">Explorer</a> · {% endif %}
+{% if w.chain in gmgn %}<a target="_blank" href="https://gmgn.ai/{{ gmgn[w.chain] }}/address/{{ w.address }}">GMGN</a> · {% endif %}
+<a target="_blank" href="https://app.zerion.io/{{ w.address }}/overview">Zerion</a></div>
+<form method="post" action="{{ url_for('wallet_update', chain=w.chain, address=w.address) }}" class="row" style="margin-top:10px">
+<label>Trạng thái<select name="status">{% for s in statuses %}<option {{ 'selected' if w.status==s }}>{{ s }}</option>{% endfor %}</select></label>
+<label style="flex:1">Ghi chú<input name="note" value="{{ w.note }}"></label><button>Lưu</button></form>
+<form method="post" action="{{ url_for('wallet_score', chain=w.chain, address=w.address) }}" style="margin-top:8px"><button class="ghost">Chấm điểm ngay</button></form>
+</div>
+
+<div class="grid">
+<div class="card"><h3>PnL 7D / 30D</h3><div class="big">{{ signed(m.pnl_7d if m else none) }} / {{ signed(m.pnl_30d if m else none) }}</div></div>
+<div class="card"><h3>Winrate 7D / 30D</h3><div class="big">{{ (m.winrate_7d if m else none)|pct }} / {{ (m.winrate_30d if m else none)|pct }}</div></div>
+<div class="card"><h3>Token · lệnh 30D</h3><div class="big">{{ m.tokens_30d if m else '—' }} · {{ m.trades_30d if m else '—' }}</div><div class="mute">Volume {{ (m.volume_30d if m else none)|money }}</div></div>
+<div class="card"><h3>Giữ TB · điểm</h3><div class="big">{{ (m.avg_hold_s if m else none)|hold }} · {{ '%.0f'|format(m.score) if m and m.score is not none else '—' }}</div>
+<div class="mute">{{ 'nguồn ' ~ m.source ~ ', cập nhật ' ~ (m.updated_at|dt) if m else 'chưa chấm' }}</div></div>
+<div class="card"><h3>Paper (book fixed)</h3>{% for s in pstats %}<div class="big">{{ signed(s.pnl) }}</div><div class="mute">{{ s.n }} lệnh · win {{ s.winrate|pct }}</div>{% else %}<div class="mute">Chưa có lệnh đóng</div>{% endfor %}</div>
+</div>
+
+<div class="card"><h3>Nhãn</h3>{% for l in labels %}<div><span class="tag {{ l.label }}">{{ l.label }}</span> <span class="mute">{{ l.detail }}</span></div>{% else %}<span class="mute">Không có</span>{% endfor %}</div>
+
+<div class="card"><h3>Vào sớm</h3><div class="tbl"><table><tr><th>Token</th><th>Trễ sau mở pool</th></tr>
+{% for e in early %}<tr><td><b>{{ e.symbol or '' }}</b> <code class="mute">{{ e.token|short }}</code></td><td>{{ e.delay_s|hold }}</td></tr>
+{% else %}<tr><td colspan="2" class="mute">—</td></tr>{% endfor %}</table></div></div>
+
+<div class="card"><h3>Tín hiệu của ví</h3>{{ signal_rows(signals, false) }}</div>
+
+<div class="card"><h3>Lệnh paper theo ví</h3><div class="tbl"><table>
+<tr><th>Book</th><th>Token</th><th>Vào</th><th>Trạng thái</th><th>Lý do</th><th>PnL</th></tr>
+{% for p in positions %}<tr><td>{{ p.book }}</td><td>{{ p.symbol }}</td><td>{{ p.entry_ts|dt }}</td><td>{{ p.status }}</td><td>{{ p.reason or '' }}</td><td>{{ signed(p.pnl_usd) if p.pnl_usd is not none else '—' }}</td></tr>
+{% else %}<tr><td colspan="6" class="mute">—</td></tr>{% endfor %}</table></div></div>
+{% endblock %}

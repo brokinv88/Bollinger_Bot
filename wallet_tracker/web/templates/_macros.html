@@ -1,0 +1,23 @@
+{% macro wallet_link(chain, addr) -%}
+<a href="{{ url_for('wallet_detail', chain=chain, address=addr) }}"><code>{{ addr|short }}</code></a>
+{%- endmacro %}
+{% macro signed(v) -%}
+<span class="{{ 'up' if (v or 0) > 0 else 'down' if (v or 0) < 0 }}">{{ v|money }}</span>
+{%- endmacro %}
+{% macro kind_tag(k) -%}
+<span class="tag">{{ {'buy':'🟢 mua','buy_more':'🟢 mua thêm','sell_partial':'🟠 bán 1 phần','sell_all':'🔴 bán hết'}.get(k,k) }}</span>
+{%- endmacro %}
+{% macro signal_rows(rows, show_wallet=true) %}
+<div class="tbl"><table>
+<tr><th>Lúc</th><th>Loại</th><th>Token</th><th>Chain</th>{% if show_wallet %}<th>Ví</th>{% endif %}<th>Giá</th><th>Thanh khoản</th><th>Hợp lưu</th><th>Kết quả</th></tr>
+{% for s in rows %}
+<tr><td>{{ s.ts|dt }}</td><td>{{ kind_tag(s.kind) }}</td>
+<td><b>{{ s.symbol }}</b> <code class="mute">{{ s.token|short }}</code></td><td>{{ s.chain }}</td>
+{% if show_wallet %}<td>{{ wallet_link(s.chain, s.wallet) }}</td>{% endif %}
+<td>{{ '%.6g'|format(s.price) if s.price else '—' }}</td><td>{{ s.liquidity|money }}</td>
+<td>{{ '🔥 %d'|format(s.confluence) if s.confluence and s.confluence > 1 else '' }}</td>
+<td class="wrap">{% if s.kind in ('buy','buy_more') and not s.passed %}<span class="down">⛔ {{ (s.reasons|fromjson)|join('; ') }}</span>{% endif %}
+{% for x in s.actions|fromjson %}<div class="mute">{{ x }}</div>{% endfor %}</td></tr>
+{% else %}<tr><td colspan="9" class="mute">Chưa có tín hiệu</td></tr>{% endfor %}
+</table></div>
+{% endmacro %}

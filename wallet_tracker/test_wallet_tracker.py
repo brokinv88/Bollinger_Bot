@@ -165,3 +165,28 @@ def test_evm_wallet_swaps_filters_spam_and_quotes(monkeypatch):
     monkeypatch.setattr(c, "decimals", lambda t: 18)
     got = sorted((s["side"], s["tx"], s["amount"]) for s in c.wallet_swaps([W1], 1, 20))
     assert got == [("buy", "0xbuy", 5.0), ("sell", "0xsell", 5.0)]
+
+
+def test_web_pages(conn, monkeypatch, tmp_path):
+    pytest.importorskip("flask")
+    from wallet_tracker.web import create_app
+    db.add_wallet(conn, "base", W1, note="kol")
+    db.set_label(conn, "base", W1, "high_winrate", "win 70%")
+    db.save_metrics(conn, "base", W1, {"pnl_7d": 10, "pnl_30d": 500, "winrate_30d": 0.6, "tokens_30d": 8,
+                                       "score": 50, "avg_hold_s": 7200}, "fake")
+    set_price(monkeypatch, 1.0)
+    monitor.Monitor(conn, clients={}).handle_swap("base", swap(W1, "buy", 10, "0x1"), NOW)
+    paper.snapshot(conn, NOW)
+    path = conn.execute("PRAGMA database_list").fetchone()[2]
+    client = create_app(path).test_client()
+    for url in ["/", "/wallets", "/wallets?min_winrate=50&sort=pnl_30d&label=high_winrate", f"/wallet/base/{W1}",
+                "/signals?passed=1", "/positions?status=open", "/settings"]:
+        r = client.get(url)
+        assert r.status_code == 200, url
+    assert b"MEME" in client.get("/").data and W1[:6].encode() in client.get("/wallets").data
+    client.post("/wallets/add", data={"chain": "base", "address": W2, "status": "watch_only"})
+    assert db.get_wallet(conn, "base", W2)["status"] == "watch_only"
+    client.post("/settings", data={"MIN_LIQUIDITY_USD": "25000"})
+    assert settings.get(conn, "MIN_LIQUIDITY_USD") == 25000.0
+    client.post("/blacklist", data={"chain": "*", "token": TOKEN})
+    assert db.is_blacklisted(conn, "base", TOKEN)
