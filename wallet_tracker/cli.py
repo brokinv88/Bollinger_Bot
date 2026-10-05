@@ -43,6 +43,8 @@ def main(argv=None):
     sub.add_parser("once", help="chạy 1 vòng theo dõi")
     sub.add_parser("daily", help="auto-discovery + tắt ví lỗ + báo cáo")
     sub.add_parser("report", help="thống kê paper trade")
+    dr = sub.add_parser("doctor", help="kiểm tra kết nối Telegram/RPC/Helius/Zerion")
+    dr.add_argument("wallet", nargs="?")
     sc = sub.add_parser("score", help="chấm điểm ví (1 ví hoặc các ví đến hạn)")
     sc.add_argument("chain", nargs="?", choices=list(config.CHAINS))
     sc.add_argument("address", nargs="?")
@@ -120,6 +122,9 @@ def main(argv=None):
         for k, v in settings.all(conn).items():
             if not args.key or k == args.key:
                 print(f"{k} = {json.dumps(v, ensure_ascii=False)}")
+    elif args.cmd == "doctor":
+        from . import doctor
+        doctor.run(args.wallet)
     elif args.cmd == "report":
         print(telegram.format_stats(conn))
         for r in paper.wallet_stats(conn):
