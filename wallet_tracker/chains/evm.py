@@ -9,6 +9,9 @@ import time
 
 import requests
 
+from .. import db
+from .base import ChainAdapter
+
 TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
 WALLET_BATCH = 50
 
@@ -21,13 +24,34 @@ def _addr(topic):
     return "0x" + topic[-40:].lower()
 
 
-class EvmClient:
+class EvmClient(ChainAdapter):
     def __init__(self, chain, cfg):
-        self.chain = chain
-        self.cfg = cfg
-        self.quotes = set(cfg["quotes"])
+        super().__init__(chain, cfg)
         self.session = requests.Session()
         self._tx_from = {}
+        self._decimals = {}
+
+    def poll(self, conn, wallets):
+        head = self.block_number()
+        key = f"block:{self.chain}"
+        cur = db.get_cursor(conn, key)
+        if cur is None:                      # lần đầu: chỉ đặt mốc, không quét lịch sử
+            db.set_cursor(conn, key, head)
+            return []
+        if head <= int(cur) or not wallets:
+            db.set_cursor(conn, key, head)
+            return []
+        swaps = self.wallet_swaps(wallets, int(cur) + 1, head)
+        db.set_cursor(conn, key, head)
+        return swaps
+
+    def decimals(self, token):
+        if token not in self._decimals:
+            try:
+                self._decimals[token] = int(self.rpc("eth_call", [{"to": token, "data": "0x313ce567"}, "latest"]), 16)
+            except Exception:
+                self._decimals[token] = 18
+        return self._decimals[token]
 
     def rpc(self, method, params):
         last = None
@@ -89,7 +113,8 @@ class EvmClient:
                     wallet = _addr(log["topics"][2] if side == "buy" else log["topics"][1])
                     if self.tx_from(log["transactionHash"]) != wallet:
                         continue
-                    amount = int(log["data"], 16) if log["data"] not in ("0x", "") else 0
+                    raw = int(log["data"], 16) if log["data"] not in ("0x", "") else 0
+                    amount = raw / 10 ** self.decimals(token)
                     key = (log["transactionHash"], wallet, token, side)
                     s = agg.setdefault(key, {"wallet": wallet, "token": token, "side": side, "amount": 0,
                                              "tx": log["transactionHash"], "block": int(log["blockNumber"], 16)})

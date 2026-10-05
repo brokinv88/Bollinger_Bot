@@ -1,8 +1,9 @@
 """CLI: python -m wallet_tracker <lệnh>"""
 import argparse
 import csv
+import json
 
-from . import config, db, discovery, paper, telegram
+from . import config, db, discovery, paper, plugins, scoring, settings, telegram
 from .monitor import Monitor, run_daily
 
 
@@ -29,8 +30,20 @@ def main(argv=None):
     sub.add_parser("once", help="chạy 1 vòng theo dõi")
     sub.add_parser("daily", help="auto-discovery + tắt ví lỗ + báo cáo")
     sub.add_parser("report", help="thống kê paper trade")
+    sc = sub.add_parser("score", help="chấm điểm ví (1 ví hoặc các ví đến hạn)")
+    sc.add_argument("chain", nargs="?", choices=list(config.CHAINS))
+    sc.add_argument("address", nargs="?")
+    b = sub.add_parser("blacklist", help="thêm/xóa token blacklist")
+    b.add_argument("action", choices=["add", "remove", "list"])
+    b.add_argument("chain", nargs="?", help="chain hoặc * cho mọi chain")
+    b.add_argument("token", nargs="?")
+    b.add_argument("--reason", default="")
+    st = sub.add_parser("set", help="xem/sửa tham số (giá trị dạng JSON)")
+    st.add_argument("key", nargs="?")
+    st.add_argument("value", nargs="?")
     args = ap.parse_args(argv)
     conn = db.connect()
+    plugins.load()
 
     if args.cmd == "add":
         new = db.add_wallet(conn, args.chain, args.address, status="watch_only" if args.sniper else "active",
@@ -60,6 +73,26 @@ def main(argv=None):
         Monitor(conn).run_once()
     elif args.cmd == "daily":
         run_daily(conn)
+    elif args.cmd == "score":
+        if args.address:
+            m = scoring.score_wallet(conn, args.chain, config.norm(args.chain, args.address))
+            print({k: v for k, v in m.items() if not k.startswith("_")},
+                  db.get_labels(conn, args.chain, config.norm(args.chain, args.address)))
+        else:
+            print(f"Đã chấm {len(scoring.score_due(conn))} ví; tự thêm: {discovery.promote_scored(conn)}")
+    elif args.cmd == "blacklist":
+        if args.action == "add":
+            db.blacklist_add(conn, args.chain, args.token, args.reason)
+        elif args.action == "remove":
+            db.blacklist_remove(conn, args.chain, args.token)
+        for r in conn.execute("SELECT * FROM blacklist"):
+            print(r["chain"], r["token"], r["reason"])
+    elif args.cmd == "set":
+        if args.key and args.value is not None:
+            settings.set(conn, args.key, json.loads(args.value))
+        for k, v in settings.all(conn).items():
+            if not args.key or k == args.key:
+                print(f"{k} = {json.dumps(v, ensure_ascii=False)}")
     elif args.cmd == "report":
         print(telegram.format_stats(conn))
         for r in paper.wallet_stats(conn):

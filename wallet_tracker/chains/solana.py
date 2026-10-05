@@ -3,17 +3,27 @@ import time
 
 import requests
 
-from .. import config
+from .. import config, db
+from .base import ChainAdapter
 
 
-class SolanaClient:
+class SolanaClient(ChainAdapter):
     def __init__(self, chain, cfg):
-        self.chain = chain
-        self.cfg = cfg
-        self.quotes = set(cfg["quotes"])
+        super().__init__(chain, cfg)
         self.session = requests.Session()
 
+    def poll(self, conn, wallets):
+        swaps = []
+        for w in wallets:
+            key = f"sig:{self.chain}:{w}"
+            s, newest = self.wallet_swaps(w, db.get_cursor(conn, key))
+            if newest:
+                db.set_cursor(conn, key, newest)
+            swaps += s
+        return swaps
+
     def rpc(self, method, params):
+        last = None
         for attempt in range(3):
             try:
                 data = self.session.post(self.cfg["rpc"], json={"jsonrpc": "2.0", "id": 1, "method": method,

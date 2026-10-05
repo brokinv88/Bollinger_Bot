@@ -1,4 +1,5 @@
-"""SQLite storage cho Wallet Tracker."""
+"""SQLite storage cho Wallet Tracker (WAL: monitor và app web dùng chung file)."""
+import json
 import sqlite3
 import statistics
 import time
@@ -6,6 +7,7 @@ import time
 from . import config
 
 SCHEMA = """
+CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS wallets (
     chain TEXT, address TEXT,
     status TEXT,            -- active | watch_only | candidate | disabled
@@ -14,6 +16,17 @@ CREATE TABLE IF NOT EXISTS wallets (
     early_hits INTEGER DEFAULT 0,
     added_at INTEGER,
     PRIMARY KEY (chain, address)
+);
+CREATE TABLE IF NOT EXISTS wallet_metrics (
+    chain TEXT, address TEXT, updated_at INTEGER, source TEXT,
+    pnl_7d REAL, pnl_30d REAL, winrate_7d REAL, winrate_30d REAL,
+    trades_7d INTEGER, trades_30d INTEGER, tokens_7d INTEGER, tokens_30d INTEGER,
+    volume_30d REAL, avg_hold_s REAL, score REAL,
+    PRIMARY KEY (chain, address)
+);
+CREATE TABLE IF NOT EXISTS wallet_labels (
+    chain TEXT, address TEXT, label TEXT, detail TEXT DEFAULT '', updated_at INTEGER,
+    PRIMARY KEY (chain, address, label)
 );
 CREATE TABLE IF NOT EXISTS early_buys (
     chain TEXT, token TEXT, wallet TEXT, delay_s REAL,
@@ -26,11 +39,25 @@ CREATE TABLE IF NOT EXISTS trades (
     price REAL,
     UNIQUE (chain, tx, wallet, token, side)
 );
+CREATE TABLE IF NOT EXISTS holdings (
+    chain TEXT, wallet TEXT, token TEXT, qty REAL,
+    PRIMARY KEY (chain, wallet, token)
+);
 CREATE TABLE IF NOT EXISTS tokens (
     chain TEXT, token TEXT, symbol TEXT,
     first_price REAL, first_ts INTEGER, max_price REAL,
     discovered INTEGER DEFAULT 0,
     PRIMARY KEY (chain, token)
+);
+CREATE TABLE IF NOT EXISTS blacklist (
+    chain TEXT, token TEXT, reason TEXT DEFAULT '', added_at INTEGER,
+    PRIMARY KEY (chain, token)
+);
+CREATE TABLE IF NOT EXISTS signals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts INTEGER, chain TEXT, wallet TEXT, token TEXT, symbol TEXT, kind TEXT,
+    price REAL, liquidity REAL, confluence INTEGER, sell_fraction REAL,
+    passed INTEGER, reasons TEXT, actions TEXT, tx TEXT
 );
 CREATE TABLE IF NOT EXISTS positions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -39,13 +66,33 @@ CREATE TABLE IF NOT EXISTS positions (
     status TEXT DEFAULT 'open',
     exit_price REAL, exit_ts INTEGER, reason TEXT, pnl_usd REAL
 );
+CREATE TABLE IF NOT EXISTS fills (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    position_id INTEGER, ts INTEGER, side TEXT, price REAL, qty REAL, usd REAL, reason TEXT
+);
+CREATE TABLE IF NOT EXISTS equity_snapshots (ts INTEGER, book TEXT, equity REAL, cash REAL);
+CREATE INDEX IF NOT EXISTS idx_trades_token ON trades(chain, token, ts);
+CREATE INDEX IF NOT EXISTS idx_signals_ts ON signals(ts);
 """
+
+# Cột thêm sau (migrate DB cũ)
+EXTRA_COLUMNS = {
+    "positions": {"qty": "REAL", "remaining_qty": "REAL", "realized_usd": "REAL DEFAULT 0",
+                  "peak_price": "REAL", "last_price": "REAL", "tp_level": "INTEGER DEFAULT 0"},
+}
 
 
 def connect(path=None):
-    conn = sqlite3.connect(path or config.DB_PATH)
+    conn = sqlite3.connect(path or config.DB_PATH, timeout=30, check_same_thread=False)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA journal_mode=WAL")
     conn.executescript(SCHEMA)
+    for table, cols in EXTRA_COLUMNS.items():
+        have = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+        for col, typ in cols.items():
+            if col not in have:
+                conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {typ}")
+    conn.commit()
     return conn
 
 
@@ -79,6 +126,11 @@ def set_status(conn, chain, address, status):
     return cur.rowcount > 0
 
 
+def set_note(conn, chain, address, note):
+    conn.execute("UPDATE wallets SET note=? WHERE chain=? AND address=?", (note, chain, config.norm(chain, address)))
+    conn.commit()
+
+
 def list_wallets(conn, chain=None, statuses=None):
     sql, args = "SELECT * FROM wallets WHERE 1=1", []
     if chain:
@@ -104,6 +156,37 @@ def median_delay(conn, chain, wallet):
     return statistics.median(r[0] for r in rows) if rows else None
 
 
+# --- metrics / labels ---
+def save_metrics(conn, chain, address, m, source):
+    cols = ["pnl_7d", "pnl_30d", "winrate_7d", "winrate_30d", "trades_7d", "trades_30d", "tokens_7d",
+            "tokens_30d", "volume_30d", "avg_hold_s", "score"]
+    conn.execute(f"INSERT OR REPLACE INTO wallet_metrics(chain,address,updated_at,source,{','.join(cols)})"
+                 f" VALUES (?,?,?,?,{','.join('?' * len(cols))})",
+                 [chain, address, int(time.time()), source] + [m.get(c) for c in cols])
+    conn.commit()
+
+
+def get_metrics(conn, chain, address):
+    return conn.execute("SELECT * FROM wallet_metrics WHERE chain=? AND address=?", (chain, address)).fetchone()
+
+
+def set_label(conn, chain, address, label, detail=""):
+    conn.execute("INSERT OR REPLACE INTO wallet_labels VALUES (?,?,?,?,?)",
+                 (chain, address, label, detail, int(time.time())))
+    conn.commit()
+
+
+def clear_labels(conn, chain, address, labels):
+    conn.executemany("DELETE FROM wallet_labels WHERE chain=? AND address=? AND label=?",
+                     [(chain, address, l) for l in labels])
+    conn.commit()
+
+
+def get_labels(conn, chain, address):
+    return [r[0] for r in conn.execute("SELECT label FROM wallet_labels WHERE chain=? AND address=?",
+                                       (chain, address))]
+
+
 # --- cursors ---
 def get_cursor(conn, key):
     row = conn.execute("SELECT value FROM cursors WHERE key=?", (key,)).fetchone()
@@ -115,12 +198,22 @@ def set_cursor(conn, key, value):
     conn.commit()
 
 
-# --- trades / tokens ---
+# --- trades / holdings / tokens ---
 def insert_trade(conn, chain, wallet, token, side, amount, tx, ts, price=None):
     cur = conn.execute("INSERT OR IGNORE INTO trades(chain,wallet,token,side,amount,tx,ts,price) VALUES (?,?,?,?,?,?,?,?)",
                        (chain, wallet, token, side, amount, tx, ts, price))
     conn.commit()
     return cur.rowcount > 0
+
+
+def update_holding(conn, chain, wallet, token, delta):
+    """Cộng dồn số dư token ví (theo các swap quan sát được). Trả số dư TRƯỚC khi cập nhật."""
+    row = conn.execute("SELECT qty FROM holdings WHERE chain=? AND wallet=? AND token=?",
+                       (chain, wallet, token)).fetchone()
+    before = row[0] if row else 0.0
+    conn.execute("INSERT OR REPLACE INTO holdings VALUES (?,?,?,?)", (chain, wallet, token, max(0.0, before + delta)))
+    conn.commit()
+    return before
 
 
 def distinct_buyers(conn, chain, token, since_ts):
@@ -150,4 +243,37 @@ def pumped_tokens(conn, x):
 def mark_discovered(conn, chain, token):
     conn.execute("INSERT OR IGNORE INTO tokens(chain,token) VALUES (?,?)", (chain, token))
     conn.execute("UPDATE tokens SET discovered=1 WHERE chain=? AND token=?", (chain, token))
+    conn.commit()
+
+
+# --- blacklist ---
+def blacklist_add(conn, chain, token, reason=""):
+    token = token if chain == "*" else config.norm(chain, token)
+    conn.execute("INSERT OR REPLACE INTO blacklist VALUES (?,?,?,?)", (chain, token, reason, int(time.time())))
+    conn.commit()
+
+
+def blacklist_remove(conn, chain, token):
+    conn.execute("DELETE FROM blacklist WHERE chain=? AND token=?", (chain, token))
+    conn.commit()
+
+
+def is_blacklisted(conn, chain, token):
+    return conn.execute("SELECT reason FROM blacklist WHERE (chain=? OR chain='*') AND token=?",
+                        (chain, token)).fetchone()
+
+
+# --- signals ---
+def save_signal(conn, sig):
+    cur = conn.execute(
+        "INSERT INTO signals(ts,chain,wallet,token,symbol,kind,price,liquidity,confluence,sell_fraction,passed,"
+        "reasons,actions,tx) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        (sig.ts, sig.chain, sig.wallet, sig.token, sig.symbol, sig.kind, sig.price, sig.liquidity, sig.confluence,
+         sig.sell_fraction, int(sig.passed), json.dumps(sig.reasons, ensure_ascii=False), "[]", sig.tx))
+    conn.commit()
+    return cur.lastrowid
+
+
+def update_signal_actions(conn, sig):
+    conn.execute("UPDATE signals SET actions=? WHERE id=?", (json.dumps(sig.actions, ensure_ascii=False), sig.id))
     conn.commit()

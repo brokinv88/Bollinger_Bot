@@ -32,29 +32,49 @@ TELEGRAM_CHAT_ID = _env("WT_TELEGRAM_CHAT_ID")
 HELIUS_API_KEY = _env("HELIUS_API_KEY")
 HELIUS_API_URL = _env("HELIUS_API_URL", "https://api.helius.xyz")
 
-# --- Paper trade ---
-PAPER_CAPITAL_USD = 1000.0       # vốn mỗi book
-PAPER_SIZE_USD = 100.0           # mỗi lệnh
-PAPER_COST_PCT = 0.015           # phí + trượt giá mỗi chiều (memecoin thực tế 1-3%)
-BOOKS = {
-    # TP/SL cố định
-    "fixed": {"tp": 1.00, "sl": -0.30, "max_hold_h": 72, "mirror": False},
-    # Bán theo khi ví nguồn bán (+ SL an toàn)
-    "mirror": {"tp": None, "sl": -0.50, "max_hold_h": 168, "mirror": True},
+ZERION_API_KEY = _env("ZERION_API_KEY")      # tùy chọn: lịch sử ví + PnL (free dev key)
+
+# Tham số chỉnh được: giá trị mặc định. Giá trị thực tế đọc qua settings.get() (có thể sửa trên app).
+DEFAULTS = {
+    # Paper trade
+    "PAPER_CAPITAL_USD": 1000.0,     # vốn mỗi book
+    "PAPER_SIZE_USD": 100.0,         # mỗi lệnh
+    "PAPER_COST_PCT": 0.015,         # phí + trượt giá mỗi chiều
+    "BOOKS": {
+        # TP nhiều nấc + trailing + SL + time stop
+        "fixed": {"mirror": False, "exits": [
+            {"rule": "stop_loss", "pct": -0.30},
+            {"rule": "take_profit_ladder", "levels": [[1.0, 0.5], [3.0, 0.25]]},
+            {"rule": "trailing_stop", "activate": 1.0, "pct": 0.30},
+            {"rule": "time_stop", "hours": 72},
+        ]},
+        # Bán theo tỷ lệ ví nguồn bán + SL an toàn
+        "mirror": {"mirror": True, "exits": [
+            {"rule": "stop_loss", "pct": -0.50},
+            {"rule": "time_stop", "hours": 168},
+        ]},
+    },
+    # Lọc token / tín hiệu
+    "MIN_LIQUIDITY_USD": 100000.0,
+    "MAX_TAX": 0.10,
+    "CONFLUENCE_WINDOW_S": 3600,
+    "BLOCK_LABELS": ["insider", "wash_trader", "bundler", "bot_flipper"],
+    "ALERT_KINDS": ["buy", "buy_more", "sell_partial", "sell_all"],
+    # Discovery / chấm ví
+    "DISCOVERY_PUMP_X": 5.0,
+    "DISCOVERY_WINDOW_MIN": 60,
+    "DISCOVERY_MAX_LOGS": 300,
+    "FUNDING_CHECK_MAX": 50,         # số ví mua sớm kiểm tra nguồn tiền (insider/bundler) mỗi token
+    "BUNDLER_MIN_SHARED": 3,         # >= 3 ví mua sớm cùng 1 nguồn nạp tiền -> bundler
+    "PROMOTE_MIN_HITS": 2,
+    "PROMOTE_MIN_WINRATE": 0.55,     # hoặc: chấm điểm đạt winrate/PnL/số token
+    "PROMOTE_MIN_PNL_30D": 1000.0,
+    "PROMOTE_MIN_TOKENS": 5,
+    "SNIPER_DELAY_S": 60,
+    "DEMOTE_MIN_TRADES": 10,
+    "SCORE_MAX_PER_RUN": 30,         # giới hạn gọi API mỗi lần chấm
+    "SCORE_STALE_H": 24,
 }
-
-# --- Lọc token ---
-MIN_LIQUIDITY_USD = 100_000
-MAX_TAX = 0.10
-CONFLUENCE_WINDOW_S = 3600
-
-# --- Discovery / chấm ví ---
-DISCOVERY_PUMP_X = 5.0           # token tăng >= 5x so với giá lúc ví theo dõi mua -> quét người mua sớm
-DISCOVERY_WINDOW_MIN = 60        # người mua trong 60 phút đầu sau khi mở pool
-DISCOVERY_MAX_LOGS = 300
-PROMOTE_MIN_HITS = 2             # vào sớm >= 2 token thắng -> tự thêm vào danh sách theo dõi
-SNIPER_DELAY_S = 60              # trễ trung vị < 60s -> sniper (chỉ alert, không paper)
-DEMOTE_MIN_TRADES = 10           # ví discovery có >= 10 lệnh paper đóng mà lỗ -> tắt
 
 POLL_INTERVAL_S = int(_env("WT_POLL_INTERVAL_S", "30"))
 
@@ -95,6 +115,9 @@ CHAINS = {
         quotes=[a.strip().lower() for a in _env("ROBINHOOD_QUOTES").split(",") if a.strip()],
     ),
 }
+
+ZERION_CHAIN_IDS = {"ethereum": "ethereum", "base": "base", "bsc": "binance-smart-chain", "solana": "solana",
+                    "robinhood": _env("ROBINHOOD_ZERION_ID", "robinhood")}
 
 ENABLED_CHAINS = [c.strip() for c in _env("WT_CHAINS", ",".join(CHAINS)).split(",") if c.strip()]
 

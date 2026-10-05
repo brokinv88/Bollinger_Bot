@@ -46,8 +46,8 @@ def handle_command(conn, text):
 def format_stats(conn):
     lines = ["📊 Paper trade"]
     for book, s in paper.book_stats(conn).items():
-        lines.append(f"{book}: đóng {s['closed']} | win {s['winrate']:.0%} | PnL ${s['pnl']:+.2f} | "
-                     f"mở {s['open']} | tiền mặt ${s['cash']:.0f}")
+        lines.append(f"{book}: equity ${s['equity']:.0f} | đóng {s['closed']} | win {s['winrate']:.0%} | "
+                     f"PnL đã chốt ${s['pnl']:+.2f} | mở {s['open']}")
     return "\n".join(lines)
 
 
