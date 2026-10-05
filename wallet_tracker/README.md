@@ -5,9 +5,8 @@ Plan: [`docs/wallet_tracker_plan.md`](../docs/wallet_tracker_plan.md).
 
 ## Cài đặt (máy local)
 ```bash
-cp wallet_tracker/.env.example wallet_tracker/.env   # điền Telegram bot riêng, HELIUS_API_KEY, ZERION_API_KEY
-./.venv/bin/pip install requests flask
-./run_wallet_tracker.command                         # = python -m wallet_tracker run  -> http://localhost:5050
+./setup_wallet_tracker.command   # 1 lần: tạo .venv, cài thư viện, tạo wallet_tracker/.env rồi mở để điền
+./run_wallet_tracker.command     # chạy monitor + app -> http://localhost:5050
 ```
 - Telegram: tạo bot qua @BotFather, nhắn 1 tin cho bot, lấy chat id ở `https://api.telegram.org/bot<TOKEN>/getUpdates`.
 - `HELIUS_API_KEY` (free): bắt buộc cho Solana. `ZERION_API_KEY` (free dev): chấm PnL/winrate ví + phát hiện insider/bundler.
