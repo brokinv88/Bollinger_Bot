@@ -13,6 +13,7 @@ from .. import db
 from .base import ChainAdapter
 
 TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+QUOTE_SYMBOLS = {"WETH", "ETH", "WBNB", "BNB", "USDC", "USDT", "DAI", "USDBC", "FDUSD", "BUSD", "USDC.E", "USDT0"}
 WALLET_BATCH = 50
 
 
@@ -30,6 +31,9 @@ class EvmClient(ChainAdapter):
         self.session = requests.Session()
         self._tx_from = {}
         self._decimals = {}
+        self._symbols = {}
+        self.endpoints = [u.strip() for u in cfg["rpc"].split(",") if u.strip()]
+        self._ep = 0
 
     def poll(self, conn, wallets):
         head = self.block_number()
@@ -53,20 +57,42 @@ class EvmClient(ChainAdapter):
                 self._decimals[token] = 18
         return self._decimals[token]
 
+    def call(self, url, method, params):
+        r = self.session.post(url, json={"jsonrpc": "2.0", "id": 1, "method": method, "params": params}, timeout=20)
+        data = r.json()
+        if "error" in data:
+            raise RuntimeError(data["error"])
+        return data["result"]
+
     def rpc(self, method, params):
+        """Thử URL đang dùng, lỗi thì lần lượt các URL khác (nhớ URL chạy được)."""
         last = None
-        for attempt in range(3):
+        n = len(self.endpoints)
+        for attempt in range(max(2, n)):
+            i = (self._ep + attempt) % n
             try:
-                r = self.session.post(self.cfg["rpc"], json={"jsonrpc": "2.0", "id": 1, "method": method,
-                                                             "params": params}, timeout=20)
-                data = r.json()
-                if "error" in data:
-                    raise RuntimeError(data["error"])
-                return data["result"]
+                result = self.call(self.endpoints[i], method, params)
+                self._ep = i
+                return result
             except Exception as e:
                 last = e
-                time.sleep(1 + attempt)
+                time.sleep(0.5)
         raise RuntimeError(f"{self.chain} {method}: {last}")
+
+    def is_quote(self, token):
+        """WETH/stable: theo danh sách cấu hình hoặc theo symbol on-chain (chain mới chưa biết địa chỉ)."""
+        if token in self.quotes:
+            return True
+        if token not in self._symbols:
+            sym = ""
+            try:
+                raw = bytes.fromhex(self.rpc("eth_call", [{"to": token, "data": "0x95d89b41"}, "latest"])[2:])
+                sym = (raw[64:64 + int.from_bytes(raw[32:64], "big")] if len(raw) >= 96 else raw).decode(
+                    errors="ignore").strip("\x00 ").upper()
+            except Exception:
+                pass
+            self._symbols[token] = sym
+        return self._symbols[token] in QUOTE_SYMBOLS
 
     def block_number(self):
         return int(self.rpc("eth_blockNumber", []), 16)
@@ -108,7 +134,7 @@ class EvmClient(ChainAdapter):
                     if len(log["topics"]) != 3:          # ERC721 có tokenId indexed
                         continue
                     token = log["address"].lower()
-                    if token in self.quotes:
+                    if self.is_quote(token):
                         continue
                     wallet = _addr(log["topics"][2] if side == "buy" else log["topics"][1])
                     if self.tx_from(log["transactionHash"]) != wallet:

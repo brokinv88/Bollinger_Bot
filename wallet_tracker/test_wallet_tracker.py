@@ -163,6 +163,7 @@ def test_evm_wallet_swaps_filters_spam_and_quotes(monkeypatch):
     monkeypatch.setattr(c, "get_logs", lambda f, t, address=None, topics=None: in_logs if topics[1] is None else out_logs)
     monkeypatch.setattr(c, "tx_from", lambda h: PAIR if h == "0xspam" else W1)
     monkeypatch.setattr(c, "decimals", lambda t: 18)
+    monkeypatch.setattr(c, "is_quote", lambda t: t == weth)
     got = sorted((s["side"], s["tx"], s["amount"]) for s in c.wallet_swaps([W1], 1, 20))
     assert got == [("buy", "0xbuy", 5.0), ("sell", "0xsell", 5.0)]
 
@@ -190,3 +191,18 @@ def test_web_pages(conn, monkeypatch, tmp_path):
     assert settings.get(conn, "MIN_LIQUIDITY_USD") == 25000.0
     client.post("/blacklist", data={"chain": "*", "token": TOKEN})
     assert db.is_blacklisted(conn, "base", TOKEN)
+
+
+def test_evm_rpc_failover(monkeypatch):
+    c = evm.EvmClient("base", {**config.CHAINS["base"], "rpc": "https://bad,https://good"})
+    calls = []
+
+    def fake_call(url, method, params):
+        calls.append(url)
+        if url == "https://bad":
+            raise RuntimeError("Please specify an address")
+        return "0x10"
+    monkeypatch.setattr(c, "call", fake_call)
+    monkeypatch.setattr(evm.time, "sleep", lambda s: None)
+    assert c.block_number() == 16 and c.block_number() == 16
+    assert calls == ["https://bad", "https://good", "https://good"]

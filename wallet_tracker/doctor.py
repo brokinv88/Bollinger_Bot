@@ -5,6 +5,7 @@ import requests
 
 from . import config
 from .chains import make_client
+from .chains.evm import TRANSFER
 
 TEST_WALLET = "0x8f86b823cd79b0cbc328e18b1cc0c66cc1b583f5"
 
@@ -37,14 +38,24 @@ def run(wallet=None):
     _check("DexScreener", dexscreener)
 
     for chain in config.active_chains():
-        def rpc(chain=chain):
-            c = make_client(chain)
-            if config.CHAINS[chain]["kind"] == "evm":
-                head = c.block_number()
-                c.get_logs(head - 20, head, topics=["0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"])
-                return f"block {head}, eth_getLogs OK"
-            return f"slot {c.rpc('getSlot', [])}"
-        _check(f"RPC {chain}", rpc)
+        c = make_client(chain)
+        if config.CHAINS[chain]["kind"] != "evm":
+            _check(f"RPC {chain}", lambda c=c: f"slot {c.rpc('getSlot', [])}")
+            continue
+        ok = []
+        for url in c.endpoints:
+            def logs(url=url):
+                head = int(c.call(url, "eth_blockNumber", []), 16)
+                topic = "0x" + "0" * 24 + wallet[2:].lower()
+                c.call(url, "eth_getLogs", [{"fromBlock": hex(head - 50), "toBlock": hex(head),
+                                             "topics": [TRANSFER, None, [topic]]}])
+                ok.append(url)
+                return f"block {head}, lọc log theo ví OK"
+            _check(f"RPC {chain}", logs)
+            print(f"   ↳ {url}")
+        if not ok:
+            print(f"   ⚠️  {chain}: không URL nào lọc log theo ví được -> điền {chain.upper()}_RPC_URL bằng RPC có key "
+                  f"(Alchemy/dRPC free) trong .env")
 
     if config.HELIUS_API_KEY:
         def helius():
@@ -70,7 +81,7 @@ def run(wallet=None):
         return f"{len(items)} giao dịch trade gần nhất, chain: {', '.join(sorted(c for c in chains if c)) or '—'}"
 
     _check("Zerion API", zerion_raw)
-    for chain in [c for c in ("base", "bsc", "ethereum") if c in config.active_chains()]:
+    for chain in [c for c in ("base", "bsc", "ethereum", "robinhood") if c in config.active_chains()]:
         def zerion_parse(chain=chain):
             trades = p.trades(chain, wallet, 30)
             return f"{len(trades)} lệnh mua/bán 30 ngày" + (f", vd {trades[-1]}" if trades else "")

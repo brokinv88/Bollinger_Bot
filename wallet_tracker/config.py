@@ -81,6 +81,9 @@ POLL_INTERVAL_S = int(_env("WT_POLL_INTERVAL_S", "30"))
 _SOL_RPC = (f"https://mainnet.helius-rpc.com/?api-key={HELIUS_API_KEY}" if HELIUS_API_KEY
             else "https://api.mainnet-beta.solana.com")
 
+# RPC: có thể nhiều URL cách nhau dấu phẩy -> tự chuyển URL khác khi lỗi.
+# Theo dõi ví cần eth_getLogs lọc theo topic (không có address); một số RPC public chặn kiểu này
+# -> chạy "python -m wallet_tracker doctor" để xem URL nào dùng được, hoặc dùng key Alchemy/dRPC free.
 CHAINS = {
     "solana": dict(
         kind="solana", rpc=_env("SOLANA_RPC_URL", _SOL_RPC), dexscreener="solana", goplus=None,
@@ -89,27 +92,27 @@ CHAINS = {
                 "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY2W1PbgM7uHHo3w"],
     ),
     "base": dict(
-        kind="evm", rpc=_env("BASE_RPC_URL", "https://base-rpc.publicnode.com"), block_time=2.0,
+        kind="evm", rpc=_env("BASE_RPC_URL", "https://base.drpc.org,https://mainnet.base.org,https://1rpc.io/base"), block_time=2.0,
         max_range=1000, dexscreener="base", goplus="8453",
         quotes=["0x4200000000000000000000000000000000000006", "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
                 "0xd9aaec86b65d86f6a7b5b1b0c42ffa531710b6ca", "0x50c5725949a6f0c72e6c4a641f24049a917db0cb"],
     ),
     "bsc": dict(
-        kind="evm", rpc=_env("BSC_RPC_URL", "https://bsc-rpc.publicnode.com"), block_time=0.75,
+        kind="evm", rpc=_env("BSC_RPC_URL", "https://bsc.drpc.org,https://1rpc.io/bnb,https://binance.llamarpc.com"), block_time=0.75,
         max_range=1000, dexscreener="bsc", goplus="56",
         quotes=["0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", "0x55d398326f99059ff775485246999027b3197955",
                 "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", "0xe9e7cea3dedca5984780bafc599bd69add087d56",
                 "0xc5f0f7b66764f6ec8c8dff7ba683102295e16409"],
     ),
     "ethereum": dict(
-        kind="evm", rpc=_env("ETH_RPC_URL", "https://ethereum-rpc.publicnode.com"), block_time=12.0,
+        kind="evm", rpc=_env("ETH_RPC_URL", "https://eth.drpc.org,https://1rpc.io/eth,https://eth.llamarpc.com"), block_time=12.0,
         max_range=1000, dexscreener="ethereum", goplus="1",
         quotes=["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                 "0xdac17f958d2ee523a2206206994597c13d831ec7", "0x6b175474e89094c44da98b954eedeac495271d0f"],
     ),
-    # Robinhood Chain (Arbitrum Orbit, EVM). Tắt cho tới khi điền ROBINHOOD_RPC_URL.
+    # Robinhood Chain (Arbitrum Orbit, EVM, chain id 4663). Quote token nhận diện theo symbol (WETH/USDC...).
     "robinhood": dict(
-        kind="evm", rpc=_env("ROBINHOOD_RPC_URL"), block_time=float(_env("ROBINHOOD_BLOCK_TIME", "0.25")),
+        kind="evm", rpc=_env("ROBINHOOD_RPC_URL", "https://rpc.mainnet.chain.robinhood.com"), block_time=float(_env("ROBINHOOD_BLOCK_TIME", "0.25")),
         max_range=int(_env("ROBINHOOD_MAX_RANGE", "5000")), dexscreener=_env("ROBINHOOD_DEXSCREENER_ID", "robinhood"),
         goplus=_env("ROBINHOOD_GOPLUS_ID") or None,
         quotes=[a.strip().lower() for a in _env("ROBINHOOD_QUOTES").split(",") if a.strip()],
