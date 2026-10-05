@@ -7,6 +7,14 @@ from . import config, db, discovery, paper, plugins, scoring, settings, telegram
 from .monitor import Monitor, run_daily
 
 
+def expand_chains(spec):
+    """'evm' -> mọi chain EVM; 'base,bsc' -> danh sách; chain không hợp lệ bị bỏ."""
+    out = []
+    for c in (x.strip() for x in spec.split(",") if x.strip()):
+        out += [k for k, v in config.CHAINS.items() if v["kind"] == "evm"] if c == "evm" else [c]
+    return [c for c in dict.fromkeys(out) if c in config.CHAINS]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="wallet_tracker")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -17,7 +25,7 @@ def main(argv=None):
     a.add_argument("--sniper", action="store_true", help="chỉ alert, không paper")
     i = sub.add_parser("import", help="nhập ví từ CSV (cột: chain,address,status,note)")
     i.add_argument("file")
-    i.add_argument("--chain", choices=list(config.CHAINS), help="chain cho các dòng để trống cột chain")
+    i.add_argument("--chain", default="", help="chain cho dòng để trống cột chain: base | base,bsc | evm (mọi chain EVM)")
     r = sub.add_parser("remove", help="tắt ví")
     r.add_argument("chain", choices=list(config.CHAINS))
     r.add_argument("address")
@@ -58,10 +66,10 @@ def main(argv=None):
         n = 0
         with open(args.file, newline="") as f:
             for row in csv.DictReader(f):
-                chain = (row.get("chain") or "").strip() or args.chain
                 status = (row.get("status") or "").strip() or "active"
-                if chain in config.CHAINS and row.get("address") and status in ("active", "watch_only", "candidate",
-                                                                               "disabled"):
+                if not row.get("address") or status not in ("active", "watch_only", "candidate", "disabled"):
+                    continue
+                for chain in expand_chains((row.get("chain") or "").strip() or args.chain):
                     n += db.add_wallet(conn, chain, row["address"], status=status, note=row.get("note", ""))
         print(f"Đã thêm {n} ví mới")
     elif args.cmd == "remove":
