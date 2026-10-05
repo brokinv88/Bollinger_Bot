@@ -3,7 +3,7 @@ Paper, alert... là subscriber (xem plugins.py), monitor không cần biết."""
 import time
 import traceback
 
-from . import config, db, discovery, events, filters, market, paper, plugins, scoring, settings, telegram
+from . import config, db, discovery, events, filters, market, paper, plugins, portfolio, scoring, settings, telegram
 from .chains import make_client
 from .models import Signal
 
@@ -13,9 +13,10 @@ SNAPSHOT_EVERY_S = 3600
 
 
 def run_daily(conn):
-    """Chấm điểm ví -> tự thêm ứng viên đạt chuẩn -> auto-discovery -> tắt ví lỗ -> báo cáo."""
+    """Chấm điểm ví -> tự thêm ứng viên đạt chuẩn -> cập nhật danh mục -> auto-discovery -> tắt ví lỗ -> báo cáo."""
     scoring.score_due(conn)
     discovery.promote_scored(conn)
+    portfolio.refresh_all(conn)
     msgs = discovery.auto_discover(conn) + discovery.demote_losers(conn) + [telegram.format_stats(conn)]
     telegram.send("\n\n".join(msgs))
 

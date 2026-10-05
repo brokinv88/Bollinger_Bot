@@ -96,3 +96,19 @@ class ZerionProvider:
                 if t.get("direction") == "in" and self._is_quote(chain, t, token) and t.get("sender"):
                     senders.append(config.norm(chain, t["sender"]))
         return list(dict.fromkeys(reversed(senders)))
+
+    def positions(self, chain, wallet):
+        """Token ví đang nắm trên chain (ví thường, không gồm vị thế DeFi), lớn nhất trước."""
+        params = {"currency": "usd", "filter[positions]": "only_simple", "filter[trash]": "only_non_trash",
+                  "filter[chain_ids]": config.ZERION_CHAIN_IDS.get(chain, chain), "sort": "-value", "page[size]": 100}
+        out = []
+        for it in (self._get(f"{API}/wallets/{wallet}/positions/", params).get("data") or []):
+            a = it.get("attributes") or {}
+            info = a.get("fungible_info") or {}
+            token = self._token_id(chain, a)
+            sym = (info.get("symbol") or "?")
+            out.append({"token": token or f"native:{sym}", "symbol": sym, "name": info.get("name") or "",
+                        "qty": float((a.get("quantity") or {}).get("float") or 0),
+                        "value_usd": float(a.get("value") or 0), "price": float(a.get("price") or 0),
+                        "is_quote": self._is_quote(chain, a, token)})
+        return out

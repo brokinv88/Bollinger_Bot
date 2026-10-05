@@ -180,10 +180,14 @@ def test_web_pages(conn, monkeypatch, tmp_path):
     paper.snapshot(conn, NOW)
     path = conn.execute("PRAGMA database_list").fetchone()[2]
     client = create_app(path).test_client()
-    for url in ["/", "/wallets", "/wallets?min_winrate=50&sort=pnl_30d&label=high_winrate", f"/wallet/base/{W1}",
+    db.save_positions(conn, "base", W1, [{"token": TOKEN, "symbol": "MEME", "qty": 10, "value_usd": 500, "price": 50},
+                                         {"token": "native:ETH", "symbol": "ETH", "qty": 1, "value_usd": 3000,
+                                          "is_quote": True}])
+    for url in ["/holdings", "/holdings?quotes=1&min_wallets=1", "/how", "/", "/wallets", "/wallets?min_winrate=50&sort=pnl_30d&label=high_winrate", f"/wallet/base/{W1}",
                 "/signals?passed=1", "/positions?status=open", "/settings"]:
         r = client.get(url)
         assert r.status_code == 200, url
+    assert b"MEME" in client.get("/holdings").data and b"$3,000" not in client.get("/holdings").data
     assert b"MEME" in client.get("/").data and W1[:6].encode() in client.get("/wallets").data
     client.post("/wallets/add", data={"chain": "base", "address": W2, "status": "watch_only"})
     assert db.get_wallet(conn, "base", W2)["status"] == "watch_only"

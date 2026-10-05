@@ -19,6 +19,8 @@ Plan: [`docs/wallet_tracker_plan.md`](../docs/wallet_tracker_plan.md).
 | Tổng quan | Equity từng book, biểu đồ 30 ngày, lệnh đang mở, tín hiệu mới |
 | Ví | Thêm ví, quét người mua sớm (discover), **lọc kiểu Wallet Radar** (chain, trạng thái, nhãn, winrate/PnL/số token 30D, vào sớm), đổi trạng thái |
 | Chi tiết ví | PnL/winrate 7D-30D, thời gian giữ, nhãn + lý do, token vào sớm, tín hiệu, lệnh paper, link Explorer/GMGN/Zerion, chấm điểm ngay |
+| Danh mục | Token các ví theo dõi đang nắm (Zerion), sắp theo số ví cùng nắm, tổng giá trị, link chart |
+| Cách hoạt động | Logic tín hiệu, bộ lọc, luật thoát lệnh với tham số hiện tại |
 | Tín hiệu | Mọi lệnh mua / mua thêm / bán một phần / bán hết, lý do bị chặn, kết quả paper |
 | Lệnh paper | Lọc book/trạng thái, từng lần khớp (TP nấc, trailing, bán theo ví) |
 | Cài đặt | Sửa mọi tham số (ngưỡng, luật thoát lệnh từng book), blacklist token |
@@ -31,6 +33,8 @@ python -m wallet_tracker discover base <token>
 python -m wallet_tracker score [chain ví]                  # chấm 1 ví hoặc các ví đến hạn
 python -m wallet_tracker blacklist add '*' <token> --reason scam
 python -m wallet_tracker set MIN_LIQUIDITY_USD 50000       # xem/sửa tham số (JSON)
+python -m wallet_tracker positions                       # cập nhật danh mục token ví đang nắm
+python -m wallet_tracker doctor                          # kiểm tra kết nối
 python -m wallet_tracker list [--all] | report | once | daily | monitor | web
 ```
 Telegram: `/add <chain> <ví> [ghi chú]`, `/remove <chain> <ví>`, `/list`, `/stats`.

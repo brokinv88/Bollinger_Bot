@@ -43,6 +43,7 @@ def main(argv=None):
     sub.add_parser("once", help="chạy 1 vòng theo dõi")
     sub.add_parser("daily", help="auto-discovery + tắt ví lỗ + báo cáo")
     sub.add_parser("report", help="thống kê paper trade")
+    sub.add_parser("positions", help="cập nhật danh mục token các ví theo dõi đang nắm")
     dr = sub.add_parser("doctor", help="kiểm tra kết nối Telegram/RPC/Helius/Zerion")
     dr.add_argument("wallet", nargs="?")
     sc = sub.add_parser("score", help="chấm điểm ví (1 ví hoặc các ví đến hạn)")
@@ -122,6 +123,11 @@ def main(argv=None):
         for k, v in settings.all(conn).items():
             if not args.key or k == args.key:
                 print(f"{k} = {json.dumps(v, ensure_ascii=False)}")
+    elif args.cmd == "positions":
+        from . import portfolio
+        print(f"Đã cập nhật {portfolio.refresh_all(conn)} ví")
+        for r in portfolio.aggregate(conn)[:30]:
+            print(f"{r['chain']:9} {r['symbol'] or '?':12} {r['n_wallets']} ví  ${r['total_usd'] or 0:>12,.0f}  {r['token']}")
     elif args.cmd == "doctor":
         from . import doctor
         doctor.run(args.wallet)

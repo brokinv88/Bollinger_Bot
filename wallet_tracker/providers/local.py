@@ -15,3 +15,11 @@ class LocalProvider:
 
     def funding_sources(self, chain, wallet):
         return []
+
+    def positions(self, chain, wallet):
+        """Không có Zerion: số dư suy ra từ các swap bot đã thấy (không có giá trị USD)."""
+        rows = self.conn.execute("SELECT h.token, h.qty, t.symbol, t.max_price FROM holdings h LEFT JOIN tokens t"
+                                 " ON t.chain=h.chain AND t.token=h.token WHERE h.chain=? AND h.wallet=? AND h.qty>0",
+                                 (chain, wallet)).fetchall()
+        return [{"token": r["token"], "symbol": r["symbol"] or "?", "qty": r["qty"], "value_usd": None,
+                 "price": None, "is_quote": False} for r in rows]

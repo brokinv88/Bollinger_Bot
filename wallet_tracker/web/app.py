@@ -6,7 +6,7 @@ from datetime import datetime
 
 from flask import Flask, Response, flash, g, redirect, render_template, request, url_for
 
-from .. import config, db, discovery, paper, plugins, scoring, settings
+from .. import config, db, discovery, paper, plugins, portfolio, scoring, settings
 
 EXPLORERS = {"base": "https://basescan.org/address/", "bsc": "https://bscscan.com/address/",
              "ethereum": "https://etherscan.io/address/", "solana": "https://solscan.io/account/"}
@@ -170,7 +170,37 @@ def create_app(db_path=None):
                               (chain, w["address"])).fetchall(),
             positions=c.execute("SELECT * FROM positions WHERE chain=? AND wallet=? ORDER BY id DESC LIMIT 50",
                                 (chain, w["address"])).fetchall(),
-            pstats=paper.wallet_stats(c, "fixed", chain, w["address"]))
+            pstats=paper.wallet_stats(c, "fixed", chain, w["address"]),
+            holdings=db.get_positions(c, chain, w["address"]))
+
+    @app.post("/wallet/<chain>/<address>/positions")
+    def wallet_positions(chain, address):
+        try:
+            rows = portfolio.refresh_wallet(conn(), chain, address)
+            flash(f"Đã cập nhật danh mục: {len(rows)} token")
+        except Exception as e:
+            flash(f"Lỗi cập nhật danh mục: {e}", "error")
+        return redirect(url_for("wallet_detail", chain=chain, address=address))
+
+    # --- Danh mục token các ví đang nắm ---
+    @app.route("/holdings")
+    def holdings():
+        c, a = conn(), request.args
+        rows = portfolio.aggregate(c, a.get("chain") or None, a.get("quotes") == "1", int(a.get("min_wallets") or 1))
+        return render_template("holdings.html", rows=rows, a=a, has_zerion=bool(config.ZERION_API_KEY))
+
+    @app.post("/holdings/refresh")
+    def holdings_refresh():
+        try:
+            flash(f"Đã cập nhật danh mục {portfolio.refresh_all(conn())} ví")
+        except Exception as e:
+            flash(f"Lỗi: {e}", "error")
+        return redirect(url_for("holdings"))
+
+    @app.route("/how")
+    def how():
+        c = conn()
+        return render_template("how.html", s=settings.all(c))
 
     # --- Tín hiệu ---
     @app.route("/signals")

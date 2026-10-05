@@ -22,6 +22,14 @@
 <div class="card"><h3>Paper (book fixed)</h3>{% for s in pstats %}<div class="big">{{ signed(s.pnl) }}</div><div class="mute">{{ s.n }} lệnh · win {{ s.winrate|pct }}</div>{% else %}<div class="mute">Chưa có lệnh đóng</div>{% endfor %}</div>
 </div>
 
+<div class="card"><h3>Token đang nắm ({{ holdings|length }}){% if holdings %} · cập nhật {{ holdings[0].updated_at|dt }}{% endif %}</h3>
+<form method="post" action="{{ url_for('wallet_positions', chain=w.chain, address=w.address) }}" style="margin-bottom:8px"><button class="ghost">Cập nhật danh mục</button></form>
+<div class="tbl"><table><tr><th>Token</th><th>Số lượng</th><th>Giá</th><th>Giá trị</th></tr>
+{% for h in holdings %}<tr><td><b>{{ h.symbol }}</b>{% if h.is_quote %} <span class="tag">quote</span>{% endif %} <code class="mute">{{ h.token|short }}</code></td>
+<td>{{ '{:,.4g}'.format(h.qty) if h.qty else '—' }}</td><td>{{ '%.6g'|format(h.price) if h.price else '—' }}</td><td>{{ h.value_usd|money }}</td></tr>
+{% else %}<tr><td colspan="4" class="mute">Chưa có dữ liệu — bấm "Cập nhật danh mục" (cần ZERION_API_KEY để có giá trị USD)</td></tr>{% endfor %}
+</table></div></div>
+
 <div class="card"><h3>Nhãn</h3>{% for l in labels %}<div><span class="tag {{ l.label }}">{{ l.label }}</span> <span class="mute">{{ l.detail }}</span></div>{% else %}<span class="mute">Không có</span>{% endfor %}</div>
 
 <div class="card"><h3>Vào sớm</h3><div class="tbl"><table><tr><th>Token</th><th>Trễ sau mở pool</th></tr>

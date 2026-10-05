@@ -36,9 +36,11 @@ code{font-size:12px}
   {% set ep = request.endpoint %}
   <a href="{{ url_for('dashboard') }}" class="{{ 'on' if ep=='dashboard' }}">Tổng quan</a>
   <a href="{{ url_for('wallets') }}" class="{{ 'on' if ep in ('wallets','wallet_detail') }}">Ví</a>
+  <a href="{{ url_for('holdings') }}" class="{{ 'on' if ep=='holdings' }}">Danh mục</a>
   <a href="{{ url_for('signals') }}" class="{{ 'on' if ep=='signals' }}">Tín hiệu</a>
   <a href="{{ url_for('positions') }}" class="{{ 'on' if ep=='positions' }}">Lệnh paper</a>
   <a href="{{ url_for('settings_page') }}" class="{{ 'on' if ep=='settings_page' }}">Cài đặt</a>
+  <a href="{{ url_for('how') }}" class="{{ 'on' if ep=='how' }}">Cách hoạt động</a>
 </nav>
 <main>
 {% for cat, msg in get_flashed_messages(with_categories=true) %}<div class="flash {{ cat }}">{{ msg }}</div>{% endfor %}

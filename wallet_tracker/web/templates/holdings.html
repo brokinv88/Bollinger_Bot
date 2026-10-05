@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% from "_macros.html" import wallet_link %}
+{% block content %}
+<div class="card"><h3>Token các ví theo dõi đang nắm</h3>
+{% if not has_zerion %}<div class="flash error">Chưa có ZERION_API_KEY: danh mục chỉ suy ra từ các swap bot đã thấy, không có giá trị USD.</div>{% endif %}
+<form class="row">
+<label>Chain<select name="chain"><option value="">tất cả</option>{% for c in chains %}<option {{ 'selected' if a.chain==c }}>{{ c }}</option>{% endfor %}</select></label>
+<label>Số ví nắm ≥<input name="min_wallets" value="{{ a.min_wallets or 1 }}" size="3"></label>
+<label>Gồm ETH/stable<select name="quotes"><option value="">không</option><option value="1" {{ 'selected' if a.quotes=='1' }}>có</option></select></label>
+<button>Lọc</button></form>
+<form method="post" action="{{ url_for('holdings_refresh') }}" style="margin-top:8px"><button class="ghost">Cập nhật danh mục tất cả ví</button>
+<span class="mute">(tự cập nhật mỗi 6 giờ)</span></form></div>
+
+<div class="card"><h3>{{ rows|length }} token · sắp theo số ví cùng nắm</h3><div class="tbl"><table>
+<tr><th>Token</th><th>Chain</th><th>Số ví nắm</th><th>Tổng giá trị</th><th>Giá</th><th>Ví</th><th></th></tr>
+{% for r in rows %}
+<tr><td><b>{{ r.symbol }}</b> <span class="mute">{{ r.name or '' }}</span><br><code class="mute">{{ r.token|short }}</code></td>
+<td>{{ r.chain }}</td><td><b>{{ r.n_wallets }}</b>{{ ' 🔥' if r.n_wallets >= 3 }}</td><td>{{ r.total_usd|money }}</td>
+<td>{{ '%.6g'|format(r.price) if r.price else '—' }}</td>
+<td class="wrap">{% for w in (r.wallets or '').split(',')[:8] %}{{ wallet_link(r.chain, w) }} {% endfor %}{% if (r.wallets or '').split(',')|length > 8 %}<span class="mute">…</span>{% endif %}</td>
+<td>{% if not r.token.startswith('native:') %}<a target="_blank" href="https://dexscreener.com/{{ r.chain }}/{{ r.token }}">Chart</a>{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="mute">Chưa có dữ liệu — bấm "Cập nhật danh mục tất cả ví"</td></tr>{% endfor %}
+</table></div></div>
+{% endblock %}

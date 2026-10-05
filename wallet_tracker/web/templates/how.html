@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card"><h3>Luồng xử lý mỗi {{ 30 }} giây</h3>
+<ol>
+<li><b>Phát hiện giao dịch</b>: EVM đọc log chuyển token ERC20 vào/ra các ví theo dõi; chỉ tính giao dịch <i>do chính ví gửi</i> (bỏ airdrop rác); WETH/stable không tính là mua token. Solana đọc qua Helius.</li>
+<li><b>Phân loại</b> theo số dư token ví đó bot đã ghi nhận: <span class="tag">mua</span> (lần đầu) · <span class="tag">mua thêm</span> · <span class="tag">bán một phần</span> (tỷ lệ = lượng bán / số dư) · <span class="tag">bán hết</span> (≥ 95%).</li>
+<li><b>Làm giàu</b>: giá, thanh khoản, tuổi pool (DexScreener); <b>hợp lưu</b> = số ví theo dõi cùng mua token trong {{ s.CONFLUENCE_WINDOW_S // 60 }} phút; nhãn ví.</li>
+<li><b>Lọc lệnh MUA</b> (bị chặn vẫn alert, ghi lý do, không paper):
+<ul><li>có giá trên DexScreener</li><li>thanh khoản ≥ {{ s.MIN_LIQUIDITY_USD|money }}</li><li>không nằm trong blacklist</li>
+<li>ví không có nhãn chặn: {{ s.BLOCK_LABELS|join(', ') }}</li><li>không honeypot, thuế mua/bán ≤ {{ s.MAX_TAX|pct }} (GoPlus, chain có hỗ trợ)</li></ul></li>
+<li><b>Hành động</b>:
+<ul><li>Ví <span class="tag active">active</span> (smart money) + lệnh <i>mua lần đầu</i> + qua lọc → mở paper {{ s.PAPER_SIZE_USD|money }} ở mỗi book (vốn {{ s.PAPER_CAPITAL_USD|money }}/book, phí+trượt giá {{ s.PAPER_COST_PCT|pct }}/chiều, giá vào = giá lúc bot <i>phát hiện</i>).</li>
+<li>Ví <span class="tag watch_only">watch_only</span> (sniper) → chỉ alert.</li>
+<li>Mua thêm → chỉ alert. Ví nguồn bán → book <b>mirror</b> bán đúng tỷ lệ đó.</li></ul></li>
+<li><b>Thoát lệnh</b> mỗi vòng theo luật từng book (sửa ở Cài đặt): {% for b, cfg in s.BOOKS.items() %}<br><b>{{ b }}</b>{{ ' (bán theo ví nguồn)' if cfg.mirror }}: {% for r in cfg.exits %}{{ r.rule }}{{ ' ' ~ (r|dictsort|rejectattr(0,'equalto','rule')|map('join','=')|join(', ')) }}{{ '; ' if not loop.last }}{% endfor %}{% endfor %}</li>
+</ol></div>
+<div class="card"><h3>Mỗi 6 giờ</h3>
+<ol><li>Chấm điểm ví (Zerion): PnL/winrate 7D-30D, giữ TB, nhãn bot_flipper / wash_trader / high_winrate / losing.</li>
+<li>Tự thêm ứng viên: vào sớm ≥ {{ s.PROMOTE_MIN_HITS }} token thắng, hoặc win 30D ≥ {{ s.PROMOTE_MIN_WINRATE|pct }}, PnL 30D ≥ {{ s.PROMOTE_MIN_PNL_30D|money }}, ≥ {{ s.PROMOTE_MIN_TOKENS }} token; trễ trung vị &lt; {{ s.SNIPER_DELAY_S }}s → sniper.</li>
+<li>Cập nhật danh mục token các ví đang nắm (trang Danh mục).</li>
+<li>Auto-discovery: token ví theo dõi đã mua rồi tăng ≥ {{ s.DISCOVERY_PUMP_X }}x → quét người mua {{ s.DISCOVERY_WINDOW_MIN }} phút đầu.</li>
+<li>Tắt ví discovery có ≥ {{ s.DEMOTE_MIN_TRADES }} lệnh paper đóng mà tổng lỗ; gửi báo cáo Telegram.</li></ol></div>
+<div class="card"><h3>Đọc tín hiệu thế nào</h3>
+<ul><li><b>Mạnh nhất</b>: 🔥 hợp lưu ≥ 2–3 ví smart money mua cùng token, qua lọc, ví có PnL/winrate 30D tốt.</li>
+<li><b>Trung bình</b>: 1 ví smart money mua lần đầu, qua lọc.</li>
+<li><b>Tham khảo</b>: sniper mua (đã muộn với bạn), mua thêm, tín hiệu bị chặn.</li>
+<li><b>Cảnh báo thoát</b>: ví nguồn bán một phần / bán hết token bạn đang giữ.</li>
+<li>Trang Danh mục: token nhiều ví cùng <i>nắm</i> (không chỉ vừa mua) — xác nhận niềm tin dài hơn.</li></ul></div>
+{% endblock %}

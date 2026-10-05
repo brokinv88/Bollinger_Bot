@@ -70,6 +70,11 @@ CREATE TABLE IF NOT EXISTS fills (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     position_id INTEGER, ts INTEGER, side TEXT, price REAL, qty REAL, usd REAL, reason TEXT
 );
+CREATE TABLE IF NOT EXISTS wallet_positions (
+    chain TEXT, wallet TEXT, token TEXT, symbol TEXT, name TEXT,
+    qty REAL, value_usd REAL, price REAL, is_quote INTEGER DEFAULT 0, updated_at INTEGER,
+    PRIMARY KEY (chain, wallet, token)
+);
 CREATE TABLE IF NOT EXISTS equity_snapshots (ts INTEGER, book TEXT, equity REAL, cash REAL);
 CREATE INDEX IF NOT EXISTS idx_trades_token ON trades(chain, token, ts);
 CREATE INDEX IF NOT EXISTS idx_signals_ts ON signals(ts);
@@ -277,3 +282,19 @@ def save_signal(conn, sig):
 def update_signal_actions(conn, sig):
     conn.execute("UPDATE signals SET actions=? WHERE id=?", (json.dumps(sig.actions, ensure_ascii=False), sig.id))
     conn.commit()
+
+
+# --- danh mục token ví đang nắm ---
+def save_positions(conn, chain, wallet, rows):
+    """Thay toàn bộ danh mục của ví trên chain bằng rows: [{token, symbol, name, qty, value_usd, price, is_quote}]."""
+    now = int(time.time())
+    conn.execute("DELETE FROM wallet_positions WHERE chain=? AND wallet=?", (chain, wallet))
+    conn.executemany("INSERT OR REPLACE INTO wallet_positions VALUES (?,?,?,?,?,?,?,?,?,?)",
+                     [(chain, wallet, r["token"], r.get("symbol"), r.get("name"), r.get("qty"), r.get("value_usd"),
+                       r.get("price"), int(bool(r.get("is_quote"))), now) for r in rows])
+    conn.commit()
+
+
+def get_positions(conn, chain, wallet):
+    return conn.execute("SELECT * FROM wallet_positions WHERE chain=? AND wallet=? ORDER BY value_usd DESC",
+                        (chain, wallet)).fetchall()

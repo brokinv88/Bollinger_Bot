@@ -74,6 +74,7 @@ DEFAULTS = {
     "DEMOTE_MIN_TRADES": 10,
     "SCORE_MAX_PER_RUN": 30,         # giới hạn gọi API mỗi lần chấm
     "SCORE_STALE_H": 24,
+    "MIN_POSITION_USD": 50.0,        # bỏ token giá trị nhỏ (bụi/airdrop rác) khỏi danh mục
 }
 
 POLL_INTERVAL_S = int(_env("WT_POLL_INTERVAL_S", "30"))

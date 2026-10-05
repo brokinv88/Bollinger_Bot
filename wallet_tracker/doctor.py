@@ -81,6 +81,12 @@ def run(wallet=None):
         return f"{len(items)} giao dịch trade gần nhất, chain: {', '.join(sorted(c for c in chains if c)) or '—'}"
 
     _check("Zerion API", zerion_raw)
+    def zerion_positions():
+        rows = p.positions("robinhood" if "robinhood" in config.active_chains() else "base", wallet)
+        top = ", ".join(f"{r['symbol']} ${r['value_usd']:,.0f}" for r in rows[:5])
+        return f"{len(rows)} token đang nắm" + (f": {top}" if top else "")
+
+    _check("Zerion danh mục", zerion_positions)
     for chain in [c for c in ("base", "bsc", "ethereum", "robinhood") if c in config.active_chains()]:
         def zerion_parse(chain=chain):
             trades = p.trades(chain, wallet, 30)
