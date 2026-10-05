@@ -8,10 +8,10 @@ from .monitor import Monitor, run_daily
 
 
 def expand_chains(spec):
-    """'evm' -> mọi chain EVM; 'base,bsc' -> danh sách; chain không hợp lệ bị bỏ."""
+    """'evm' -> mọi chain EVM đang chạy (có RPC); 'base,bsc' -> danh sách; chain không hợp lệ bị bỏ."""
     out = []
     for c in (x.strip() for x in spec.split(",") if x.strip()):
-        out += [k for k, v in config.CHAINS.items() if v["kind"] == "evm"] if c == "evm" else [c]
+        out += [k for k in config.active_chains() if config.CHAINS[k]["kind"] == "evm"] if c == "evm" else [c]
     return [c for c in dict.fromkeys(out) if c in config.CHAINS]
 
 
@@ -72,6 +72,10 @@ def main(argv=None):
                 for chain in expand_chains((row.get("chain") or "").strip() or args.chain):
                     n += db.add_wallet(conn, chain, row["address"], status=status, note=row.get("note", ""))
         print(f"Đã thêm {n} ví mới")
+        if config.ZERION_API_KEY:
+            print(f"Đang chấm điểm... {len(scoring.score_due(conn))} ví (chạy lại 'score' để chấm tiếp)")
+        else:
+            print("Chưa có ZERION_API_KEY: cột PnL/Winrate sẽ trống cho tới khi bot tự ghi nhận giao dịch")
     elif args.cmd == "remove":
         print("Đã tắt" if db.set_status(conn, args.chain, args.address, "disabled") else "Không tìm thấy ví")
     elif args.cmd == "list":
