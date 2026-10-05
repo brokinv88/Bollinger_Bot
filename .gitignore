@@ -10,3 +10,6 @@ C1_C2_strategies/data/
 
 # ảnh research local không push lên repo
 *.jpg
+# wallet_tracker: secrets + DB local
+wallet_tracker/.env
+wallet_tracker/*.db

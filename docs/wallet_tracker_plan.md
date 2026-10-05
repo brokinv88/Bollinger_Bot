@@ -1,6 +1,6 @@
 # Plan: Wallet Tracker — theo dõi ví mua sớm / smart money / sniper để copy trade
 
-> Trạng thái: DRAFT — chưa code. Chế độ: **Alert Telegram + Paper trade** (không dùng private key, không swap thật).
+> Trạng thái: Phase 1 đã code (`wallet_tracker/`, xem `wallet_tracker/README.md`). Chế độ: **Alert Telegram + Paper trade** (không dùng private key, không swap thật).
 
 ## 1. Phạm vi đã chốt
 | Hạng mục | Quyết định |
@@ -66,9 +66,9 @@ wallet_tracker/
 - **LỢI**: ví "smart money" công khai thường bị theo dõi bởi nhiều bot → edge giảm; một số ví cố tình mua nhỏ để dụ người copy rồi xả. → Theo dõi edge decay theo thời gian, loại ví có expectancy giảm.
 - **Paper quá đẹp**: phải mô phỏng giá tại thời điểm *phát hiện* + slippage theo thanh khoản pool, không dùng giá vào của ví nguồn.
 
-## 7. Câu hỏi còn mở (trả lời trước khi code P1)
-1. Vốn giả lập mỗi lệnh paper (vd $100) và tổng vốn?
-2. Ngưỡng thanh khoản tối thiểu của token (vd $20k)?
-3. Có Telegram bot token sẵn trong `config.py`/secrets chưa — dùng chung chat hay chat riêng?
-4. Monitor chạy trên máy bạn hay VPS?
-5. Danh sách ví nhập tay ban đầu (address + chain)?
+## 7. Câu trả lời đã chốt
+1. Paper: $100/lệnh, vốn $1000 mỗi book (tối đa 10 lệnh mở).
+2. Thanh khoản tối thiểu: $100k.
+3. Telegram: bot/chat riêng (`WT_TELEGRAM_BOT_TOKEN`, `WT_TELEGRAM_CHAT_ID`).
+4. Monitor chạy trên máy local.
+5. Ví: thêm tay (CLI / CSV / Telegram `/add`) + tự thêm khi discovery phát hiện ví vào sớm >= 2 token thắng.
