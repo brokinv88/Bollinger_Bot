@@ -1,26 +1,10 @@
 {
- "equity": 2170.762047173432,
+ "equity": 2157.527649978499,
  "peak": 2170.762047173432,
  "day_start_eq": 2000.0,
  "week_start_eq": 2000.0,
- "positions": [
-  {
-   "strategy": "KELT",
-   "symbol": "FLOCKUSDT",
-   "direction": 1,
-   "entry_time": 1788552000000,
-   "entry_px": 0.05224,
-   "atr": 0.0058078571428571415,
-   "trail": 0.04062428571428572,
-   "tp": 0.08708714285714285,
-   "be_done": false,
-   "notional": 53.96826958553685,
-   "margin": 17.98942319517895,
-   "fund": 0.0017134925593407942,
-   "last_i": 449
-  }
- ],
+ "positions": [],
  "cursor": 1788652800000,
  "last_ts": 1788652800000,
- "n_trades": 5
+ "n_trades": 6
 }
